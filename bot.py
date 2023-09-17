@@ -45,8 +45,8 @@ async def running_commands(ctx):
         await ctx.response.send_message("Showing all running processes")
         await c.send(f"-----------------------")
         for id, command in running_commands_dict.items():
-            await c.send(f'''TaskID: {id}\n{command.description}''')
-            await c.send(f"-----------------------")
+            await c.send(f'''Command ID: {id}\n{command.description.strip()}
+-----------------------''')
 
 
 @tree.command(
@@ -72,6 +72,16 @@ async def kill_all_commands(ctx):
     await ctx.response.send_message("All running commands have been terminated.")
 
 
+@tree.command(
+    name="cleanup",
+    description="Clean the current chat for bot messages",
+    guild=discord.Object(id=508383744336461842)
+)
+async def cleanup(ctx, messages_amount: int):
+    await ctx.response.defer()
+    await ctx.channel.purge(limit=messages_amount, check=lambda m: m.author == client.user)
+    await ctx.channel.send(f"Deleted {messages_amount} messages", delete_after=3)
+
 
 
 
@@ -89,6 +99,9 @@ Interval: {interval}
     ''', command)
     running_commands_dict[command_tracker.id] = command_tracker
     await command
+    
+    del running_commands_dict[command_tracker.id]
+    Command.current_ids.remove(command_tracker.id)
       
         
 async def dm_aga_internal(ctx, message: str, amount: int, interval: str):
@@ -97,7 +110,7 @@ async def dm_aga_internal(ctx, message: str, amount: int, interval: str):
     print(f"Found user: {pinged_user.name}{pinged_user.discriminator}")
 
     await ctx.response.send_message(
-        f"Started pinging HA with \nMessage: '{message}'\nAmount {amount} times \nInterval: {eval(interval)} seconds")
+        f"Started annoying HA with \nMessage: {message}\nAmount {amount} times \nInterval: {eval(interval)} seconds")
 
     if pinged_user is None:
         await ctx.followup.send("User not found!")
@@ -129,7 +142,11 @@ Amount: {amount}
 Interval: {interval}
     ''', command)
     running_commands_dict[command_tracker.id] = command_tracker
+    
     await command
+    
+    del running_commands_dict[command_tracker.id]
+    Command.current_ids.remove(command_tracker.id)
         
         
 async def annoy_internal(ctx, user: str, message: str, amount: int, interval: str):
@@ -166,7 +183,12 @@ Message: {message}
 Amount: {amount}
     ''', command)
     running_commands_dict[command_tracker.id] = command_tracker
+    
     await command
+    
+    del running_commands_dict[command_tracker.id]
+    Command.current_ids.remove(command_tracker.id)
+    
   
     
 async def get_attention_internal(ctx, user: str, message: str, amount: int):
@@ -205,6 +227,7 @@ async def help(ctx):
 /annoy <user> <message> <amount> <interval>
 /dm_aga <message> <amount> <interval>
 /get_attention <user> <message> <amount>
+/cleanup <messages_amount>
 
 <interval> is in seconds, but can be evaluated by for example 20*60
 ''')
