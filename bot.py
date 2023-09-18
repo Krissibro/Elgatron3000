@@ -2,100 +2,232 @@ import discord
 from discord import app_commands
 import asyncio
 
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
 
+running_commands_dict = {}
+
+class Command:
+    current_ids = set()
+    
+    def __init__(self, description, task):
+        self.id = self.assign_id()
+        self.description = description
+        self.process = task
+        
+    # Assigns the lowest ID
+    def assign_id(self):
+        i = 1
+        while i in Command.current_ids:
+            i += 1
+        Command.current_ids.add(i)
+        return i
+    
+    def kill(self):
+        self.process.cancel()
+        Command.current_ids.remove(self.id)
+
+
+
 @tree.command(
-    name="dm_ha",
-    description="ping HA as many times as you would like with a given interval!",
+    name="running_commands",
+    description="See the currently running commands",
     guild=discord.Object(id=508383744336461842)
 )
-async def dm_ha(ctx, message: str, amount: int, interval: str):
+async def running_commands(ctx):
+    c = ctx.channel
+    if not running_commands_dict:
+        await ctx.response.send_message("No commands running") 
+        
+    else:
+        await ctx.response.send_message("Showing all running processes")
+
+        for id, command in running_commands_dict.items():
+            await c.send(f'''Command ID: {id}\n{command.description.strip()}
+                -----------------------''')
+
+
+
+@tree.command(
+    name="kill_command",
+    description="Kill a specific running command using an ID",
+    guild=discord.Object(id=508383744336461842)
+)
+async def kill_commands(ctx, id: int):
+    running_commands_dict[id].kill()
+    del running_commands_dict[id]
+    await ctx.response.send_message(f"Command {id} has been terminated")
+
+
+
+@tree.command(
+    name="kill_all_commands",
+    description="Kill all running commands",
+    guild=discord.Object(id=508383744336461842)
+)
+async def kill_all_commands(ctx):
+    for command in running_commands_dict.values():
+        command.kill()
+    running_commands_dict.clear()
+    await ctx.response.send_message("All running commands have been terminated.")
+
+
+
+@tree.command(
+    name="cleanup",
+    description="Clean the current chat for bot messages",
+    guild=discord.Object(id=508383744336461842)
+)
+async def cleanup(ctx, messages_amount: int):
+    await ctx.response.defer()
+    await ctx.channel.purge(limit=messages_amount, check=lambda m: m.author == client.user)
+    await ctx.channel.send(f"Deleted {messages_amount} messages", delete_after=3)
+
+
+
+@tree.command(
+    name="dm_aga",
+    description="Annoy HA as many times as you would like with a given interval!",
+    guild=discord.Object(id=508383744336461842)
+)
+async def dm_aga(ctx, message: str, amount: int, interval: str):
+    command = asyncio.create_task(dm_aga_internal(ctx, message, amount, interval))
+    command_tracker = Command(f'''
+        Command: dm_aga
+        Message: {message}
+        Amount: {amount}
+        Interval: {interval}
+        ''', command)
+    running_commands_dict[command_tracker.id] = command_tracker
+    await command
+    
+    del running_commands_dict[command_tracker.id]
+    Command.current_ids.remove(command_tracker.id)
+
+async def dm_aga_internal(ctx, message: str, amount: int, interval: str):
     pinged_user = await client.fetch_user(276441391502983170)
 
     print(f"Found user: {pinged_user.name}{pinged_user.discriminator}")
 
     await ctx.response.send_message(
-        f"Started pinging HA with \nMessage: '{message}'\nAmount {amount} times \nInterval: {eval(interval)} seconds")
+        f"Started annoying HA with \nMessage: {message}\nAmount {amount} times \nInterval: {eval(interval)} seconds")
 
     if pinged_user is None:
         await ctx.followup.send("User not found!")
         return
+    
     try:
         for i in range(amount):
             await pinged_user.send(message)
             await asyncio.sleep(eval(interval))
+            
     except discord.Forbidden:
         await ctx.followup.send("I don't have permission to send messages to that user!")
 
 
+
 @tree.command(
-    name="prank",
-    description="spam a message at someone!",
+    name="annoy",
+    description="Spam a message at someone!",
     guild=discord.Object(id=508383744336461842)
 )
-async def prank(ctx, user: str, message: str, amount: int, interval: str):
-    await ctx.response.send_message(
-        f"Started pinging {user} with \nMessage: '{message}'\nAmount {amount} times \nInterval: {eval(interval)} seconds")
+async def annoy(ctx, user: str, message: str, amount: int, interval: str):
+    command = asyncio.create_task(annoy_internal(ctx, user, message, amount, interval))
+    command_tracker = Command(f'''
+        Command: annoy
+        User: {user}
+        Message: {message}
+        Amount: {amount}
+        Interval: {interval}
+        ''', command)
+    running_commands_dict[command_tracker.id] = command_tracker
+    
+    await command
+    
+    del running_commands_dict[command_tracker.id]
+    Command.current_ids.remove(command_tracker.id)
+        
+async def annoy_internal(ctx, user: str, message: str, amount: int, interval: str):
+    c = ctx.channel
+    await ctx.response.send_message(f"Started pinging {user} with\nMessage: {message}\nAmount {amount} times \nInterval: {eval(interval)} seconds")
 
     if user is None:
         await ctx.followup.send("User not found!")
         return
+    
     try:
         for i in range(amount):
-            await ctx.followup.send(f"{user} {message}")
+            await c.send(f"{user} {message}")
             await asyncio.sleep(eval(interval))
+            
     except discord.Forbidden:
+        # await c.send()("I don't have permission to send messages to that user!")
         await ctx.followup.send()("I don't have permission to send messages to that user!")
+
 
 
 @tree.command(
     name="get_attention",
-    description="get someones attention!",
+    description="Ping someone x times, once every 60 seconds till they react",
     guild=discord.Object(id=508383744336461842)
 )
-async def get_attention(ctx, user: str, text: str, interval: str):
-    await ctx.response.send_message(
-        f"Started pinging {user} with \nMessage: '{text}'\nInterval: {eval(interval)} minutes")
+async def get_attention(ctx, user: str, message: str, amount: int):
+    command = asyncio.create_task(get_attention_internal(ctx, user, message, amount))
+    command_tracker = Command(f'''
+        Command: get_attention
+        User:    {user}
+        Message: {message}
+        Amount:  {amount}
+        ''', command)
+    running_commands_dict[command_tracker.id] = command_tracker
+    
+    await command
+    
+    del running_commands_dict[command_tracker.id]
+    Command.current_ids.remove(command_tracker.id)
+    
+async def get_attention_internal(ctx, user: str, message: str, amount: int):
+    c = ctx.channel
+    await ctx.response.send_message(f"Started pinging {user} with \nMessage: {message}")
 
     if user is None:
         await ctx.followup.send("User not found!")
+        # await c.send("User not found!")
         return
 
-    for i in range(10):
-        message = await ctx.followup.send(f"react with \U0001F44D to stop being notified\n```{text}{user}```")
+    for i in range(amount):
+        message = await c.send(f'''{user} {message} \nReact with \U0001F44D to stop being notified''')
         await message.add_reaction('\U0001F44D')
 
         def check(reaction, user):
             return user != client.user and reaction.message.id == message.id and str(reaction.emoji) == '\U0001F44D'
 
         try:
-            await client.wait_for('reaction_add', check=check, timeout=60.0 * eval(interval))
-            await ctx.followup.send("Will stop bothering you now :)")
+            await client.wait_for('reaction_add', check=check, timeout=60.0)
+            await c.send("Will stop bothering you now :pensive:")
             break
         except asyncio.TimeoutError:
             return
+        
 
 
 @tree.command(
-    name="pls_help",
-    description="bot info!",
+    name="help",
+    description="Bot info!",
     guild=discord.Object(id=508383744336461842)
 )
-async def pls_help(ctx):
+async def help(ctx):
     await ctx.response.send_message('''
-/prank <user> "<message>" <amount> <interval>
-/dm_HA "<message>" <amount> <interval>
+        /annoy <user> <message> <amount> <interval>
+        /dm_aga <message> <amount> <interval>
+        /get_attention <user> <message> <amount>
+        /cleanup <messages_amount>
 
-<interval> is in seconds, and can be evaluated by for example 20*60
-''')
+        <interval> is in seconds, but can be evaluated by for example 20*60
+        ''')
+
 
 
 @client.event
@@ -104,5 +236,4 @@ async def on_ready():
     print("Ready!")
 
 
-# bot.run("token")
-client.run(os.getenv("TOKEN"))
+client.run("ODM3Nzg0MTQxNjYzMDQzNjk1.GnFD0Z.DTgQW2gO1-yRnJ3eFQ5-ijOoAT1HTD0NLNvwkY")
