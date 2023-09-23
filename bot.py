@@ -1,6 +1,6 @@
 import discord
 from discord import app_commands
-from discord.ui import button
+from datetime import timedelta
 import asyncio
 
 intents = discord.Intents.default()
@@ -97,12 +97,14 @@ async def cleanup(ctx, messages_amount: int):
     guild=discord.Object(id=508383744336461842)
 )
 async def dm_aga(ctx, message: str, amount: int, interval: str):
+    interval = eval(interval)
+
     command = asyncio.create_task(dm_aga_internal(ctx, message, amount, interval))
     command_tracker = Command(f'''
         Command: dm_aga
         Message: {message}
         Amount: {amount}
-        Interval: {interval}
+        Interval: {timedelta(seconds=interval)} 
         ''', command)
     running_commands_dict[command_tracker.id] = command_tracker
     await command
@@ -120,7 +122,7 @@ async def dm_aga_internal(ctx, message: str, amount: int, interval: str):
         description=f"Started annoying HA with \nMessage: {message}"
     )
     embed.add_field(name="Amount:", value=amount, inline=True)
-    embed.add_field(name="Interval:", value=eval(interval), inline=True)
+    embed.add_field(name="Interval:", value=timedelta(seconds=interval), inline=True)
     await ctx.response.send_message(embed = embed)
 
     if pinged_user is None:
@@ -130,7 +132,7 @@ async def dm_aga_internal(ctx, message: str, amount: int, interval: str):
     try:
         for i in range(amount):
             await pinged_user.send(message)
-            await asyncio.sleep(eval(interval))
+            await asyncio.sleep(interval)
             
     except discord.Forbidden:
         await ctx.followup.send("I don't have permission to send messages to that user!")
@@ -143,13 +145,15 @@ async def dm_aga_internal(ctx, message: str, amount: int, interval: str):
     guild=discord.Object(id=508383744336461842)
 )
 async def annoy(ctx, user: str, message: str, amount: int, interval: str):
+    interval = eval(interval)
+
     command = asyncio.create_task(annoy_internal(ctx, user, message, amount, interval))
     command_tracker = Command(f'''
         Command: annoy
         User: {user}
         Message: {message}
         Amount: {amount}
-        Interval: {interval}
+        Interval: {timedelta(seconds=interval)} 
         ''', command)
     running_commands_dict[command_tracker.id] = command_tracker
     
@@ -165,7 +169,7 @@ async def annoy_internal(ctx, user: str, message: str, amount: int, interval: st
         description=f"Started pinging {user} with\nMessage: {message}"
     )
     embed.add_field(name="Amount:", value=amount, inline=True)
-    embed.add_field(name="Interval:", value=eval(interval), inline=True)
+    embed.add_field(name="Interval:", value=timedelta(seconds=interval), inline=True)
     await ctx.response.send_message(embed = embed)
 
     if user is None:
@@ -175,7 +179,7 @@ async def annoy_internal(ctx, user: str, message: str, amount: int, interval: st
     try:
         for i in range(amount):
             await c.send(f"{user} {message}")
-            await asyncio.sleep(eval(interval))
+            await asyncio.sleep(interval)
             
     except discord.Forbidden:
         # await c.send()("I don't have permission to send messages to that user!")
