@@ -1,5 +1,6 @@
 import discord
 from discord import app_commands
+from discord.ui import button
 import asyncio
 
 intents = discord.Intents.default()
@@ -45,8 +46,11 @@ async def running_commands(ctx):
         await ctx.response.send_message("Showing all running processes")
 
         for id, command in running_commands_dict.items():
-            await c.send(f'''Command ID: {id}\n{command.description.strip()}
-                -----------------------''')
+            embed = discord.Embed(
+                title=f"Command {id}",
+                description=command.description.strip()
+                )
+            await c.send(embed=embed)
 
 
 
@@ -111,11 +115,16 @@ async def dm_aga_internal(ctx, message: str, amount: int, interval: str):
 
     print(f"Found user: {pinged_user.name}{pinged_user.discriminator}")
 
-    await ctx.response.send_message(
-        f"Started annoying HA with \nMessage: {message}\nAmount {amount} times \nInterval: {eval(interval)} seconds")
+    embed = discord.Embed(
+        title="DM Aga",
+        description=f"Started annoying HA with \nMessage: {message}"
+    )
+    embed.add_field(name="Amount:", value=amount, inline=True)
+    embed.add_field(name="Interval:", value=eval(interval), inline=True)
+    await ctx.response.send_message(embed = embed)
 
     if pinged_user is None:
-        await ctx.followup.send("User not found!")
+        await ctx.followup.send("User not found!", )
         return
     
     try:
@@ -151,7 +160,13 @@ async def annoy(ctx, user: str, message: str, amount: int, interval: str):
         
 async def annoy_internal(ctx, user: str, message: str, amount: int, interval: str):
     c = ctx.channel
-    await ctx.response.send_message(f"Started pinging {user} with\nMessage: {message}\nAmount {amount} times \nInterval: {eval(interval)} seconds")
+    embed = discord.Embed(
+        title = "Annoy",
+        description=f"Started pinging {user} with\nMessage: {message}"
+    )
+    embed.add_field(name="Amount:", value=amount, inline=True)
+    embed.add_field(name="Interval:", value=eval(interval), inline=True)
+    await ctx.response.send_message(embed = embed)
 
     if user is None:
         await ctx.followup.send("User not found!")
@@ -190,7 +205,11 @@ async def get_attention(ctx, user: str, message: str, amount: int):
     
 async def get_attention_internal(ctx, user: str, message: str, amount: int):
     c = ctx.channel
-    await ctx.response.send_message(f"Started pinging {user} with \nMessage: {message}")
+    embed = discord.Embed(
+        title="get_attention",
+        description= f"Started pinging {user} with Message: {message}"
+    )
+    await ctx.response.send_message(embed = embed)
 
     if user is None:
         await ctx.followup.send("User not found!")
@@ -219,14 +238,16 @@ async def get_attention_internal(ctx, user: str, message: str, amount: int):
     guild=discord.Object(id=508383744336461842)
 )
 async def help(ctx):
-    await ctx.response.send_message('''
-        /annoy <user> <message> <amount> <interval>
-        /dm_aga <message> <amount> <interval>
-        /get_attention <user> <message> <amount>
-        /cleanup <messages_amount>
+    embed = discord.Embed(
+        title="📚 Help"
+        )
+    embed.add_field(name="/annoy", value="<user> <message> <amount> <interval>", inline=False)
+    embed.add_field(name="/dm_aga", value="<message> <amount> <interval>", inline=False)
+    embed.add_field(name="/get_attention", value="<user> <message> <amount>", inline=False)
+    embed.add_field(name="/cleanup", value="<messages_amount>", inline=False)
+    embed.set_footer(text="<interval> is in seconds, but can be evaluated by for example 20*60")
 
-        <interval> is in seconds, but can be evaluated by for example 20*60
-        ''')
+    await ctx.response.send_message(embed = embed)
 
 
 
@@ -236,4 +257,7 @@ async def on_ready():
     print("Ready!")
 
 
-client.run("ODM3Nzg0MTQxNjYzMDQzNjk1.GnFD0Z.DTgQW2gO1-yRnJ3eFQ5-ijOoAT1HTD0NLNvwkY")
+#client.run("ODM3Nzg0MTQxNjYzMDQzNjk1.GnFD0Z.DTgQW2gO1-yRnJ3eFQ5-ijOoAT1HTD0NLNvwkY")
+
+#test bot
+client.run("MTE1NTExOTgyNjY1MDUzMzkxOA.GP7imZ.WI0vvGZjr7baUVbBQatop4yTnm1Tb9bniVkTrw")
