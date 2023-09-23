@@ -38,19 +38,17 @@ class Command:
     guild=discord.Object(id=508383744336461842)
 )
 async def running_commands(ctx):
-    c = ctx.channel
     if not running_commands_dict:
         await ctx.response.send_message("No commands running") 
         
-    else:
-        await ctx.response.send_message("Showing all running processes")
+    await ctx.response.send_message("Showing all running processes")
 
-        for id, command in running_commands_dict.items():
-            embed = discord.Embed(
-                title=f"Command {id}",
-                description=command.description.strip()
-                )
-            await c.send(embed=embed)
+    for id, command in running_commands_dict.items():
+        embed = discord.Embed(
+            title=f"Command {id}",
+            description=command.description.strip()
+            )
+        await ctx.channel.send(embed=embed)
 
 
 
@@ -59,7 +57,7 @@ async def running_commands(ctx):
     description="Kill a specific running command using an ID",
     guild=discord.Object(id=508383744336461842)
 )
-async def kill_commands(ctx, id: int):
+async def kill_command(ctx, id: int):
     running_commands_dict[id].kill()
     del running_commands_dict[id]
     await ctx.response.send_message(f"Command {id} has been terminated")
@@ -75,7 +73,10 @@ async def kill_all_commands(ctx):
     for command in running_commands_dict.values():
         command.kill()
     running_commands_dict.clear()
-    await ctx.response.send_message("All running commands have been terminated.")
+    embed = discord.Embed(
+        title="All running commands have been terminated."
+    )
+    await ctx.response.send_message(embed = embed)
 
 
 
@@ -126,7 +127,7 @@ async def dm_aga_internal(ctx, message: str, amount: int, interval: str):
     await ctx.response.send_message(embed = embed)
 
     if pinged_user is None:
-        await ctx.followup.send("User not found!", )
+        await ctx.followup.send("User not found!")
         return
     
     try:
@@ -163,7 +164,6 @@ async def annoy(ctx, user: str, message: str, amount: int, interval: str):
     Command.current_ids.remove(command_tracker.id)
         
 async def annoy_internal(ctx, user: str, message: str, amount: int, interval: str):
-    c = ctx.channel
     embed = discord.Embed(
         title = "Annoy",
         description=f"Started pinging {user} with\nMessage: {message}"
@@ -178,7 +178,7 @@ async def annoy_internal(ctx, user: str, message: str, amount: int, interval: st
     
     try:
         for i in range(amount):
-            await c.send(f"{user} {message}")
+            await ctx.channel.send(f"{user} {message}")
             await asyncio.sleep(interval)
             
     except discord.Forbidden:
@@ -208,7 +208,6 @@ async def get_attention(ctx, user: str, message: str, amount: int):
     Command.current_ids.remove(command_tracker.id)
     
 async def get_attention_internal(ctx, user: str, message: str, amount: int):
-    c = ctx.channel
     embed = discord.Embed(
         title="get_attention",
         description= f"Started pinging {user} with Message: {message}"
@@ -216,12 +215,14 @@ async def get_attention_internal(ctx, user: str, message: str, amount: int):
     await ctx.response.send_message(embed = embed)
 
     if user is None:
-        await ctx.followup.send("User not found!")
-        # await c.send("User not found!")
+        embed = discord.Embed(
+            title="User not found!"
+        )
+        await ctx.followup.send(embed = embed)
         return
 
     for i in range(amount):
-        message = await c.send(f'''{user} {message} \nReact with \U0001F44D to stop being notified''')
+        message = await ctx.channel.send(f'''{user} {message} \nReact with \U0001F44D to stop being notified''')
         await message.add_reaction('\U0001F44D')
 
         def check(reaction, user):
@@ -229,7 +230,7 @@ async def get_attention_internal(ctx, user: str, message: str, amount: int):
 
         try:
             await client.wait_for('reaction_add', check=check, timeout=60.0)
-            await c.send("Will stop bothering you now :pensive:")
+            await ctx.channel.send("Will stop bothering you now :pensive:")
             break
         except asyncio.TimeoutError:
             return
