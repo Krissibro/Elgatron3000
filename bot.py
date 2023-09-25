@@ -2,6 +2,7 @@ import discord
 from discord import app_commands
 from datetime import timedelta
 import asyncio
+from backend import *
 
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
@@ -13,9 +14,9 @@ running_commands_dict = {}
 class Command:
     current_ids = set()
     
-    def __init__(self, description, task):
+    def __init__(self, embed, task):
         self.id = self.assign_id()
-        self.description = description
+        self.embed = embed
         self.process = task
         
     # Assigns the lowest ID
@@ -44,11 +45,8 @@ async def running_commands(ctx):
     await ctx.response.send_message("Showing all running processes")
 
     for id, command in running_commands_dict.items():
-        embed = discord.Embed(
-            title=f"Command {id}",
-            description=command.description.strip()
-            )
-        await ctx.channel.send(embed=embed)
+        embed = command.embed
+        await ctx.channel.send(f"ID: {id}", embed = embed)
 
 
 
@@ -100,44 +98,21 @@ async def cleanup(ctx, messages_amount: int):
 async def dm_aga(ctx, message: str, amount: int, interval: str):
     interval = eval(interval)
 
-    command = asyncio.create_task(dm_aga_internal(ctx, message, amount, interval))
-    command_tracker = Command(f'''
-        Command: dm_aga
-        Message: {message}
-        Amount: {amount}
-        Interval: {timedelta(seconds=interval)} 
-        ''', command)
+    command = asyncio.create_task(dm_aga_internal(ctx, message, amount, interval, client))
+
+    embed = discord.Embed (
+        title= "Command: DM Aga",
+        description= f"Message: {message}"
+    )
+    embed.add_field(name="Amount:", value= f"{amount}", inline=False)
+    embed.add_field(name="Interval:", value=f"{timedelta(seconds=interval)}", inline=False)
+    
+    command_tracker = Command(embed, command)
     running_commands_dict[command_tracker.id] = command_tracker
     await command
     
     del running_commands_dict[command_tracker.id]
     Command.current_ids.remove(command_tracker.id)
-
-async def dm_aga_internal(ctx, message: str, amount: int, interval: str):
-    pinged_user = await client.fetch_user(276441391502983170)
-
-    print(f"Found user: {pinged_user.name}{pinged_user.discriminator}")
-
-    embed = discord.Embed(
-        title="DM Aga",
-        description=f"Started annoying HA with \nMessage: {message}"
-    )
-    embed.add_field(name="Amount:", value=amount, inline=True)
-    embed.add_field(name="Interval:", value=timedelta(seconds=interval), inline=True)
-    await ctx.response.send_message(embed = embed)
-
-    if pinged_user is None:
-        await ctx.followup.send("User not found!")
-        return
-    
-    try:
-        for i in range(amount):
-            await pinged_user.send(message)
-            await asyncio.sleep(interval)
-            
-    except discord.Forbidden:
-        await ctx.followup.send("I don't have permission to send messages to that user!")
-
 
 
 @tree.command(
@@ -149,41 +124,22 @@ async def annoy(ctx, user: str, message: str, amount: int, interval: str):
     interval = eval(interval)
 
     command = asyncio.create_task(annoy_internal(ctx, user, message, amount, interval))
-    command_tracker = Command(f'''
-        Command: annoy
-        User: {user}
-        Message: {message}
-        Amount: {amount}
-        Interval: {timedelta(seconds=interval)} 
-        ''', command)
+
+    embed = discord.Embed (
+        title= "Command: Annoy",
+        description= f"Message: {message}"
+    )
+    embed.add_field(name="User:", value=f"{user}", inline=False)
+    embed.add_field(name="Amount:", value=f"{amount}", inline=False)
+    embed.add_field(name="Interval:", value=f"{timedelta(seconds=interval)}", inline=False)
+
+    command_tracker = Command(embed, command)
     running_commands_dict[command_tracker.id] = command_tracker
     
     await command
     
     del running_commands_dict[command_tracker.id]
     Command.current_ids.remove(command_tracker.id)
-        
-async def annoy_internal(ctx, user: str, message: str, amount: int, interval: str):
-    embed = discord.Embed(
-        title = "Annoy",
-        description=f"Started pinging {user} with\nMessage: {message}"
-    )
-    embed.add_field(name="Amount:", value=amount, inline=True)
-    embed.add_field(name="Interval:", value=timedelta(seconds=interval), inline=True)
-    await ctx.response.send_message(embed = embed)
-
-    if user is None:
-        await ctx.followup.send("User not found!")
-        return
-    
-    try:
-        for i in range(amount):
-            await ctx.channel.send(f"{user} {message}")
-            await asyncio.sleep(interval)
-            
-    except discord.Forbidden:
-        # await c.send()("I don't have permission to send messages to that user!")
-        await ctx.followup.send()("I don't have permission to send messages to that user!")
 
 
 
@@ -193,47 +149,23 @@ async def annoy_internal(ctx, user: str, message: str, amount: int, interval: st
     guild=discord.Object(id=508383744336461842)
 )
 async def get_attention(ctx, user: str, message: str, amount: int):
-    command = asyncio.create_task(get_attention_internal(ctx, user, message, amount))
-    command_tracker = Command(f'''
-        Command: get_attention
-        User:    {user}
-        Message: {message}
-        Amount:  {amount}
-        ''', command)
+
+    command = asyncio.create_task(get_attention_internal(ctx, user, message, amount, client))
+
+    embed = discord.Embed (
+        title= "Command: Annoy",
+        description= f"Message: {message}"
+    )
+    embed.add_field(name="User:", value=f"{user}", inline=False)
+    embed.add_field(name="Amount:", value=f"{amount}", inline=False)
+
+    command_tracker = Command(embed, command)
     running_commands_dict[command_tracker.id] = command_tracker
     
     await command
     
     del running_commands_dict[command_tracker.id]
     Command.current_ids.remove(command_tracker.id)
-    
-async def get_attention_internal(ctx, user: str, message: str, amount: int):
-    embed = discord.Embed(
-        title="get_attention",
-        description= f"Started pinging {user} with Message: {message}"
-    )
-    await ctx.response.send_message(embed = embed)
-
-    if user is None:
-        embed = discord.Embed(
-            title="User not found!"
-        )
-        await ctx.followup.send(embed = embed)
-        return
-
-    for i in range(amount):
-        message = await ctx.channel.send(f'''{user} {message} \nReact with \U0001F44D to stop being notified''')
-        await message.add_reaction('\U0001F44D')
-
-        def check(reaction, user):
-            return user != client.user and reaction.message.id == message.id and str(reaction.emoji) == '\U0001F44D'
-
-        try:
-            await client.wait_for('reaction_add', check=check, timeout=60.0)
-            await ctx.channel.send("Will stop bothering you now :pensive:")
-            break
-        except asyncio.TimeoutError:
-            return
         
 
 
