@@ -40,13 +40,15 @@ class Command:
 )
 async def running_commands(ctx):
     if not running_commands_dict:
-        await ctx.response.send_message("No commands running") 
+        await ctx.response.send_message(embed = discord.Embed(title="No commands running"))
+        return
         
-    await ctx.response.send_message("Showing all running processes")
+    await ctx.response.send_message(embed = discord.Embed(title="Showing all running processes"))
 
     for id, command in running_commands_dict.items():
         embed = command.embed
-        await ctx.channel.send(f"ID: {id}", embed = embed)
+        embed.add_field(name="ID:", value=f"{id}", indent = True)
+        await ctx.channel.send(embed = embed)
 
 
 
@@ -58,7 +60,7 @@ async def running_commands(ctx):
 async def kill_command(ctx, id: int):
     running_commands_dict[id].kill()
     del running_commands_dict[id]
-    await ctx.response.send_message(f"Command {id} has been terminated")
+    await ctx.response.send_message(embed = discord.Embed(title=f"Command {id} has been terminated"))
 
 
 
@@ -71,10 +73,8 @@ async def kill_all_commands(ctx):
     for command in running_commands_dict.values():
         command.kill()
     running_commands_dict.clear()
-    embed = discord.Embed(
-        title="All running commands have been terminated."
-    )
-    await ctx.response.send_message(embed = embed)
+    
+    await ctx.response.send_message(embed = discord.Embed(title="All running commands have been terminated."))
 
 
 
@@ -86,7 +86,7 @@ async def kill_all_commands(ctx):
 async def cleanup(ctx, messages_amount: int):
     await ctx.response.defer()
     await ctx.channel.purge(limit=messages_amount, check=lambda m: m.author == client.user)
-    await ctx.channel.send(f"Deleted {messages_amount} messages", delete_after=3)
+    await ctx.channel.send(embed = discord.Embed(title=f"Deleted {messages_amount} messages"), delete_after=3)
 
 
 
