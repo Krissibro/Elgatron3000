@@ -47,7 +47,7 @@ async def running_commands(ctx):
 
     for id, command in running_commands_dict.items():
         embed = command.embed
-        embed.add_field(name="ID:", value=f"{id}", indent = True)
+        embed.add_field(name="ID:", value=f"{id}", inline = True)
         await ctx.channel.send(embed = embed)
 
 
@@ -58,6 +58,9 @@ async def running_commands(ctx):
     guild=discord.Object(id=508383744336461842)
 )
 async def kill_command(ctx, id: int):
+    if id not in running_commands_dict:
+        await ctx.response.send_message(embed = discord.Embed(title=f"Command with the ID {id} does not exist"))
+        return
     running_commands_dict[id].kill()
     del running_commands_dict[id]
     await ctx.response.send_message(embed = discord.Embed(title=f"Command {id} has been terminated"))
@@ -175,9 +178,7 @@ async def get_attention(ctx, user: str, message: str, amount: int):
     guild=discord.Object(id=508383744336461842)
 )
 async def help(ctx):
-    embed = discord.Embed(
-        title="📚 Help"
-        )
+    embed = discord.Embed(title="📚 Help")
     embed.add_field(name="/annoy", value="<user> <message> <amount> <interval>", inline=False)
     embed.add_field(name="/dm_aga", value="<message> <amount> <interval>", inline=False)
     embed.add_field(name="/get_attention", value="<user> <message> <amount>", inline=False)
