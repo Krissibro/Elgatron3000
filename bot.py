@@ -202,7 +202,7 @@ async def post_free_games(channel):
             
             for image in game["keyImages"]:
                 if image["type"] == "Thumbnail":
-                    embed.set_thumbnail(url=image["url"])
+                    embed.set_image(url=image["url"])
             
             await channel.send(embed = embed)   
         
