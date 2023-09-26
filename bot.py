@@ -189,7 +189,7 @@ async def free_games_rn(ctx):
      
     
              
-async def post_free_games(channel):    
+async def post_free_games(channel):
     api = EpicGamesStoreAPI()
     free_games = api.get_free_games()["data"]["Catalog"]["searchStore"]["elements"]
     
@@ -271,8 +271,8 @@ async def on_ready():
     print("Ready!")
     
 
-#test bot
-client.run("MTE1NTExOTgyNjY1MDUzMzkxOA.GP7imZ.WI0vvGZjr7baUVbBQatop4yTnm1Tb9bniVkTrw")
+# test bot
+# client.run("MTE1NTExOTgyNjY1MDUzMzkxOA.GP7imZ.WI0vvGZjr7baUVbBQatop4yTnm1Tb9bniVkTrw")
 
 # Actual bot
-#client.run("ODM3Nzg0MTQxNjYzMDQzNjk1.GnFD0Z.DTgQW2gO1-yRnJ3eFQ5-ijOoAT1HTD0NLNvwkY")
+client.run("ODM3Nzg0MTQxNjYzMDQzNjk1.GnFD0Z.DTgQW2gO1-yRnJ3eFQ5-ijOoAT1HTD0NLNvwkY")
