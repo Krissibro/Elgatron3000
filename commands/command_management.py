@@ -1,6 +1,6 @@
 import discord
 
-from utilities.shared import client, tree, running_commands_dict
+from utilities.shared import *
 
 
 

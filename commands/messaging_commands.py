@@ -2,7 +2,7 @@ import discord
 from datetime import timedelta
 import asyncio
 
-from utilities.shared import client, tree, running_commands_dict, Command 
+from utilities.shared import *
 
 
 

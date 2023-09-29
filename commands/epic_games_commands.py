@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, time
 import asyncio
 from epicstore_api import EpicGamesStoreAPI
 
-from utilities.shared import client, tree
+from utilities.shared import *
 
 
 @tree.command(
