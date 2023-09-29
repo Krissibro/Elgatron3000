@@ -1,6 +1,6 @@
 import discord
 
-from utilities.shared import *
+from utils.shared import *
 
 
 
