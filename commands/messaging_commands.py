@@ -14,6 +14,13 @@ from utils.shared import *
 async def annoy(ctx, user: str, message: str, amount: int, interval: str):
     interval = eval(interval)
 
+    if user is None:
+        await ctx.followup.send(embed = discord.Embed(title="User could not be found"))
+        return
+    if interval <= 0:
+        await ctx.followup.send(embed = discord.Embed(title="Interval cannot be less than or equal to 0"))
+        return
+
     command = asyncio.create_task(annoy_internal(ctx, user, message, amount, interval))
 
     embed = discord.Embed(
@@ -35,7 +42,7 @@ async def annoy(ctx, user: str, message: str, amount: int, interval: str):
 
 
 
-async def annoy_internal(ctx, user: str, message: str, amount: int, interval: str):
+async def annoy_internal(ctx, user: str, message: str, amount: int, interval: int):
     embed = discord.Embed(
         title="Annoy",
         description=f"Started pinging {user} with\nMessage: {message}"
@@ -43,10 +50,6 @@ async def annoy_internal(ctx, user: str, message: str, amount: int, interval: st
     embed.add_field(name="Amount:", value=amount, inline=True)
     embed.add_field(name="Interval:", value=timedelta(seconds=interval), inline=True)
     await ctx.response.send_message(embed=embed)
-
-    if user is None:
-        await ctx.followup.send("User not found!")
-        return
 
     try:
         for i in range(amount):
@@ -68,6 +71,10 @@ async def annoy_internal(ctx, user: str, message: str, amount: int, interval: st
 async def dm_aga(ctx, message: str, amount: int, interval: str):
     interval = eval(interval)
 
+    if interval <= 0:
+        await ctx.followup.send(embed = discord.Embed(title="Interval cannot be less than or equal to 0"))
+        return
+
     command = asyncio.create_task(dm_aga_internal(ctx, message, amount, interval, client))
 
     embed = discord.Embed(
@@ -84,9 +91,8 @@ async def dm_aga(ctx, message: str, amount: int, interval: str):
     del running_commands_dict[command_tracker.id]
     Command.current_ids.remove(command_tracker.id)
 
-async def dm_aga_internal(ctx, message: str, amount: int, interval: str, client: discord.Client):
+async def dm_aga_internal(ctx, message: str, amount: int, interval: int, client: discord.Client):
     pinged_user = await client.fetch_user(276441391502983170)
-    print(f"Found user: {pinged_user.name}{pinged_user.discriminator}")
 
     embed = discord.Embed(
         title="DM Aga",
@@ -114,8 +120,17 @@ async def dm_aga_internal(ctx, message: str, amount: int, interval: str, client:
     description="Ping someone x times, once every 60 seconds till they react",
     guild=discord.Object(id=508383744336461842)
 )
-async def get_attention(ctx, user: str, message: str, amount: int):
-    command = asyncio.create_task(get_attention_internal(ctx, user, message, amount, client))
+async def get_attention(ctx, user: str, message: str, amount: int, interval: str):
+    interval = eval(interval)
+
+    if user is None:
+        await ctx.followup.send(embed = discord.Embed(title="User not found"))
+        return
+    if interval <= 0:
+        await ctx.followup.send(embed = discord.Embed(title="Interval cannot be less than or equal to 0"))
+        return
+
+    command = asyncio.create_task(get_attention_internal(ctx, user, message, amount, interval, client))
 
     embed = discord.Embed(
         title="Command: Annoy",
@@ -134,19 +149,12 @@ async def get_attention(ctx, user: str, message: str, amount: int):
 
 
 
-async def get_attention_internal(ctx, user: str, message: str, amount: int, client: discord.Client):
+async def get_attention_internal(ctx, user: str, message: str, amount: int, interval:int, client: discord.Client):
     embed = discord.Embed(
         title="get_attention",
         description=f"Started pinging {user} with Message: {message}"
     )
     await ctx.response.send_message(embed=embed)
-
-    if user is None:
-        embed = discord.Embed(
-            title="User not found!"
-        )
-        await ctx.followup.send(embed=embed)
-        return
 
     for i in range(amount):
         message = await ctx.channel.send(
@@ -157,7 +165,7 @@ async def get_attention_internal(ctx, user: str, message: str, amount: int, clie
             return user != client.user and reaction.message.id == message.id and str(reaction.emoji) == '\U0001F44D'
 
         try:
-            await client.wait_for('reaction_add', check=check, timeout=60.0)
+            await client.wait_for('reaction_add', check=check, timeout=interval)
             await ctx.channel.send(embed=discord.Embed(title="Will stop bothering you now :pensive:"))
             break
         except asyncio.TimeoutError:
