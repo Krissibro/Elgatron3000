@@ -20,6 +20,9 @@ async def annoy(ctx, user: str, message: str, amount: int, interval: str):
     if interval <= 0:
         await ctx.followup.send(embed = discord.Embed(title="Interval cannot be less than or equal to 0"))
         return
+    if amount <= 0:
+        await ctx.followup.send(embed = discord.Embed(title="amount cannot be less than or equal to 0"))
+        return
 
     command = asyncio.create_task(annoy_internal(ctx, user, message, amount, interval))
 
@@ -78,6 +81,9 @@ async def dm_aga(ctx, message: str, amount: int, interval: str):
     if interval <= 0:
         await ctx.followup.send(embed = discord.Embed(title="Interval cannot be less than or equal to 0"))
         return
+    if amount <= 0:
+        await ctx.followup.send(embed = discord.Embed(title="amount cannot be less than or equal to 0"))
+        return
 
     command = asyncio.create_task(dm_aga_internal(ctx, message, amount, interval, client))
 
@@ -129,6 +135,9 @@ async def get_attention(ctx, user: str, message: str, amount: int, interval: str
         return
     if interval <= 0:
         await ctx.followup.send(embed = discord.Embed(title="Interval cannot be less than or equal to 0"))
+        return
+    if amount <= 0:
+        await ctx.followup.send(embed = discord.Embed(title="amount cannot be less than or equal to 0"))
         return
 
     command = asyncio.create_task(get_attention_internal(ctx, user, message, amount, interval, client))
