@@ -11,14 +11,14 @@ from utils.shared import *
 )
 async def running_commands(ctx):
     if not running_commands_dict:
-        await ctx.response.send_message(embed=discord.Embed(title="No commands running"))
+        await ctx.followup.send(embed=discord.Embed(title="No commands running"), delete_after=3, ephemeral = True)
         return
 
-    await ctx.response.send_message(embed=discord.Embed(title="Showing all running processes"))
+    await ctx.response.send_message(embed=discord.Embed(title="Showing all running processes"), ephemeral = True)
 
     for id, command in running_commands_dict.items():
         embed = command.embed
-        await ctx.channel.send(embed=embed)
+        await ctx.channel.send(embed=embed, ephemeral = True)
 
 
 @tree.command(
@@ -28,11 +28,12 @@ async def running_commands(ctx):
 )
 async def kill_command(ctx, id: int):
     if id not in running_commands_dict:
-        await ctx.response.send_message(embed=discord.Embed(title=f"Command with the ID {id} does not exist"))
+        await ctx.response.send_message(embed=discord.Embed(title=f"Command with the ID {id} does not exist"), delete_after=3, ephemeral = True)
         return
+    
     running_commands_dict[id].kill()
     del running_commands_dict[id]
-    await ctx.response.send_message(embed=discord.Embed(title=f"Command {id} has been terminated"))
+    await ctx.response.send_message(embed=discord.Embed(title=f"Command {id} has been terminated"), ephemeral = True)
 
 
 @tree.command(
@@ -45,7 +46,7 @@ async def kill_all_commands(ctx):
         command.kill()
     running_commands_dict.clear()
 
-    await ctx.response.send_message(embed=discord.Embed(title="All running commands have been terminated."))
+    await ctx.response.send_message(embed=discord.Embed(title="All running commands have been terminated."), ephemeral = True)
 
 
 @tree.command(
@@ -54,9 +55,12 @@ async def kill_all_commands(ctx):
     guild=discord.Object(id=508383744336461842)
 )
 async def cleanup(ctx, messages_amount: int):
+    if messages_amount <= 0:
+        await ctx.response.send_message(embed=discord.Embed(title=f"Cannot delete less than 1 message"), delete_after=3, ephemeral = True)
+        return
     await ctx.response.defer()
     await ctx.channel.purge(limit=messages_amount, check=lambda m: m.author == client.user)
-    await ctx.channel.send(embed=discord.Embed(title=f"Deleted {messages_amount} messages"), delete_after=3)
+    await ctx.channel.send(embed=discord.Embed(title=f"Deleted {messages_amount} messages"), delete_after=3, ephemeral = True)
 
 
 @tree.command(

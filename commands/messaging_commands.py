@@ -58,7 +58,6 @@ async def annoy_internal(ctx, user: str, message: str, amount: int, interval: in
             await asyncio.sleep(interval)
 
     except discord.Forbidden:
-        # await c.send()("I don't have permission to send messages to that user!")
         await ctx.followup.send(embed=discord.Embed(title="I don't have permission to send messages to that user!"))
 
 
@@ -82,7 +81,7 @@ async def dm_aga(ctx, message: str, amount: int, interval: str):
         await ctx.followup.send(embed = discord.Embed(title="amount cannot be less than or equal to 0"), delete_after=3, ephemeral = True)
         return
 
-    command = asyncio.create_task(dm_spam_internal(ctx, user, message, amount, interval, client))
+    command = asyncio.create_task(dm_spam_internal(ctx, user, message, amount, interval))
 
     embed = discord.Embed(
         title="Command: DM Aga",
@@ -99,7 +98,7 @@ async def dm_aga(ctx, message: str, amount: int, interval: str):
     Command.current_ids.remove(command_tracker.id)
 
 
-async def dm_spam_internal(ctx, user: str, message: str, amount: int, interval: int, client: discord.Client):
+async def dm_spam_internal(ctx, user: str, message: str, amount: int, interval: int):
     embed = discord.Embed(
         title="DM Aga",
         description=f"Started annoying HA with \nMessage: {message}"
