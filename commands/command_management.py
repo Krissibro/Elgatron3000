@@ -18,7 +18,6 @@ async def running_commands(ctx):
 
     for id, command in running_commands_dict.items():
         embed = command.embed
-        embed.add_field(name="ID:", value=f"{id}", inline=True)
         await ctx.channel.send(embed=embed)
 
 

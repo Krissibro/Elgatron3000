@@ -16,6 +16,7 @@ class Command:
         self.id = self.assign_id()
         self.embed = embed
         self.process = task
+        embed.add_field(name="ID:", value=f"{id}", inline=True)
 
     # Assigns the lowest ID
     def assign_id(self):
