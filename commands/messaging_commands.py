@@ -70,7 +70,11 @@ async def annoy_internal(ctx, user: str, message: str, amount: int, interval: in
 )
 async def dm_aga(ctx, message: str, amount: int, interval: str):
     interval = eval(interval)
+    user = await client.fetch_user(276441391502983170)
 
+    if user is None:
+        await ctx.followup.send(embed=discord.Embed(title="User not found!"))
+        return
     if interval <= 0:
         await ctx.followup.send(embed = discord.Embed(title="Interval cannot be less than or equal to 0"))
         return
@@ -100,11 +104,8 @@ async def dm_aga_internal(ctx, message: str, amount: int, interval: int, client:
     )
     embed.add_field(name="Amount:", value=amount, inline=True)
     embed.add_field(name="Interval:", value=timedelta(seconds=interval), inline=True)
-    await ctx.response.send_message(embed=embed)
 
-    if pinged_user is None:
-        await ctx.followup.send(embed=discord.Embed(title="User not found!"))
-        return
+    await ctx.response.send_message(embed=embed)
 
     try:
         for i in range(amount):
@@ -149,16 +150,21 @@ async def get_attention(ctx, user: str, message: str, amount: int, interval: str
 
 
 
-async def get_attention_internal(ctx, user: str, message: str, amount: int, interval:int, client: discord.Client):
+async def get_attention_internal(ctx, user: str, msg: str, amount: int, interval:int, client: discord.Client):
     embed = discord.Embed(
-        title="get_attention",
-        description=f"Started pinging {user} with Message: {message}"
+        title="Get attention",
+        description=f"Started pinging {user} with Message: {msg}"
     )
+    embed.add_field(name="User:", value=f"{user}", inline=False)
+    embed.add_field(name="Amount:", value=f"{amount}", inline=False)
+    embed.add_field(name="Interval:", value=f"{timedelta(seconds=interval)}", inline=False)
     await ctx.response.send_message(embed=embed)
 
     for i in range(amount):
-        message = await ctx.channel.send(
-            embed=discord.Embed(title=f"{user} {message}\nReact with \U0001F44D to stop being notified"))
+        message = await ctx.channel.send(f"{user}",
+            embed=discord.Embed(
+                                title=f"{msg}",
+                                description="React with \U0001F44D to stop being notified"))
         await message.add_reaction('\U0001F44D')
 
         def check(reaction, user):
@@ -169,4 +175,4 @@ async def get_attention_internal(ctx, user: str, message: str, amount: int, inte
             await ctx.channel.send(embed=discord.Embed(title="Will stop bothering you now :pensive:"))
             break
         except asyncio.TimeoutError:
-            return
+            continue
