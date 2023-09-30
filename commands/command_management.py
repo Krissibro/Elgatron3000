@@ -59,7 +59,6 @@ async def cleanup(ctx, messages_amount: int):
     await ctx.channel.send(embed=discord.Embed(title=f"Deleted {messages_amount} messages"), delete_after=3)
 
 
-
 @tree.command(
     name="help",
     description="Bot info!",
@@ -69,7 +68,7 @@ async def help(ctx):
     embed = discord.Embed(title="📚 Help")
     embed.add_field(name="/annoy", value="<user> <message> <amount> <interval>", inline=False)
     embed.add_field(name="/dm_aga", value="<message> <amount> <interval>", inline=False)
-    embed.add_field(name="/get_attention", value="<user> <message> <amount>", inline=False)
+    embed.add_field(name="/get_attention", value="<user> <message> <amount> <interval>", inline=False)
     embed.add_field(name="/free_games_rn", value="See free games from Epic Games", inline=False)
     embed.add_field(name="/cleanup", value="<messages_amount>", inline=False)
     embed.add_field(name="/running_commands", value="See running commands and their IDs", inline=False)
@@ -77,4 +76,4 @@ async def help(ctx):
     embed.add_field(name="/kill_all_commands", value="Kill all commands, try to use /kill_command first", inline=False)
     embed.set_footer(text="<interval> is in seconds, but can be evaluated by for example 20*60")
 
-    await ctx.response.send_message(embed = embed)
+    await ctx.response.send_message(embed = embed, ephemeral = True)

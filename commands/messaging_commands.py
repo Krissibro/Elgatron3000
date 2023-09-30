@@ -15,13 +15,13 @@ async def annoy(ctx, user: str, message: str, amount: int, interval: str):
     interval = eval(interval)
 
     if user is None:
-        await ctx.followup.send(embed = discord.Embed(title="User could not be found"))
+        await ctx.followup.send(embed = discord.Embed(title="User could not be found"), delete_after=3, ephemeral = True)
         return
     if interval <= 0:
-        await ctx.followup.send(embed = discord.Embed(title="Interval cannot be less than or equal to 0"))
+        await ctx.followup.send(embed = discord.Embed(title="Interval cannot be less than or equal to 0"), delete_after=3, ephemeral = True)
         return
     if amount <= 0:
-        await ctx.followup.send(embed = discord.Embed(title="amount cannot be less than or equal to 0"))
+        await ctx.followup.send(embed = discord.Embed(title="amount cannot be less than or equal to 0"), delete_after=3, ephemeral = True)
         return
 
     command = asyncio.create_task(annoy_internal(ctx, user, message, amount, interval))
@@ -43,8 +43,6 @@ async def annoy(ctx, user: str, message: str, amount: int, interval: str):
     Command.current_ids.remove(command_tracker.id)
 
 
-
-
 async def annoy_internal(ctx, user: str, message: str, amount: int, interval: int):
     embed = discord.Embed(
         title="Annoy",
@@ -52,7 +50,7 @@ async def annoy_internal(ctx, user: str, message: str, amount: int, interval: in
     )
     embed.add_field(name="Amount:", value=amount, inline=True)
     embed.add_field(name="Interval:", value=timedelta(seconds=interval), inline=True)
-    await ctx.response.send_message(embed=embed)
+    await ctx.response.send_message(embed=embed, ephemeral = True)
 
     try:
         for i in range(amount):
@@ -62,7 +60,6 @@ async def annoy_internal(ctx, user: str, message: str, amount: int, interval: in
     except discord.Forbidden:
         # await c.send()("I don't have permission to send messages to that user!")
         await ctx.followup.send(embed=discord.Embed(title="I don't have permission to send messages to that user!"))
-
 
 
 
@@ -76,16 +73,16 @@ async def dm_aga(ctx, message: str, amount: int, interval: str):
     user = await client.fetch_user(276441391502983170)
 
     if user is None:
-        await ctx.followup.send(embed=discord.Embed(title="User not found!"))
+        await ctx.followup.send(embed=discord.Embed(title="User not found!"), delete_after=3, ephemeral = True)
         return
     if interval <= 0:
-        await ctx.followup.send(embed = discord.Embed(title="Interval cannot be less than or equal to 0"))
+        await ctx.followup.send(embed = discord.Embed(title="Interval cannot be less than or equal to 0"), delete_after=3, ephemeral = True)
         return
     if amount <= 0:
-        await ctx.followup.send(embed = discord.Embed(title="amount cannot be less than or equal to 0"))
+        await ctx.followup.send(embed = discord.Embed(title="amount cannot be less than or equal to 0"), delete_after=3, ephemeral = True)
         return
 
-    command = asyncio.create_task(dm_aga_internal(ctx, message, amount, interval, client))
+    command = asyncio.create_task(dm_spam_internal(ctx, user, message, amount, interval, client))
 
     embed = discord.Embed(
         title="Command: DM Aga",
@@ -101,9 +98,8 @@ async def dm_aga(ctx, message: str, amount: int, interval: str):
     del running_commands_dict[command_tracker.id]
     Command.current_ids.remove(command_tracker.id)
 
-async def dm_aga_internal(ctx, message: str, amount: int, interval: int, client: discord.Client):
-    pinged_user = await client.fetch_user(276441391502983170)
 
+async def dm_spam_internal(ctx, user: str, message: str, amount: int, interval: int, client: discord.Client):
     embed = discord.Embed(
         title="DM Aga",
         description=f"Started annoying HA with \nMessage: {message}"
@@ -111,15 +107,16 @@ async def dm_aga_internal(ctx, message: str, amount: int, interval: int, client:
     embed.add_field(name="Amount:", value=amount, inline=True)
     embed.add_field(name="Interval:", value=timedelta(seconds=interval), inline=True)
 
-    await ctx.response.send_message(embed=embed)
+    await ctx.response.send_message(embed=embed, ephemeral = True)
 
     try:
         for i in range(amount):
-            await pinged_user.send(message)
+            await user.send(message)
             await asyncio.sleep(interval)
 
     except discord.Forbidden:
         await ctx.followup.send(embed=discord.Embed(title="I don't have permission to send messages to that user!"))
+
 
 
 @tree.command(
@@ -131,13 +128,13 @@ async def get_attention(ctx, user: str, message: str, amount: int, interval: str
     interval = eval(interval)
 
     if user is None:
-        await ctx.followup.send(embed = discord.Embed(title="User not found"))
+        await ctx.followup.send(embed = discord.Embed(title="User not found"), delete_after=3, ephemeral = True)
         return
     if interval <= 0:
-        await ctx.followup.send(embed = discord.Embed(title="Interval cannot be less than or equal to 0"))
+        await ctx.followup.send(embed = discord.Embed(title="Interval cannot be less than or equal to 0"), delete_after=3, ephemeral = True)
         return
     if amount <= 0:
-        await ctx.followup.send(embed = discord.Embed(title="amount cannot be less than or equal to 0"))
+        await ctx.followup.send(embed = discord.Embed(title="amount cannot be less than or equal to 0"), delete_after=3, ephemeral = True)
         return
 
     command = asyncio.create_task(get_attention_internal(ctx, user, message, amount, interval, client))
@@ -158,7 +155,6 @@ async def get_attention(ctx, user: str, message: str, amount: int, interval: str
     Command.current_ids.remove(command_tracker.id)
 
 
-
 async def get_attention_internal(ctx, user: str, msg: str, amount: int, interval:int, client: discord.Client):
     embed = discord.Embed(
         title="Get attention",
@@ -167,7 +163,7 @@ async def get_attention_internal(ctx, user: str, msg: str, amount: int, interval
     embed.add_field(name="User:", value=f"{user}", inline=False)
     embed.add_field(name="Amount:", value=f"{amount}", inline=False)
     embed.add_field(name="Interval:", value=f"{timedelta(seconds=interval)}", inline=False)
-    await ctx.response.send_message(embed=embed)
+    await ctx.response.send_message(embed=embed, ephemeral = True)
 
     for i in range(amount):
         message = await ctx.channel.send(f"{user}",
