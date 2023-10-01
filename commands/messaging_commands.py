@@ -24,7 +24,7 @@ async def annoy(ctx, user: str, message: str, amount: int, interval: str):
         await ctx.followup.send(embed = discord.Embed(title="amount cannot be less than or equal to 0"), delete_after=3, ephemeral = True)
         return
 
-    comm_inf = Command_Info("Command: Annoy", user, message, amount, interval)
+    comm_inf = Command_Info("Annoy", user, message, amount, interval)
     command = asyncio.create_task(annoy_internal(ctx, comm_inf))
 
     command_tracker = Command(comm_inf, command)
@@ -37,13 +37,7 @@ async def annoy(ctx, user: str, message: str, amount: int, interval: str):
 
 
 async def annoy_internal(ctx, comm_inf: Command_Info):
-    embed = discord.Embed(
-        title="Annoy",
-        description=f"Started pinging {comm_inf.user} with\nMessage: {comm_inf.message}"
-    )
-    embed.add_field(name="Amount:", value=comm_inf.amount, inline=True)
-    embed.add_field(name="Interval:", value=timedelta(seconds=comm_inf.interval), inline=True)
-    await ctx.response.send_message(embed=embed, ephemeral = True)
+    await ctx.response.send_message(embed=Command_Info.make_embed(), ephemeral = True)
 
     try:
         for i in range(comm_inf.amount, 0, -1):
@@ -75,7 +69,7 @@ async def dm_aga(ctx, message: str, amount: int, interval: str):
         await ctx.followup.send(embed = discord.Embed(title="amount cannot be less than or equal to 0"), delete_after=3, ephemeral = True)
         return
 
-    comm_inf = Command_Info("Command: DM Aga", user, message, amount, interval)
+    comm_inf = Command_Info("DM Aga", user, message, amount, interval)
     command = asyncio.create_task(dm_spam_internal(ctx, comm_inf))
 
     command_tracker = Command(comm_inf, command)
@@ -87,14 +81,7 @@ async def dm_aga(ctx, message: str, amount: int, interval: str):
 
 
 async def dm_spam_internal(ctx, comm_inf: Command_Info):
-    embed = discord.Embed(
-        title="DM Aga",
-        description=f"Started annoying HA with \nMessage: {comm_inf.message}"
-    )
-    embed.add_field(name="Amount:", value=comm_inf.amount, inline=True)
-    embed.add_field(name="Interval:", value=timedelta(seconds=comm_inf.interval), inline=True)
-
-    await ctx.response.send_message(embed=embed, ephemeral = True)
+    await ctx.response.send_message(embed=Command_Info.make_embed(), ephemeral = True)
 
     try:
         for i in range(comm_inf.amount, 0, -1):
@@ -125,7 +112,7 @@ async def get_attention(ctx, user: str, message: str, amount: int, interval: str
         await ctx.followup.send(embed = discord.Embed(title="amount cannot be less than or equal to 0"), delete_after=3, ephemeral = True)
         return
 
-    comm_inf = Command_Info("Command: Annoy", user, message, amount, interval)
+    comm_inf = Command_Info("Annoy", user, message, amount, interval)
     command = asyncio.create_task(get_attention_internal(ctx, comm_inf))
 
     command_tracker = Command(comm_inf, command)
@@ -138,14 +125,7 @@ async def get_attention(ctx, user: str, message: str, amount: int, interval: str
 
 
 async def get_attention_internal(ctx, comm_inf: Command_Info, client: discord.Client):
-    embed = discord.Embed(
-        title="Get attention",
-        description=f"Started pinging {comm_inf.user} with Message: {comm_inf.msg}"
-    )
-    embed.add_field(name="User:", value=f"{comm_inf.user}", inline=False)
-    embed.add_field(name="Amount:", value=f"{comm_inf.amount}", inline=False)
-    embed.add_field(name="Interval:", value=f"{timedelta(seconds=comm_inf.interval)}", inline=False)
-    await ctx.response.send_message(embed=embed, ephemeral = True)
+    await ctx.response.send_message(embed=Command_Info.make_embed(), ephemeral = True)
 
     for i in range(comm_inf.amount, 0, -1):
         comm_inf.amount = i

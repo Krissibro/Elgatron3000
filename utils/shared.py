@@ -1,6 +1,6 @@
 import discord
 from discord import app_commands
-from typing import Type
+from datetime import timedelta
 
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
@@ -21,12 +21,12 @@ class Command_Info():
     
     def make_embed(self):
         embed = discord.Embed(
-            title= self.command,
+            title= f"Command: {self.command}",
             description=f"Message: {self.message}"
         )
         embed.add_field(name="User:", value=f"{self.user}", inline=False)
         embed.add_field(name="Amount:", value=f"{self.amount}", inline=False)
-        embed.add_field(name="Interval:", value=f"{self.interval}", inline=False)
+        embed.add_field(name="Interval:", value=f"{timedelta(seconds=self.interval)}", inline=False)
         return embed
 
 class Command:
