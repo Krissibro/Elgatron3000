@@ -16,9 +16,9 @@ async def running_commands(ctx):
 
     await ctx.response.send_message(embed=discord.Embed(title="Showing all running processes"), ephemeral = True)
 
-    for id, command in running_commands_dict.items():
-        embed = command.embed
-        await ctx.channel.send(embed=embed, ephemeral = True)
+    for _, command in running_commands_dict.items():
+        embed = command.get_embed()
+        await ctx.channel.send(embed=embed)
 
 
 @tree.command(
@@ -60,7 +60,7 @@ async def cleanup(ctx, messages_amount: int):
         return
     await ctx.response.defer()
     await ctx.channel.purge(limit=messages_amount, check=lambda m: m.author == client.user)
-    await ctx.channel.send(embed=discord.Embed(title=f"Deleted {messages_amount} messages"), delete_after=3, ephemeral = True)
+    await ctx.channel.send(embed=discord.Embed(title=f"Deleted {messages_amount} messages"), delete_after=3)
 
 
 @tree.command(
