@@ -124,23 +124,33 @@ async def get_attention(ctx, user: str, message: str, amount: int, interval: str
     Command.current_ids.remove(command_tracker.id)
 
 
+class SimpleView(discord.ui.View):
+    seen : bool = False
+    
+    @discord.ui.button(emoji="👍", style=discord.ButtonStyle.success)
+    async def hello(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message(embed=discord.Embed(title="Okay, i will stop annoying you now :)"))
+        self.seen= True
+        self.stop()
+
+
 async def get_attention_internal(ctx, command_info: Command_Info, client: discord.Client):
     await ctx.response.send_message(embed=command_info.make_embed(), ephemeral = True)
-
+    
+    view = SimpleView()
+    
     for i in range(command_info.amount, 0, -1):
         command_info.remaining = i
-        message = await ctx.channel.send(f"{command_info.user}",
+        await ctx.channel.send(
+            f"{command_info.user}",
             embed=discord.Embed(
                                 title=f"{command_info.message}",
-                                description="React with \U0001F44D to stop being notified"))
-        await message.add_reaction('\U0001F44D')
+                                description="Press Da button to stop being notified"
+                                ),
+            view = view
+            )
 
-        def check(reaction, user):
-            return user != client.user and reaction.message.id == message.id and str(reaction.emoji) == '\U0001F44D'
-
-        try:
-            await client.wait_for('reaction_add', check=check, timeout=command_info.interval)
-            await ctx.channel.send(embed=discord.Embed(title="Will stop bothering you now :pensive:"))
+        if view.seen:
             break
-        except asyncio.TimeoutError:
-            continue
+        else:
+            await asyncio.sleep(command_info.interval)
