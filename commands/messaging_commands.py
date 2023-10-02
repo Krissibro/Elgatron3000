@@ -15,13 +15,13 @@ async def annoy(ctx, user: str, message: str, amount: int, interval: str):
     interval = eval(interval)
 
     if user is None:
-        await ctx.followup.send(embed = discord.Embed(title="User could not be found"), delete_after=3, ephemeral = True)
+        await ctx.response.send_message(embed = discord.Embed(title="User could not be found"), ephemeral = True)
         return
     if interval <= 0:
-        await ctx.followup.send(embed = discord.Embed(title="Interval cannot be less than or equal to 0"), delete_after=3, ephemeral = True)
+        await ctx.response.send_message(embed = discord.Embed(title="Interval cannot be less than or equal to 0"), ephemeral = True)
         return
     if amount <= 0:
-        await ctx.followup.send(embed = discord.Embed(title="amount cannot be less than or equal to 0"), delete_after=3, ephemeral = True)
+        await ctx.response.send_message(embed = discord.Embed(title="Amount cannot be less than or equal to 0"), ephemeral = True)
         return
 
     comm_inf = Command_Info("Annoy", user, message, amount, interval)
@@ -37,7 +37,7 @@ async def annoy(ctx, user: str, message: str, amount: int, interval: str):
 
 
 async def annoy_internal(ctx, comm_inf: Command_Info):
-    await ctx.response.send_message(embed=Command_Info.make_embed(), ephemeral = True)
+    await ctx.response.send_message(embed=comm_inf.make_embed(), ephemeral = True)
 
     try:
         for i in range(comm_inf.amount, 0, -1):
@@ -60,13 +60,13 @@ async def dm_aga(ctx, message: str, amount: int, interval: str):
     user = await client.fetch_user(276441391502983170)
 
     if user is None:
-        await ctx.followup.send(embed=discord.Embed(title="User not found!"), delete_after=3, ephemeral = True)
+        await ctx.response.send_message(embed=discord.Embed(title="User not found!"), ephemeral = True)
         return
     if interval <= 0:
-        await ctx.followup.send(embed = discord.Embed(title="Interval cannot be less than or equal to 0"), delete_after=3, ephemeral = True)
+        await ctx.response.send_message(embed = discord.Embed(title="Interval cannot be less than or equal to 0"), ephemeral = True)
         return
     if amount <= 0:
-        await ctx.followup.send(embed = discord.Embed(title="amount cannot be less than or equal to 0"), delete_after=3, ephemeral = True)
+        await ctx.response.send_message(embed = discord.Embed(title="Amount cannot be less than or equal to 0"), ephemeral = True)
         return
 
     comm_inf = Command_Info("DM Aga", user, message, amount, interval)
@@ -81,7 +81,7 @@ async def dm_aga(ctx, message: str, amount: int, interval: str):
 
 
 async def dm_spam_internal(ctx, comm_inf: Command_Info):
-    await ctx.response.send_message(embed=Command_Info.make_embed(), ephemeral = True)
+    await ctx.response.send_message(embed=comm_inf.make_embed(), ephemeral = True)
 
     try:
         for i in range(comm_inf.amount, 0, -1):
@@ -90,7 +90,7 @@ async def dm_spam_internal(ctx, comm_inf: Command_Info):
             await asyncio.sleep(comm_inf.interval)
 
     except discord.Forbidden:
-        await ctx.followup.send(embed=discord.Embed(title="I don't have permission to send messages to that user!"))
+        await ctx.followup.send(embed=discord.Embed(title="I don't have permission to send messages to that user!"), ephemeral = True)
 
 
 
@@ -103,17 +103,17 @@ async def get_attention(ctx, user: str, message: str, amount: int, interval: str
     interval = eval(interval)
 
     if user is None:
-        await ctx.followup.send(embed = discord.Embed(title="User not found"), delete_after=3, ephemeral = True)
+        await ctx.response.send_message(embed = discord.Embed(title="User not found"), ephemeral = True)
         return
     if interval <= 0:
-        await ctx.followup.send(embed = discord.Embed(title="Interval cannot be less than or equal to 0"), delete_after=3, ephemeral = True)
+        await ctx.response.send_message(embed = discord.Embed(title="Interval cannot be less than or equal to 0"), ephemeral = True)
         return
     if amount <= 0:
-        await ctx.followup.send(embed = discord.Embed(title="amount cannot be less than or equal to 0"), delete_after=3, ephemeral = True)
+        await ctx.response.send_message(embed = discord.Embed(title="Amount cannot be less than or equal to 0"), ephemeral = True)
         return
 
-    comm_inf = Command_Info("Annoy", user, message, amount, interval)
-    command = asyncio.create_task(get_attention_internal(ctx, comm_inf))
+    comm_inf = Command_Info("Get Attention", user, message, amount, interval)
+    command = asyncio.create_task(get_attention_internal(ctx, comm_inf, client))
 
     command_tracker = Command(comm_inf, command)
     running_commands_dict[command_tracker.id] = command_tracker
@@ -125,7 +125,7 @@ async def get_attention(ctx, user: str, message: str, amount: int, interval: str
 
 
 async def get_attention_internal(ctx, comm_inf: Command_Info, client: discord.Client):
-    await ctx.response.send_message(embed=Command_Info.make_embed(), ephemeral = True)
+    await ctx.response.send_message(embed=comm_inf.make_embed(), ephemeral = True)
 
     for i in range(comm_inf.amount, 0, -1):
         comm_inf.amount = i
