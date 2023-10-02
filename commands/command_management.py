@@ -2,7 +2,20 @@ import discord
 
 from utils.shared import *
 
+class SimpleView(discord.ui.View):
 
+    def __init__(self, id: int, running_commands_dict: dict):
+        discord.ui.View.__init__(self)
+        self.id= id
+        self.running_commands_dict = running_commands_dict
+    
+    @discord.ui.button(emoji="🪦", style=discord.ButtonStyle.red)
+    async def hello(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message(embed=discord.Embed(title=f"Command {self.id} Killed"), ephemeral= True)
+        self.running_commands_dict[self.id].kill()
+        del self.running_commands_dict[self.id]
+
+        self.stop()
 
 @tree.command(
     name="running_commands",
@@ -16,9 +29,9 @@ async def running_commands(ctx):
 
     await ctx.response.send_message(embed=discord.Embed(title="Showing all running processes"), ephemeral = True)
 
-    for _, command in running_commands_dict.items():
+    for id, command in running_commands_dict.items():
         embed = command.get_embed()
-        await ctx.channel.send(embed=embed)
+        await ctx.channel.send(embed=embed, view = SimpleView(id, running_commands_dict))
 
 
 @tree.command(

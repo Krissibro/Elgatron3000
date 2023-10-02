@@ -124,12 +124,12 @@ async def get_attention(ctx, user: str, message: str, amount: int, interval: str
     Command.current_ids.remove(command_tracker.id)
 
 
-class SimpleView(discord.ui.View):
+class Seen_Button(discord.ui.View):
     seen : bool = False
     
     @discord.ui.button(emoji="👍", style=discord.ButtonStyle.success)
     async def hello(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message(embed=discord.Embed(title="Okay, i will stop annoying you now :)"))
+        await interaction.response.send_message(embed=discord.Embed(title="Okay, i will stop annoying you now :)"), ephemeral= True)
         self.seen= True
         self.stop()
 
@@ -137,7 +137,7 @@ class SimpleView(discord.ui.View):
 async def get_attention_internal(ctx, command_info: Command_Info, client: discord.Client):
     await ctx.response.send_message(embed=command_info.make_embed(), ephemeral = True)
     
-    view = SimpleView()
+    view = Seen_Button()
     
     for i in range(command_info.amount, 0, -1):
         command_info.remaining = i
