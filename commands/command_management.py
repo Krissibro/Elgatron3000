@@ -76,7 +76,7 @@ async def help(ctx):
     embed.add_field(name="/free_games_rn", value="See free games from Epic Games", inline=False)
     embed.add_field(name="/cleanup", value="<messages_amount>", inline=False)
     embed.add_field(name="/running_commands", value="See running commands and their IDs", inline=False)
-    embed.add_field(name="/kill_command", value="<id>", inline=False)
+    embed.add_field(name="/kill_command", value="<ID>", inline=False)
     embed.add_field(name="/kill_all_commands", value="Kill all commands, try to use /kill_command first", inline=False)
     embed.set_footer(text="<interval> is in seconds, but can be evaluated by for example 20*60")
 

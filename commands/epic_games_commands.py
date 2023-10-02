@@ -12,12 +12,20 @@ from utils.shared import *
     guild=discord.Object(id=508383744336461842)
 )
 async def free_games_rn(ctx):
-    title_embed = discord.Embed(title="Free and Epic Games INCOMING!!!!",
-                                description="https://store.epicgames.com/en-US/free-games")
-    await ctx.response.send_message(embed=title_embed)
-
+    await free_epic(ctx.channel)
+    await free_PS(ctx.channel)
     await post_free_games(ctx.channel)
 
+
+async def free_epic(channel):
+    Epic_embed = discord.Embed(title="Free and Epic Games INCOMING!!!!",
+                               description="https://store.epicgames.com/en-US/free-games")
+    await channel.send(embed=Epic_embed)
+
+async def free_PS(channel):
+    PS_embed = discord.Embed(title="Free Pisstation Games INCOMING!!111!!!",
+                             description="https://www.playstation.com/en-us/ps-plus/whats-new/#monthly-games")
+    await channel.send(embed=PS_embed)
 
 async def post_free_games(channel):
     api = EpicGamesStoreAPI()
@@ -53,7 +61,6 @@ async def schedule_post_free_games():
         await asyncio.sleep(seconds_until_next_run)
 
         channel = client.get_channel(1111353625638350893)
-        title_embed = discord.Embed(title="Free and Epic Games INCOMING!!!!",
-                                    description="https://store.epicgames.com/en-US/free-games")
-        await channel.send(embed=title_embed)
+        
+        free_epic(channel)
         await post_free_games(channel)
