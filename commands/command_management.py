@@ -83,14 +83,22 @@ async def cleanup(ctx, messages_amount: int):
 )
 async def help(ctx):
     embed = discord.Embed(title="📚 Help")
-    embed.add_field(name="/annoy", value="<user> <message> <amount> <interval>", inline=False)
-    embed.add_field(name="/dm_aga", value="<message> <amount> <interval>", inline=False)
-    embed.add_field(name="/get_attention", value="<user> <message> <amount> <interval>", inline=False)
-    embed.add_field(name="/free_games_rn", value="See free games from Epic Games", inline=False)
-    embed.add_field(name="/cleanup", value="<messages_amount>", inline=False)
-    embed.add_field(name="/running_commands", value="See running commands and their IDs", inline=False)
-    embed.add_field(name="/kill_command", value="<ID>", inline=False)
-    embed.add_field(name="/kill_all_commands", value="Kill all commands, try to use /kill_command first", inline=False)
+    embed.add_field(name="/annoy <message> <amount> <interval>", 
+                    value="Spams a given message at a given user", inline=False)
+    embed.add_field(name="/dm_aga <message> <amount> <interval>", 
+                    value="Sends a given personal message to HA", inline=False)
+    embed.add_field(name="/get_attention <user> <message> <amount> <interval>", 
+                    value="Sends the given message at the given user until they acnowledge that they have seen the message", inline=False)
+    embed.add_field(name="/free_games_rn", 
+                    value="See free games from Epic Games", inline=False)
+    embed.add_field(name="/cleanup <messages_amount>", 
+                    value="Deletes the given amount of messages", inline=False)
+    embed.add_field(name="/running_commands", 
+                    value="Manage running commands and see their IDs", inline=False)
+    embed.add_field(name="/kill_command <ID>", 
+                    value="Kills the command with the corresponding ID", inline=False)
+    embed.add_field(name="/kill_all_commands", 
+                    value="Kill all commands, try to use /kill_command first", inline=False)
     embed.set_footer(text="<interval> is in seconds, but can be evaluated by for example 20*60")
 
     await ctx.response.send_message(embed = embed, ephemeral = True)

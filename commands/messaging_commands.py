@@ -143,7 +143,7 @@ async def get_attention_internal(ctx, command_info: Command_Info, client: discor
             f"{command_info.user}",
             embed=discord.Embed(
                 title=f"{command_info.message}",
-                description="Press Da button to stop being notified"
+                description="Press the button to stop being notified"
                 ),
             view = view
             )
