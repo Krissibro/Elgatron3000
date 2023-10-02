@@ -30,6 +30,7 @@ async def annoy(ctx, user: str, message: str, amount: int, interval: str):
     command_tracker = Command(command_info, command)
     running_commands_dict[command_tracker.id] = command_tracker
 
+    await ctx.response.send_message(embed=command_info.make_embed(), ephemeral = True)
     await command
 
     del running_commands_dict[command_tracker.id]
@@ -37,8 +38,6 @@ async def annoy(ctx, user: str, message: str, amount: int, interval: str):
 
 
 async def annoy_internal(ctx, command_info: Command_Info):
-    await ctx.response.send_message(embed=command_info.make_embed(), ephemeral = True)
-
     try:
         for i in range(command_info.amount, 0, -1):
             command_info.remaining = i
@@ -74,6 +73,8 @@ async def dm_aga(ctx, message: str, amount: int, interval: str):
 
     command_tracker = Command(command_info, command)
     running_commands_dict[command_tracker.id] = command_tracker
+
+    await ctx.response.send_message(embed=command_info.make_embed(), ephemeral = True)
     await command
 
     del running_commands_dict[command_tracker.id]
@@ -81,8 +82,6 @@ async def dm_aga(ctx, message: str, amount: int, interval: str):
 
 
 async def dm_spam_internal(ctx, command_info: Command_Info):
-    await ctx.response.send_message(embed=command_info.make_embed(), ephemeral = True)
-
     try:
         for i in range(command_info.amount, 0, -1):
             command_info.remaining = i
@@ -118,6 +117,7 @@ async def get_attention(ctx, user: str, message: str, amount: int, interval: str
     command_tracker = Command(command_info, command)
     running_commands_dict[command_tracker.id] = command_tracker
 
+    await ctx.response.send_message(embed=command_info.make_embed(), ephemeral = True)
     await command
 
     del running_commands_dict[command_tracker.id]
@@ -135,8 +135,6 @@ class Seen_Button(discord.ui.View):
 
 
 async def get_attention_internal(ctx, command_info: Command_Info, client: discord.Client):
-    await ctx.response.send_message(embed=command_info.make_embed(), ephemeral = True)
-    
     view = Seen_Button()
     
     for i in range(command_info.amount, 0, -1):
@@ -144,9 +142,9 @@ async def get_attention_internal(ctx, command_info: Command_Info, client: discor
         await ctx.channel.send(
             f"{command_info.user}",
             embed=discord.Embed(
-                                title=f"{command_info.message}",
-                                description="Press Da button to stop being notified"
-                                ),
+                title=f"{command_info.message}",
+                description="Press Da button to stop being notified"
+                ),
             view = view
             )
 
