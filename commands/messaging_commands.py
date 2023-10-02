@@ -131,7 +131,7 @@ async def get_attention_internal(ctx, comm_inf: Command_Info, client: discord.Cl
         comm_inf.amount = i
         message = await ctx.channel.send(f"{comm_inf.user}",
             embed=discord.Embed(
-                                title=f"{comm_inf.msg}",
+                                title=f"{comm_inf.message}",
                                 description="React with \U0001F44D to stop being notified"))
         await message.add_reaction('\U0001F44D')
 
