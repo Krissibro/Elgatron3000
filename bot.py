@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 # Commands from other files
 from commands.command_management import * 
 from commands.messaging_commands import * 
-from commands.epic_games_commands import * 
+from commands.epic_games_commands import *
 
 
 @client.event

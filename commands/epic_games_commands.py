@@ -3,14 +3,13 @@ from datetime import datetime, timedelta, time
 import asyncio
 from epicstore_api import EpicGamesStoreAPI
 
-from utils.shared import *
+from utilities.shared import *
 
 
 
 @tree.command(
     name="free_games_rn",
     description="See the currently free games on Epic Games",
-    guild=discord.Object(id=508383744336461842)
 )
 async def free_games_rn(ctx):
     await free_epic(ctx.channel)

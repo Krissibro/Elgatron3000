@@ -1,7 +1,6 @@
 import discord
 
-from utils.shared import *
-
+from utilities.shared import *
 
 
 class SimpleView(discord.ui.View):
@@ -22,7 +21,6 @@ class SimpleView(discord.ui.View):
 @tree.command(
     name="running_commands",
     description="See the currently running commands",
-    guild=discord.Object(id=508383744336461842)
 )
 async def running_commands(ctx):
     if not running_commands_dict:
@@ -39,7 +37,6 @@ async def running_commands(ctx):
 @tree.command(
     name="kill_command",
     description="Kill a specific running command using an ID",
-    guild=discord.Object(id=508383744336461842)
 )
 async def kill_command(ctx, id: int):
     if id not in running_commands_dict:
@@ -54,7 +51,6 @@ async def kill_command(ctx, id: int):
 @tree.command(
     name="kill_all_commands",
     description="Kill all running commands",
-    guild=discord.Object(id=508383744336461842)
 )
 async def kill_all_commands(ctx):
     for command in running_commands_dict.values():
@@ -67,7 +63,6 @@ async def kill_all_commands(ctx):
 @tree.command(
     name="cleanup",
     description="Clean the current chat for bot messages",
-    guild=discord.Object(id=508383744336461842)
 )
 async def cleanup(ctx, messages_amount: int):
     if messages_amount <= 0:
@@ -81,7 +76,6 @@ async def cleanup(ctx, messages_amount: int):
 @tree.command(
     name="help",
     description="Bot info!",
-    guild=discord.Object(id=508383744336461842)
 )
 async def help(ctx):
     embed = discord.Embed(title="📚 Help")
