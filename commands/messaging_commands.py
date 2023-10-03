@@ -2,7 +2,8 @@ import discord
 from datetime import timedelta
 import asyncio
 
-from Elgatron3000.utils.shared import *
+from utils.shared import *
+
 
 
 @tree.command(

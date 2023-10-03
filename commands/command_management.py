@@ -1,6 +1,7 @@
 import discord
 
-from Elgatron3000.utils.shared import *
+from utils.shared import *
+
 
 
 class SimpleView(discord.ui.View):
