@@ -4,16 +4,18 @@ from utilities.shared import *
 from utilities.settings import guild_id
 
 
-class Edit_window(discord.ui.Modal, title = "Edit"):
-    field = discord.ui.TextInput(label="please enter the edit you want to make", style=discord.TextStyle.short)
+class Edit_window(discord.ui.Modal , title = "Edit"):
+    async def __init__(self):
+        discord.ui.Modal.__init__(self)
+        edit = discord.ui.TextInput(label="please enter the edit you want to make", style=discord.TextStyle.short, default = "editing")
 
     async def on_submit(self, interaction: discord.Interaction):
         await interaction.response.defer()
 
 class SimpleView(discord.ui.View):
 
-    def __init__(self, id: int, running_commands_dict: dict):
-        discord.ui.View.__init__(self)
+    async def __init__(self, id: int, running_commands_dict: dict):
+        super().__init__(self)
         self.id= id
         self.running_commands_dict = running_commands_dict
     
@@ -26,8 +28,12 @@ class SimpleView(discord.ui.View):
         self.stop()
 
     @discord.ui.button(emoji="🪶", style=discord.ButtonStyle.green)
-    async def text_box(self, interaction: discord.Interaction, text_box = discord.ui.text_input):
-        await interaction.response.send_modal(Edit_window())
+    async def text_box(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # issue where the message is empty while editing or while canceling, not 100% sure why hmmm
+        modal: discord.ui.Modal = Edit_window()
+        await interaction.response.send_modal(modal)
+        self.running_commands_dict[self.id].info.message = modal.edit
+
 
 @tree.command(
     name="running_commands",
