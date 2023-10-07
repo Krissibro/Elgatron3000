@@ -4,6 +4,12 @@ from utilities.shared import *
 from utilities.settings import guild_id
 
 
+class Edit_window(discord.ui.Modal, title = "Edit"):
+    field = discord.ui.TextInput(label="please enter the edit you want to make", style=discord.TextStyle.short)
+
+    async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+
 class SimpleView(discord.ui.View):
 
     def __init__(self, id: int, running_commands_dict: dict):
@@ -18,6 +24,10 @@ class SimpleView(discord.ui.View):
         del self.running_commands_dict[self.id]
 
         self.stop()
+
+    @discord.ui.button(emoji="🪶", style=discord.ButtonStyle.green)
+    async def text_box(self, interaction: discord.Interaction, text_box = discord.ui.text_input):
+        await interaction.response.send_modal(Edit_window())
 
 @tree.command(
     name="running_commands",
