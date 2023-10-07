@@ -129,7 +129,7 @@ class Seen_Button(discord.ui.View):
     
     @discord.ui.button(emoji="👍", style=discord.ButtonStyle.success)
     async def hello(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message(embed=discord.Embed(title=f"Okay, i will stop annoying you now {interaction.user.display_name}:)"), ephemeral= True)
+        await interaction.response.send_message(embed=discord.Embed(title=f"Okay, i will stop annoying you now {interaction.user.nick} :)"), ephemeral= True)
         self.seen= True
         self.stop()
 
@@ -147,8 +147,8 @@ async def get_attention_internal(ctx, command_info: Command_Info, client: discor
                 ),
             view = view
             )
+        
+        await asyncio.sleep(command_info.interval)
 
         if view.seen:
             break
-        else:
-            await asyncio.sleep(command_info.interval)
