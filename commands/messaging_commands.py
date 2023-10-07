@@ -1,14 +1,15 @@
 import discord
-from datetime import timedelta
 import asyncio
 
 from utilities.shared import *
+from utilities.settings import guild_id
 
 
 
 @tree.command(
     name="annoy",
     description="Spam a message at someone!",
+    guild=discord.Object(id=guild_id)
 )
 async def annoy(ctx, user: str, message: str, amount: int, interval: str):
     interval = eval(interval)
@@ -51,6 +52,7 @@ async def annoy_internal(ctx, command_info: Command_Info):
 @tree.command(
     name="dm_aga",
     description="Annoy HA as many times as you would like with a given interval!",
+    guild=discord.Object(id=guild_id)
 )
 async def dm_aga(ctx, message: str, amount: int, interval: str):
     interval = eval(interval)
@@ -93,7 +95,8 @@ async def dm_spam_internal(ctx, command_info: Command_Info):
 
 @tree.command(
     name="get_attention",
-    description="Ping someone x times, once every 60 seconds till they react",\
+    description="Ping someone x times, once every 60 seconds till they react",
+    guild=discord.Object(id=guild_id)
 )
 async def get_attention(ctx, user: str, message: str, amount: int, interval: str):
     interval = eval(interval)
@@ -126,16 +129,16 @@ class Seen_Button(discord.ui.View):
     
     @discord.ui.button(emoji="👍", style=discord.ButtonStyle.success)
     async def hello(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message(embed=discord.Embed(title="Okay, i will stop annoying you now :)"), ephemeral= True)
+        await interaction.response.send_message(embed=discord.Embed(title=f"Okay, i will stop annoying you now {interaction.user.display_name}:)"), ephemeral= True)
         self.seen= True
         self.stop()
 
 
-async def get_attention_internal(ctx, command_info: Command_Info, client: discord.Client):
-    view = Seen_Button()
-    
+async def get_attention_internal(ctx, command_info: Command_Info, client: discord.Client): 
     for i in range(command_info.amount, 0, -1):
         command_info.remaining = i
+        view = Seen_Button(timeout=command_info.interval*2)
+
         await ctx.channel.send(
             f"{command_info.user}",
             embed=discord.Embed(
