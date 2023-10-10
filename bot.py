@@ -10,6 +10,7 @@ from utilities.settings import guild_id, testing
 if testing:
     from commands.test_commands import *
 
+
 @client.event
 async def on_ready():
     await tree.sync(guild=discord.Object(id=guild_id))

@@ -1,8 +1,4 @@
-import discord
-import asyncio
-
 from utilities.shared import *
-from utilities.settings import guild_id
 
 class Edit_window(discord.ui.Modal, title = "Edit"):
     field = discord.ui.TextInput(label="please enter the edit you want to make", style=discord.TextStyle.short)

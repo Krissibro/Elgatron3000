@@ -1,8 +1,4 @@
-import discord
-import asyncio
-
 from utilities.shared import *
-from utilities.settings import guild_id
 from ast import literal_eval
 
 

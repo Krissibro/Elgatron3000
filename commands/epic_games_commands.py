@@ -1,11 +1,7 @@
-import discord
-import asyncio
-
-from datetime import datetime, timedelta, time
+from datetime import datetime, time
 from epicstore_api import EpicGamesStoreAPI
 
 from utilities.shared import *
-from utilities.settings import guild_id
 
 
 @tree.command(

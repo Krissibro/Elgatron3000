@@ -1,7 +1,4 @@
-import discord
-
 from utilities.shared import *
-from utilities.settings import guild_id
 
 
 class EditWindow(discord.ui.Modal):
