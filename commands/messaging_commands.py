@@ -70,8 +70,6 @@ async def annoy_internal(ctx, command_info: MessagingInfo):
 )
 async def dm_aga(ctx, message: str, amount: int, interval: str):
     interval = literal_eval(interval)
-    # user = await client.fetch_user(276441391502983170)
-
     await execute_command(ctx, "dm_spam_internal", dm_spam_internal, client.fetch_user(276441391502983170), message, amount, interval)
 
 
@@ -93,7 +91,6 @@ async def dm_spam_internal(ctx, command_info: MessagingInfo):
 )
 async def get_attention(ctx, user: str, message: str, amount: int, interval: str):
     interval = literal_eval(interval)
-
     await execute_command(ctx, "get_attention", get_attention_internal, user, message, amount, interval)
 
 
@@ -104,8 +101,8 @@ class SeenButton(discord.ui.View):
     async def hello(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message(embed=discord.Embed(
             title=f"Okay, i will stop annoying you now {interaction.user.nick} :)"),
-            ephemeral= True)
-        self.seen= True
+            ephemeral=True)
+        self.seen = True
         self.stop()
 
 
