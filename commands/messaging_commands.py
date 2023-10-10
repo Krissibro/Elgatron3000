@@ -81,7 +81,7 @@ async def dm_spam_internal(ctx, command_info: MessagingInfo):
             await asyncio.sleep(command_info.interval)
 
     except discord.Forbidden:
-        await ctx.followup.send(embed=discord.Embed(title="I don't have permission to send messages to that user!"), ephemeral = True)
+        await ctx.followup.send(embed=discord.Embed(title="I don't have permission to send messages to that user!"), ephemeral=True)
 
 
 @tree.command(

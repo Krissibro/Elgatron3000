@@ -118,4 +118,4 @@ async def help(ctx):
                     value="Kill all commands, try to use /kill_command first", inline=False)
     embed.set_footer(text="<interval> is in seconds, but can be evaluated by for example 20*60")
 
-    await ctx.response.send_message(embed = embed, ephemeral = True)
+    await ctx.response.send_message(embed=embed, ephemeral=True)

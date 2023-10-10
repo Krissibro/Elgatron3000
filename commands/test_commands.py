@@ -1,10 +1,12 @@
 from utilities.shared import *
 
+
 class Edit_window(discord.ui.Modal, title = "Edit"):
     field = discord.ui.TextInput(label="please enter the edit you want to make", style=discord.TextStyle.short)
 
     async def on_submit(self, interaction: discord.Interaction):
         await interaction.response.defer()
+
 
 @tree.command(
     name="modal_test",

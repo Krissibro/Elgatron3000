@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from commands.command_management import * 
 from commands.messaging_commands import * 
 from commands.epic_games_commands import *
-from utilities.settings import guild_id, testing
+from utilities.settings import testing
 
 if testing:
     from commands.test_commands import *
