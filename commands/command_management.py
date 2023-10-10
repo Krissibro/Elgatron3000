@@ -4,7 +4,7 @@ from utilities.shared import *
 from utilities.settings import guild_id
 
 
-class Edit_window(discord.ui.Modal):
+class EditWindow(discord.ui.Modal):
     def __init__(self, old_message:str):
         super().__init__(title = "Edit")
         self.add_item(discord.ui.TextInput(label="please enter the edit you want to make", style=discord.TextStyle.short, default = old_message))
@@ -30,7 +30,7 @@ class SimpleView(discord.ui.View):
     @discord.ui.button(emoji="🪶", style=discord.ButtonStyle.green)
     async def text_box(self, interaction: discord.Interaction, button: discord.ui.Button):
         # issue where the message is empty while editing or while canceling, not 100% sure why hmmm
-        modal: discord.ui.Modal = Edit_window(self.running_commands_dict[self.id].info.message)
+        modal: discord.ui.Modal = EditWindow(self.running_commands_dict[self.id].info.message)
         await interaction.response.send_modal(modal)
         self.running_commands_dict[self.id].info.message = modal.children[0].value
 

@@ -9,7 +9,8 @@ tree = app_commands.CommandTree(client)
 
 running_commands_dict = {}
 
-class Command_Info():
+
+class MessagingInfo():
     current_ids = set()
 
     def __init__(self, command: str, user: str, message: str, amount:int, interval: int):
@@ -30,10 +31,11 @@ class Command_Info():
         embed.add_field(name="Interval:", value=f"{timedelta(seconds=self.interval)}", inline=False)
         return embed
 
+
 class Command:
     current_ids = set()
 
-    def __init__(self, info: Command_Info, task):
+    def __init__(self, info: MessagingInfo, task):
         self.id = self.assign_id()
         self.info = info
         self.process = task
@@ -41,9 +43,9 @@ class Command:
     # Assigns the lowest ID
     def assign_id(self):
         i = 1
-        while i in Command.current_ids:
+        while i in self.current_ids:
             i += 1
-        Command.current_ids.add(i)
+        self.current_ids.add(i)
         return i
 
     def get_embed(self):
