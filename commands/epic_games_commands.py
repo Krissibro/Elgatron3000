@@ -8,27 +8,29 @@ from utilities.shared import *
 from utilities.settings import guild_id
 
 
-
 @tree.command(
     name="free_games_rn",
     description="See the currently free games on Epic Games",
     guild=discord.Object(id=guild_id)
 )
 async def free_games_rn(ctx):
-    await free_epic(ctx.channel)
-    await free_PS(ctx.channel)
+    await ctx.response.defer()
+    await free_epic_games(ctx.channel)
+    await free_playstation_games(ctx.channel)
     await post_free_games(ctx.channel)
 
 
-async def free_epic(channel):
-    Epic_embed = discord.Embed(title="Free and Epic Games INCOMING!!!!",
-                               description="https://store.epicgames.com/en-US/free-games")
-    await channel.send(embed=Epic_embed)
+async def free_epic_games(channel):
+    epic_games_embed = discord.Embed(title="Free and Epic Games INCOMING!!!!",
+                                     description="https://store.epicgames.com/en-US/free-games")
+    await channel.send(embed=epic_games_embed)
 
-async def free_PS(channel):
-    PS_embed = discord.Embed(title="Free Pisstation Games INCOMING!!111!!!",
-                             description="https://www.playstation.com/en-us/ps-plus/whats-new/#monthly-games")
-    await channel.send(embed=PS_embed)
+
+async def free_playstation_games(channel):
+    playstation_embed = discord.Embed(title="Free Pisstation Games INCOMING!!111!!!",
+                                      description="https://www.playstation.com/en-us/ps-plus/whats-new/#monthly-games")
+    await channel.send(embed=playstation_embed)
+
 
 async def post_free_games(channel):
     api = EpicGamesStoreAPI()
@@ -52,7 +54,7 @@ async def schedule_post_free_games():
     while True:
         now = datetime.utcnow()
         next_friday = now + timedelta((4 - now.weekday()) % 7)  # 4 represents Friday
-        next_run = datetime.combine(next_friday.date(), time(18, 0))  # 18:00 UTC
+        next_run = datetime.combine(next_friday.date(), time(16, 0))  # 16:00 UTC -> 18:00 CET/CSET
         print(next_run)
 
         # If it's already past Friday 18:00, schedule for the next Friday
@@ -65,5 +67,5 @@ async def schedule_post_free_games():
 
         channel = client.get_channel(1111353625638350893)
         
-        free_epic(channel)
+        await free_epic_games(channel)
         await post_free_games(channel)
