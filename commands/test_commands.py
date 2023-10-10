@@ -1,12 +1,16 @@
 from utilities.shared import *
 
 
-class Edit_window(discord.ui.Modal, title = "Edit"):
-    field = discord.ui.TextInput(label="please enter the edit you want to make", style=discord.TextStyle.short)
+class EditWindow(discord.ui.Modal):
+    def __init__(self, old_message:str):
+        super().__init__(title="Edit")
+        self.add_item(discord.ui.TextInput(label="please enter the edit you want to make",
+                                           style=discord.TextStyle.short,
+                                           default=old_message))
 
     async def on_submit(self, interaction: discord.Interaction):
         await interaction.response.defer()
-
+        self.stop()
 
 @tree.command(
     name="modal_test",
@@ -14,4 +18,8 @@ class Edit_window(discord.ui.Modal, title = "Edit"):
     guild=discord.Object(id=guild_id)
 )
 async def modal_test(ctx: discord.Interaction):
-    await ctx.response.send_modal(Edit_window())
+    edit = EditWindow("test")
+    # TODO find a way to prevent the assignment to happen immediately, and rather wait until the user has finished writing
+    await ctx.response.send_modal(edit)
+    await asyncio.sleep(10)
+    print(edit.children[0])

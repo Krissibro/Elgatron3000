@@ -28,8 +28,8 @@ class SimpleView(discord.ui.View):
 
     @discord.ui.button(emoji="🪶", style=discord.ButtonStyle.green)
     async def text_box(self, interaction: discord.Interaction, button: discord.ui.Button):
-        # issue where the message is empty while editing or while canceling, not 100% sure why hmmm
         modal: discord.ui.Modal = EditWindow(self.running_commands_dict[self.id].info.message)
+        # TODO find a way to prevent the assignment to happen immediately, and rather wait until the user has finished writing
         await interaction.response.send_modal(modal)
         self.running_commands_dict[self.id].info.message = modal.children[0].value
 
