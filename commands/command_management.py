@@ -3,14 +3,16 @@ from utilities.shared import *
 
 class EditWindow(discord.ui.Modal):
     def __init__(self, old_message:str):
-        super().__init__(title = "Edit")
-        self.add_item(discord.ui.TextInput(label="please enter the edit you want to make", style=discord.TextStyle.short, default = old_message))
+        super().__init__(title="Edit")
+        self.add_item(discord.ui.TextInput(label="please enter the edit you want to make",
+                                           style=discord.TextStyle.short,
+                                           default=old_message))
 
     async def on_submit(self, interaction: discord.Interaction):
         await interaction.response.defer()
 
-class SimpleView(discord.ui.View):
 
+class SimpleView(discord.ui.View):
     def __init__(self, id: int, running_commands_dict: dict):
         super().__init__()
         self.id= id
@@ -18,7 +20,7 @@ class SimpleView(discord.ui.View):
     
     @discord.ui.button(emoji="🪦", style=discord.ButtonStyle.red)
     async def hello(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message(embed=discord.Embed(title=f"Command {self.id} Killed"), ephemeral= True)
+        await interaction.response.send_message(embed=discord.Embed(title=f"Command {self.id} Killed"), ephemeral=True)
         self.running_commands_dict[self.id].kill()
         del self.running_commands_dict[self.id]
 
@@ -39,10 +41,10 @@ class SimpleView(discord.ui.View):
 )
 async def running_commands(ctx):
     if not running_commands_dict:
-        await ctx.response.send_message(embed=discord.Embed(title="No commands running"), ephemeral = True)
+        await ctx.response.send_message(embed=discord.Embed(title="No commands running"), ephemeral=True)
         return
 
-    await ctx.response.send_message(embed=discord.Embed(title="Showing all running processes"), ephemeral = True)
+    await ctx.response.send_message(embed=discord.Embed(title="Showing all running processes"), ephemeral=True)
 
     for id, command in running_commands_dict.items():
         embed = command.get_embed()
@@ -56,12 +58,12 @@ async def running_commands(ctx):
 )
 async def kill_command(ctx, id: int):
     if id not in running_commands_dict:
-        await ctx.response.send_message(embed=discord.Embed(title=f"Command with the ID {id} does not exist"), ephemeral = True)
+        await ctx.response.send_message(embed=discord.Embed(title=f"Command with the ID {id} does not exist"), ephemeral=True)
         return
     
     running_commands_dict[id].kill()
     del running_commands_dict[id]
-    await ctx.response.send_message(embed=discord.Embed(title=f"Command {id} has been terminated"), ephemeral = True)
+    await ctx.response.send_message(embed=discord.Embed(title=f"Command {id} has been terminated"), ephemeral=True)
 
 
 @tree.command(
@@ -74,7 +76,7 @@ async def kill_all_commands(ctx):
         command.kill()
     running_commands_dict.clear()
 
-    await ctx.response.send_message(embed=discord.Embed(title="All running commands have been terminated."), ephemeral = True)
+    await ctx.response.send_message(embed=discord.Embed(title="All running commands have been terminated."), ephemeral=True)
 
 
 @tree.command(
@@ -84,11 +86,11 @@ async def kill_all_commands(ctx):
 )
 async def cleanup(ctx, messages_amount: int):
     if messages_amount <= 0:
-        await ctx.response.send_message(embed=discord.Embed(title=f"Cannot delete less than 1 message"), ephemeral = True)
+        await ctx.response.send_message(embed=discord.Embed(title=f"Cannot delete less than 1 message"), ephemeral=True)
         return
     await ctx.response.defer()
     await ctx.channel.purge(limit=messages_amount, check=lambda m: m.author == client.user)
-    await ctx.response.send_message(embed=discord.Embed(title=f"Deleted {messages_amount} messages"), ephemeral = True)
+    await ctx.response.send_message(embed=discord.Embed(title=f"Deleted {messages_amount} messages"), ephemeral=True)
 
 
 @tree.command(
