@@ -8,6 +8,10 @@ class EditWindow(discord.ui.Modal):
                                            style=discord.TextStyle.short,
                                            default=old_message))
 
+    async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+        self.stop()
+
 
 class SimpleView(discord.ui.View):
     def __init__(self, id: int, running_commands_dict: dict):
@@ -28,7 +32,7 @@ class SimpleView(discord.ui.View):
         modal: discord.ui.Modal = EditWindow(self.running_commands_dict[self.id].info.message)
         # TODO find a way to prevent the assignment to happen immediately, and rather wait until the user has finished writing
         await interaction.response.send_modal(modal)
-
+        
         while not modal.is_finished():
             await asyncio.sleep(1)
         self.running_commands_dict[self.id].info.message = modal.children[0].value
