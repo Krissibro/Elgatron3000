@@ -53,14 +53,10 @@ async def annoy(ctx, user: str, message: str, amount: int, interval: str):
 
 
 async def annoy_internal(ctx, command_info: MessagingInfo):
-    try:
-        for i in range(command_info.amount, 0, -1):
-            command_info.remaining = i
-            await ctx.channel.send(f"{command_info.user} {command_info.message}")
-            await asyncio.sleep(command_info.interval)
-
-    except discord.Forbidden:
-        await ctx.followup.send(embed=discord.Embed(title="I don't have permission to send messages to that user!"))
+    while command_info.remaining > 0:
+        command_info.remaining -= 1
+        await ctx.channel.send(f"{command_info.user} {command_info.message}")
+        await asyncio.sleep(command_info.interval)
 
 
 @tree.command(
@@ -75,8 +71,8 @@ async def dm_aga(ctx, message: str, amount: int, interval: str):
 
 async def dm_spam_internal(ctx, command_info: MessagingInfo):
     try:
-        for i in range(command_info.amount, 0, -1):
-            command_info.remaining = i
+        while command_info.remaining > 0:
+            command_info.remaining -= 1
             await command_info.user.send(command_info.message)
             await asyncio.sleep(command_info.interval)
 
@@ -107,8 +103,8 @@ class SeenButton(discord.ui.View):
 
 
 async def get_attention_internal(ctx, command_info: MessagingInfo):
-    for i in range(command_info.amount, 0, -1):
-        command_info.remaining = i
+    while command_info.remaining > 0:
+        command_info.remaining -= 1
         view = SeenButton(timeout=command_info.interval * 2)
 
         await ctx.channel.send(

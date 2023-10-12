@@ -1,12 +1,19 @@
 from utilities.shared import *
+from ast import literal_eval
 
 
 class EditWindow(discord.ui.Modal):
-    def __init__(self, old_message:str):
+    def __init__(self, old_message:str, old_amount:int, old_interval:int):
         super().__init__(title="Edit")
-        self.add_item(discord.ui.TextInput(label="please enter the edit you want to make",
+        self.add_item(discord.ui.TextInput(label="Message:",
                                            style=discord.TextStyle.short,
                                            default=old_message))
+        self.add_item(discord.ui.TextInput(label="Amount:",
+                                           style=discord.TextStyle.short,
+                                           default=old_amount))
+        self.add_item(discord.ui.TextInput(label="Interval:",
+                                           style=discord.TextStyle.short,
+                                           default=old_interval))
 
     async def on_submit(self, interaction: discord.Interaction):
         await interaction.response.defer()
@@ -17,25 +24,27 @@ class SimpleView(discord.ui.View):
     def __init__(self, id: int, running_commands_dict: dict):
         super().__init__()
         self.id= id
-        self.running_commands_dict = running_commands_dict
+        self.command = running_commands_dict[self.id]
     
     @discord.ui.button(emoji="🪦", style=discord.ButtonStyle.red)
     async def hello(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message(embed=discord.Embed(title=f"Command {self.id} Killed"), ephemeral=True)
-        self.running_commands_dict[self.id].kill()
-        del self.running_commands_dict[self.id]
+        self.command.kill()
+        del self.command
 
         self.stop()
 
     @discord.ui.button(emoji="🪶", style=discord.ButtonStyle.green)
     async def text_box(self, interaction: discord.Interaction, button: discord.ui.Button):
-        modal: discord.ui.Modal = EditWindow(self.running_commands_dict[self.id].info.message)
-        # TODO find a way to prevent the assignment to happen immediately, and rather wait until the user has finished writing
+        modal: discord.ui.Modal = EditWindow(self.command.info.message, self.command.info.amount, self.command.info.interval)
         await interaction.response.send_modal(modal)
         
         while not modal.is_finished():
             await asyncio.sleep(1)
-        self.running_commands_dict[self.id].info.message = modal.children[0].value
+        self.command.info.message = modal.children[0]
+        self.command.info.amount = literal_eval(str(modal.children[1]))
+        self.command.info.remaining = literal_eval(str(modal.children[2]))
+        self.command.info.interval = literal_eval(str(modal.children[2]))
 
 
 @tree.command(
