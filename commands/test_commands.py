@@ -7,9 +7,11 @@ class EditWindow(discord.ui.Modal):
         self.add_item(discord.ui.TextInput(label="please enter the edit you want to make",
                                            style=discord.TextStyle.short,
                                            default=old_message))
+        self.submitted = False
 
     async def on_submit(self, interaction: discord.Interaction):
         await interaction.response.defer()
+        self.submitted = True
         self.stop()
 
 @tree.command(
@@ -21,5 +23,8 @@ async def modal_test(ctx: discord.Interaction):
     edit = EditWindow("test")
     # TODO find a way to prevent the assignment to happen immediately, and rather wait until the user has finished writing
     await ctx.response.send_modal(edit)
-    await asyncio.sleep(10)
+
+    while(not edit.submitted):
+        await asyncio.sleep(1)
+    
     print(edit.children[0])
