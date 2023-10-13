@@ -52,6 +52,16 @@ async def annoy(ctx, user: str, message: str, amount: int, interval: str):
     await execute_command(ctx, "annoy", annoy_internal, user, message, amount, interval)
 
 
+@tree.command(
+    name="spam_message",
+    description="Spam a message!",
+    guild=discord.Object(id=guild_id)
+)
+async def spam_message(ctx, message: str, amount: int, interval: str):
+    interval = literal_eval(interval)
+    await execute_command(ctx, "spam_message", annoy_internal, "", message, amount, interval)
+
+
 async def annoy_internal(ctx, command_info: MessagingInfo):
     while command_info.remaining > 0:
         command_info.remaining -= 1
@@ -96,8 +106,7 @@ class SeenButton(discord.ui.View):
     @discord.ui.button(emoji="👍", style=discord.ButtonStyle.success)
     async def hello(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message(embed=discord.Embed(
-            title=f"Okay, i will stop annoying you now {interaction.user.nick} :)"),
-            ephemeral=True)
+            title=f"Okay, i will stop annoying you now {interaction.user.nick} :)"))
         self.seen = True
         self.stop()
 
