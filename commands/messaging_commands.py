@@ -3,8 +3,8 @@ from ast import literal_eval
 
 
 async def validate_user(ctx, user):
-    # This doesnt really check anything at all xD
-    if user is None:
+    # This doesnt really check anything at all, not sure we want it to check in messaging commands as i dont think we gotta? xD
+    if user == None:
         await ctx.response.send_message(embed=discord.Embed(title="User could not be found"), ephemeral=True)
         return False
     return True
@@ -51,19 +51,9 @@ async def execute_command(ctx, command_name, internal_function, user, message, a
     description="Spam a message at someone!",
     guild=discord.Object(id=guild_id)
 )
-async def annoy(ctx, user: str, message: str, amount: int, interval: str):
+async def annoy(ctx, message: str, amount: int, interval: str, user: str = ""):
     interval = literal_eval(interval)
     await execute_command(ctx, "annoy", annoy_internal, user, message, amount, interval)
-
-
-@tree.command(
-    name="spam_message",
-    description="Spam a message!",
-    guild=discord.Object(id=guild_id)
-)
-async def spam_message(ctx, message: str, amount: int, interval: str):
-    interval = literal_eval(interval)
-    await execute_command(ctx, "spam_message", annoy_internal, "", message, amount, interval)
 
 
 async def annoy_internal(ctx, command_info: MessagingInfo):
@@ -99,7 +89,7 @@ async def dm_spam_internal(ctx, command_info: MessagingInfo):
     description="Ping someone x times, once every 60 seconds till they react",
     guild=discord.Object(id=guild_id)
 )
-async def get_attention(ctx, user: str, message: str, amount: int, interval: str):
+async def get_attention(ctx, message: str, amount: int, interval: str, user: str):
     interval = literal_eval(interval)
     await execute_command(ctx, "get_attention", get_attention_internal, user, message, amount, interval)
 

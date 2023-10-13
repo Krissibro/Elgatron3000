@@ -113,13 +113,13 @@ async def cleanup(ctx, messages_amount: int):
 )
 async def help(ctx):
     embed = discord.Embed(title="📚 Help")
-    embed.add_field(name="/annoy <user> <message> <amount> <interval>", 
+    embed.add_field(name="/annoy <message> <amount> <interval> (<user>)", 
                     value="Spams a given message at a given user", inline=False)
     embed.add_field(name="/a spam_message <message> <amount> <interval>", 
                     value="Spams a given message", inline=False)
     embed.add_field(name="/dm_aga <message> <amount> <interval>", 
                     value="Sends a given personal message to HA", inline=False)
-    embed.add_field(name="/get_attention <user> <message> <amount> <interval>", 
+    embed.add_field(name="/get_attention <message> <amount> <interval> <user>", 
                     value="Sends the given message at the given user until they acnowledge that they have seen the message", inline=False)
     embed.add_field(name="/free_games_rn", 
                     value="See free games from Epic Games", inline=False)
