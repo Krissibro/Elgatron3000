@@ -31,8 +31,8 @@ class MessagingInfo():
             description=f"Message: {self.message}"
         )
         embed.add_field(name="User:", value=f"{self.user}", inline=False)
-        embed.add_field(name="Amount:", value=f"{self.remaining}/{self.amount}", inline=False)
-        embed.add_field(name="Interval:", value=f"{timedelta(seconds=self.interval)}", inline=False)
+        embed.add_field(name="Amount:", value=f"{self.remaining}/{self.amount}", inline=True)
+        embed.add_field(name="Interval:", value=f"{timedelta(seconds=self.interval)}", inline=True)
         return embed
 
 
