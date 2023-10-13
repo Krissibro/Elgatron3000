@@ -23,7 +23,7 @@ class MessagingInfo():
         self.amount: int = amount
         self.remaining: int = amount
         self.interval : int = interval
-        self.user: str = str(user.mention or '')
+        self.user: str = "" if user is None else user.mention
         self.messages = []
     
     def make_embed(self):
