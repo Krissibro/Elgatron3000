@@ -59,7 +59,8 @@ async def annoy(ctx, message: str, amount: int, interval: str, user: str = ""):
 async def annoy_internal(ctx, command_info: MessagingInfo):
     while command_info.remaining > 0:
         command_info.remaining -= 1
-        await ctx.channel.send(f"{command_info.user} {command_info.message}")
+        message = await ctx.channel.send(f"{command_info.user} {command_info.message}")
+        command_info.messages.append(message)
         await asyncio.sleep(command_info.interval)
 
 
@@ -86,7 +87,7 @@ async def dm_spam_internal(ctx, command_info: MessagingInfo):
 
 @tree.command(
     name="get_attention",
-    description="Ping someone x times, once every 60 seconds till they react",
+    description="Ping someone X times, once every 60 seconds until they react",
     guild=discord.Object(id=guild_id)
 )
 async def get_attention(ctx, message: str, amount: int, interval: str, user: str):
@@ -110,7 +111,7 @@ async def get_attention_internal(ctx, command_info: MessagingInfo):
         command_info.remaining -= 1
         view = SeenButton(timeout=command_info.interval * 2)
 
-        await ctx.channel.send(
+        message = await ctx.channel.send(
             f"{command_info.user}",
             embed=discord.Embed(
                 title=f"{command_info.message}",
@@ -119,7 +120,8 @@ async def get_attention_internal(ctx, command_info: MessagingInfo):
             view = view
             )
         
+        command_info.messages.append(message)
+        
         await asyncio.sleep(command_info.interval)
-
         if view.seen:
             break

@@ -18,12 +18,13 @@ class MessagingInfo():
     current_ids = set()
 
     def __init__(self, command: str, user: str, message: str, amount:int, interval: int):
-        self.command = command
-        self.message = message
-        self.amount = amount
-        self.remaining = amount
-        self.interval = interval
-        self.user = user
+        self.command: str = command
+        self.message: str = message
+        self.amount: int = amount
+        self.remaining: int = amount
+        self.interval : int = interval
+        self.user: str = user
+        self.messages = []
     
     def make_embed(self):
         embed = discord.Embed(

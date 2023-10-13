@@ -27,8 +27,10 @@ class SimpleView(discord.ui.View):
         self.command = running_commands_dict[self.id]
     
     @discord.ui.button(emoji="🪦", style=discord.ButtonStyle.red)
-    async def hello(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def kill(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message(embed=discord.Embed(title=f"Command {self.id} Killed"), ephemeral=True)
+        # ChatGPT made this, idk how it works
+        await asyncio.gather(*[i.delete() for i in self.command.info.messages])
         self.command.kill()
         del self.command
 
@@ -114,15 +116,13 @@ async def cleanup(ctx, messages_amount: int):
 async def help(ctx):
     embed = discord.Embed(title="📚 Help")
     embed.add_field(name="/annoy <message> <amount> <interval> (<user>)", 
-                    value="Spams a given message at a given user", inline=False)
-    embed.add_field(name="/a spam_message <message> <amount> <interval>", 
-                    value="Spams a given message", inline=False)
+                    value="Sends a message every given interval", inline=False)
     embed.add_field(name="/dm_aga <message> <amount> <interval>", 
-                    value="Sends a given personal message to HA", inline=False)
+                    value="Sends a message to HA every given interval", inline=False)
     embed.add_field(name="/get_attention <message> <amount> <interval> <user>", 
-                    value="Sends the given message at the given user until they acnowledge that they have seen the message", inline=False)
+                    value="Mention someone X times, every given interval until they react", inline=False)
     embed.add_field(name="/free_games_rn", 
-                    value="See free games from Epic Games", inline=False)
+                    value="See free games from Epic Games and Playstation", inline=False)
     embed.add_field(name="/cleanup <messages_amount>", 
                     value="Deletes the given amount of messages", inline=False)
     embed.add_field(name="/running_commands", 
