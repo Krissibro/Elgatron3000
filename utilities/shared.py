@@ -17,13 +17,13 @@ running_commands_dict = {}
 class MessagingInfo():
     current_ids = set()
 
-    def __init__(self, command: str, user: str, message: str, amount:int, interval: int):
+    def __init__(self, command: str, user: discord.User, message: str, amount:int, interval: int):
         self.command: str = command
         self.message: str = message
         self.amount: int = amount
         self.remaining: int = amount
         self.interval : int = interval
-        self.user: str = user
+        self.user: str = str(f"<@{user.id}>" or '')
         self.messages = []
     
     def make_embed(self):

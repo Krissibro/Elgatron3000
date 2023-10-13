@@ -2,9 +2,10 @@ from utilities.shared import *
 from ast import literal_eval
 
 
-async def validate_user(ctx, user):
-    # This doesnt really check anything at all, not sure we want it to check in messaging commands as i dont think we gotta? xD
-    if user == None:
+async def validate_user(ctx:discord.Interaction, user:discord.User):
+    if user is None:
+        return True
+    elif ctx.guild.get_member(user.id) is None:
         await ctx.response.send_message(embed=discord.Embed(title="User could not be found"), ephemeral=True)
         return False
     return True
@@ -24,7 +25,7 @@ async def validate_amount(ctx, amount):
     return True
 
 
-async def execute_command(ctx, command_name, internal_function, user, message, amount, interval):
+async def execute_command(ctx, command_name, internal_function, user: discord.User, message: str, amount: int, interval:int):
     # Error handling
     if not (await validate_user(ctx, user) and await validate_amount(ctx, amount) and await validate_interval(ctx, interval)):
         return
@@ -51,7 +52,7 @@ async def execute_command(ctx, command_name, internal_function, user, message, a
     description="Spam a message at someone!",
     guild=discord.Object(id=guild_id)
 )
-async def annoy(ctx, message: str, amount: int, interval: str, user: str = ""):
+async def annoy(ctx, message: str, amount: int, interval: str, user: discord.User = None):
     interval = literal_eval(interval)
     await execute_command(ctx, "annoy", annoy_internal, user, message, amount, interval)
 
@@ -90,7 +91,7 @@ async def dm_spam_internal(ctx, command_info: MessagingInfo):
     description="Ping someone X times, once every 60 seconds until they react",
     guild=discord.Object(id=guild_id)
 )
-async def get_attention(ctx, message: str, amount: int, interval: str, user: str):
+async def get_attention(ctx, message: str, amount: int, interval: str, user: discord.User):
     interval = literal_eval(interval)
     await execute_command(ctx, "get_attention", get_attention_internal, user, message, amount, interval)
 
