@@ -9,21 +9,22 @@ from utilities.shared import *
     description="See the currently free games on Epic Games",
     guild=discord.Object(id=guild_id)
 )
-async def free_games_rn(ctx):
-    await ctx.response.defer()
+async def free_games_rn(ctx: discord.Interaction):
+    await ctx.response.send_message(embed=discord.Embed(title="Free Games INCOMING!!!!"))
     await free_epic_games(ctx.channel)
     await free_playstation_games(ctx.channel)
+    # TODO doesnt work, kristoffer you know how this api works better than me xD
     await post_free_games(ctx.channel)
 
 
 async def free_epic_games(channel):
-    epic_games_embed = discord.Embed(title="Free and Epic Games INCOMING!!!!",
+    epic_games_embed = discord.Embed(title="Epic Games!!!!",
                                      description="https://store.epicgames.com/en-US/free-games")
     await channel.send(embed=epic_games_embed)
 
 
 async def free_playstation_games(channel):
-    playstation_embed = discord.Embed(title="Free Pisstation Games INCOMING!!111!!!",
+    playstation_embed = discord.Embed(title="Pisstation Games!!111!!!",
                                       description="https://www.playstation.com/en-us/ps-plus/whats-new/#monthly-games")
     await channel.send(embed=playstation_embed)
 

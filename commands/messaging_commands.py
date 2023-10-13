@@ -3,6 +3,7 @@ from ast import literal_eval
 
 
 async def validate_user(ctx, user):
+    # This doesnt really check anything at all xD
     if user is None:
         await ctx.response.send_message(embed=discord.Embed(title="User could not be found"), ephemeral=True)
         return False
@@ -28,16 +29,19 @@ async def execute_command(ctx, command_name, internal_function, user, message, a
     if not (await validate_user(ctx, user) and await validate_amount(ctx, amount) and await validate_interval(ctx, interval)):
         return
 
+    # Make Command info
     command_info = MessagingInfo(command_name, user, message, amount, interval)
+    
+    # Make Command and add to command Tracker
     command = asyncio.create_task(internal_function(ctx, command_info))
-
     command_tracker = Command(command_info, command)
     running_commands_dict[command_tracker.id] = command_tracker
 
+    # Run Command
     await ctx.response.send_message(embed=command_info.make_embed(), ephemeral=True)
     await command
 
-    # After
+    # Clean up after Command
     del running_commands_dict[command_tracker.id]
     Command.current_ids.remove(command_tracker.id)
 
