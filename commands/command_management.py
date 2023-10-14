@@ -38,7 +38,7 @@ class SimpleView(discord.ui.View):
 
     @discord.ui.button(emoji="🪶", style=discord.ButtonStyle.green)
     async def text_box(self, interaction: discord.Interaction, button: discord.ui.Button):
-        modal: discord.ui.Modal = EditWindow(self.command.info.message, self.command.info.amount, self.command.info.interval)
+        modal: discord.ui.Modal = EditWindow(self.command.info.message, self.command.info.remaining, self.command.info.interval)
         await interaction.response.send_modal(modal)
         
         while not modal.is_finished():
@@ -73,11 +73,13 @@ async def manage_commands(ctx):
 
     for id, command in running_commands_dict.items():
         embed = command.get_embed()
-        message = await ctx.channel.send(embed=embed, view = SimpleView(id, running_commands_dict))
+        message = await ctx.channel.send(embed=embed, 
+                                          view=SimpleView(id, running_commands_dict))
         messages.append(message)
 
-    await ctx.response.send_message(embed=discord.Embed(title="Showing all running processes"), view=DeleteButton(messages), ephemeral=True)
-
+    # TODO: i want this to be ephimeral, but i also want it to be visible to everyone, hmmmmm
+    await ctx.response.send_message(embed=discord.Embed(title="Showing all running processes"),
+                                     view=DeleteButton(messages))
 
 @tree.command(
     name="kill_command",
