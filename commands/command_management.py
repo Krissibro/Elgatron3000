@@ -48,22 +48,35 @@ class SimpleView(discord.ui.View):
         self.command.info.remaining = literal_eval(str(modal.children[2]))
         self.command.info.interval = literal_eval(str(modal.children[2]))
 
+class DeleteButton(discord.ui.View):
+    def __init__(self, messages):
+        super().__init__()
+        self.messages = messages
+    
+    @discord.ui.button(emoji="🗑️", style=discord.ButtonStyle.green)
+    async def text_box(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.defer()
+        await asyncio.gather(*[i.delete() for i in self.messages])
+        self.stop()
 
 @tree.command(
-    name="running_commands",
-    description="See the currently running commands",
+    name="manage_commands",
+    description="See and manage running commands",
     guild=discord.Object(id=guild_id)
 )
-async def running_commands(ctx):
+async def manage_commands(ctx):
     if not running_commands_dict:
         await ctx.response.send_message(embed=discord.Embed(title="No commands running"), ephemeral=True)
         return
 
-    await ctx.response.send_message(embed=discord.Embed(title="Showing all running processes"), ephemeral=True)
+    messages = []
 
     for id, command in running_commands_dict.items():
         embed = command.get_embed()
-        await ctx.channel.send(embed=embed, view = SimpleView(id, running_commands_dict))
+        message = await ctx.channel.send(embed=embed, view = SimpleView(id, running_commands_dict))
+        messages.append(message)
+
+    await ctx.response.send_message(embed=discord.Embed(title="Showing all running processes"), view=DeleteButton(messages), ephemeral=True)
 
 
 @tree.command(
@@ -125,8 +138,8 @@ async def help(ctx):
                     value="See free games from Epic Games and Playstation", inline=False)
     embed.add_field(name="/cleanup <messages_amount>", 
                     value="Deletes the given amount of messages", inline=False)
-    embed.add_field(name="/running_commands", 
-                    value="Manage running commands and see their IDs", inline=False)
+    embed.add_field(name="/manage_commands", 
+                    value="Manage and see info about running commands", inline=False)
     embed.add_field(name="/kill_command <ID>", 
                     value="Kills the command with the corresponding ID", inline=False)
     embed.add_field(name="/kill_all_commands", 
