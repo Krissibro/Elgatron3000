@@ -5,9 +5,11 @@ from ast import literal_eval
 async def validate_user(ctx:discord.Interaction, user:discord.User):
     if user is None:
         return True
-    elif ctx.guild.get_member(user.id) is None:
+    """ Doesnt work RN
+    elif user in ctx.guild.members:
         await ctx.response.send_message(embed=discord.Embed(title="User could not be found"), ephemeral=True)
         return False
+    """
     return True
 
 
