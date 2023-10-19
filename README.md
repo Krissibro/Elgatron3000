@@ -12,7 +12,7 @@ Elgatron3000 is a very cool and epic Discord bot designed to provide a mix of re
 
 1. **Clone the Repository**
 ```bash
-git clone https://github.com/your_username/Elgatron3000.git
+git clone https://github.com/Krissibro/Elgatron3000.git
 cd Elgatron3000
 ```
 
