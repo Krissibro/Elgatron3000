@@ -14,8 +14,8 @@ if testing:
 @client.event
 async def on_ready():
     await tree.sync(guild=discord.Object(id=guild_id))
-    if not testing:
-        client.loop.create_task(schedule_post_free_games())
+    # if not testing:
+    client.loop.create_task(schedule_post_free_games())
     print("Ready!")
 
 

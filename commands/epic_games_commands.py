@@ -46,7 +46,7 @@ async def free_games_rn(ctx):
     await post_free_games(ctx.channel)
 
 
-async def scheduled_command():
+async def scheduled_post_free_games():
     channel = client.get_channel(1111353625638350893)
 
     await channel.send(embed=discord.Embed(title="Free Games INCOMING!!!!"))
@@ -55,8 +55,8 @@ async def scheduled_command():
 
 async def schedule_post_free_games():
     scheduler = AsyncIOScheduler(timezone='Europe/Oslo')
-    trigger = CronTrigger(day_of_week='fri', hour=18, minute=0, second=0, timezone='Europe/Oslo')
-    scheduler.add_job(scheduled_command, trigger)
+    trigger = CronTrigger(day_of_week='thu', hour=18, minute=0, second=0, timezone='Europe/Oslo')
+    scheduler.add_job(scheduled_post_free_games, trigger)
     scheduler.start()
 
     scheduler.print_jobs()
