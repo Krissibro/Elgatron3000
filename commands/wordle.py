@@ -26,10 +26,13 @@ class Wordle:
         self.correct_guess = False
 
         # Gammin
-        channel = client.get_channel(1111353625638350893)
+        #channel = client.get_channel(1111353625638350893)
         # Test channel
-        # channel = client.get_channel(839100318893211669)
-        await channel.send(embed=discord.Embed(title="New Daily Wordle dropped! :fire: :fire: "))
+        channel = client.get_channel(839100318893211669)
+        embed = discord.Embed(title="New Daily Wordle dropped! :fire: :fire: ")
+        embed.add_field(name="There is also:", value=f"[Connections](https://www.nytimes.com/games/connections)\n" +
+                                                      f"[Real Wordle](https://www.nytimes.com/games/wordle/index.html)")
+        await channel.send(embed=embed)
 
     async def guess_word(self, ctx, guessed_word: str):
         guessed_word = guessed_word.strip().lower()
@@ -37,14 +40,14 @@ class Wordle:
         if self.correct_guess:
             await ctx.response.send_message(embed=discord.Embed(title="The daily wordle has already been guessed"))
             return
-        if ctx.user.id in self.users_that_guessed:
-            await ctx.response.send_message(embed=discord.Embed(title="You have already guessed"))
-            return
+        #if ctx.user.id in self.users_that_guessed:
+        #    await ctx.response.send_message(embed=discord.Embed(title="You have already guessed"))
+        #    return
         if not len(guessed_word) == 5:
             await ctx.response.send_message(embed=discord.Embed(title="The word must be 5 letters long"))
             return
         if guessed_word not in valid_words:
-            await ctx.response.send_message(embed=discord.Embed(title=f"{guessed_word} is not a valid word"))
+            await ctx.response.send_message(embed=discord.Embed(title=f"{guessed_word.upper()} is not a valid word"))
             return
 
         self.guessed_words.add(guessed_word)
@@ -90,8 +93,8 @@ class Wordle:
 
         for user_id, guessed_word, guess_result in self.display_list:
             user = await client.fetch_user(user_id)
-            embed.add_field(name=user.name,
-                            value=f"**{guessed_word}**\n{guess_result}",
+            embed.add_field(name=f"‎ **{guessed_word}**     <-  {user.name}",
+                            value=f"{guess_result}",
                             inline=False)
 
         return embed
