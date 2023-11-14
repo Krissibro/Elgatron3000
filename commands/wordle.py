@@ -26,9 +26,9 @@ class Wordle:
         self.correct_guess = False
 
         # Gammin
-        #channel = client.get_channel(1111353625638350893)
+        channel = client.get_channel(1111353625638350893)
         # Test channel
-        channel = client.get_channel(839100318893211669)
+        #channel = client.get_channel(839100318893211669)
         embed = discord.Embed(title="New Daily Wordle dropped! :fire: :fire: ")
         embed.description = f"[Connections](https://www.nytimes.com/games/connections)\n[Real Wordle](https://www.nytimes.com/games/wordle/index.html)"
         await channel.send(embed=embed)
@@ -39,9 +39,9 @@ class Wordle:
         if self.correct_guess:
             await ctx.response.send_message(embed=discord.Embed(title="The daily wordle has already been guessed"))
             return
-        #if ctx.user.id in self.users_that_guessed:
-        #    await ctx.response.send_message(embed=discord.Embed(title="You have already guessed"))
-        #    return
+        if ctx.user.id in self.users_that_guessed:
+            await ctx.response.send_message(embed=discord.Embed(title="You have already guessed"))
+            return
         if not len(guessed_word) == 5:
             await ctx.response.send_message(embed=discord.Embed(title="The word must be 5 letters long"))
             return
