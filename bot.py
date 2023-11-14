@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from commands.command_management import * 
 from commands.messaging_commands import * 
 from commands.epic_games_commands import *
+from commands.wordle import *
 from utilities.settings import testing
 
 if testing:
@@ -16,6 +17,7 @@ async def on_ready():
     await tree.sync(guild=discord.Object(id=guild_id))
     # if not testing:
     client.loop.create_task(schedule_post_free_games())
+    client.loop.create_task(initialize_wordle())
     print("Ready!")
 
 

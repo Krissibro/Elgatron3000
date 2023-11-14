@@ -1,6 +1,8 @@
 import discord
 from discord import app_commands
 import asyncio
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
 from datetime import timedelta
 
 from utilities.settings import guild_id
@@ -10,11 +12,12 @@ intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
+scheduler = AsyncIOScheduler(timezone='Europe/Oslo')
 
 running_commands_dict = {}
 
 
-class MessagingInfo():
+class MessagingInfo:
     current_ids = set()
 
     def __init__(self, command: str, user: discord.User, message: str, amount:int, interval: int):

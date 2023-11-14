@@ -1,6 +1,4 @@
 from epicstore_api import EpicGamesStoreAPI
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.triggers.cron import CronTrigger
 
 from utilities.shared import *
 
@@ -54,7 +52,7 @@ async def scheduled_post_free_games():
 
 
 async def schedule_post_free_games():
-    scheduler = AsyncIOScheduler(timezone='Europe/Oslo')
+
     trigger = CronTrigger(day_of_week='thu', hour=18, minute=0, second=0, timezone='Europe/Oslo')
     scheduler.add_job(scheduled_post_free_games, trigger)
     scheduler.start()
