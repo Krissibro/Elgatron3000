@@ -26,10 +26,10 @@ class Wordle:
         self.correct_guess = False
 
         # Gammin
-        # channel = client.get_channel(1111353625638350893)
+        channel = client.get_channel(1111353625638350893)
         # Test channel
-        channel = client.get_channel(839100318893211669)
-        # await channel.send(embed=discord.Embed(title="New Daily Wordle dropped! :fire: :fire: "))
+        # channel = client.get_channel(839100318893211669)
+        await channel.send(embed=discord.Embed(title="New Daily Wordle dropped! :fire: :fire: "))
 
     async def guess_word(self, ctx, guessed_word: str):
         guessed_word = guessed_word.strip().lower()
@@ -91,7 +91,7 @@ class Wordle:
         for user_id, guessed_word, guess_result in self.display_list:
             user = await client.fetch_user(user_id)
             embed.add_field(name=user.name,
-                            value=f"{guessed_word}\n{guess_result}",
+                            value=f"**{guessed_word}**\n{guess_result}",
                             inline=False)
 
         return embed
@@ -107,6 +107,8 @@ async def initialize_wordle():
 
     await wordle.pick_new_word()
     scheduler.add_job(wordle.pick_new_word, trigger)
+
+    scheduler.print_jobs()
 
 
 @tree.command(
