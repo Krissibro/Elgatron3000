@@ -30,8 +30,7 @@ class Wordle:
         # Test channel
         channel = client.get_channel(839100318893211669)
         embed = discord.Embed(title="New Daily Wordle dropped! :fire: :fire: ")
-        embed.add_field(name="There is also:", value=f"[Connections](https://www.nytimes.com/games/connections)\n" +
-                                                      f"[Real Wordle](https://www.nytimes.com/games/wordle/index.html)")
+        embed.description = f"[Connections](https://www.nytimes.com/games/connections)\n[Real Wordle](https://www.nytimes.com/games/wordle/index.html)"
         await channel.send(embed=embed)
 
     async def guess_word(self, ctx, guessed_word: str):
