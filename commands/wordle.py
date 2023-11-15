@@ -1,13 +1,10 @@
-import pandas as pd
+import numpy as np
 import random
 from utilities.shared import *
 
 
-valid_words_df = pd.read_csv('./data/valid-words.csv', header=None)
-word_bank_df = pd.read_csv('./data/word-bank.csv', header=None)
-
-valid_words = set(valid_words_df[0].tolist())
-word_bank = word_bank_df[0].tolist()
+valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())
+word_bank = list(np.genfromtxt('./data/word-bank.csv', delimiter=',', dtype=str))
 
 
 class Wordle:
@@ -148,8 +145,3 @@ async def guess_daily_wordle(ctx, guessed_word: str):
     global wordle
 
     await wordle.guess_word(ctx, guessed_word)
-
-
-
-
-
