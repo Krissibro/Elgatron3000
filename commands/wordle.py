@@ -1,13 +1,10 @@
-import pandas as pd
+import numpy as np
 import random
 from utilities.shared import *
 
 
-valid_words_df = pd.read_csv('./data/valid-words.csv', header=None)
-word_bank_df = pd.read_csv('./data/word-bank.csv', header=None)
-
-valid_words = set(valid_words_df[0].tolist())
-word_bank = word_bank_df[0].tolist()
+valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())
+word_bank = list(np.genfromtxt('./data/word-bank.csv', delimiter=',', dtype=str))
 
 
 class Wordle:
@@ -15,6 +12,7 @@ class Wordle:
     correct_guess = False
     guessed_words = set()
     users_that_guessed = set()
+    available_letters = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'}
 
     display_list = []
 
@@ -23,12 +21,13 @@ class Wordle:
         self.guessed_words.clear()
         self.users_that_guessed.clear()
         self.display_list.clear()
+        self.available_letters = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'}
         self.correct_guess = False
 
         # Gammin
         channel = client.get_channel(1111353625638350893)
         # Test channel
-        #channel = client.get_channel(839100318893211669)
+        # channel = client.get_channel(839100318893211669)
         embed = discord.Embed(title="New Daily Wordle dropped! :fire: :fire: ")
         embed.description = f"[Connections](https://www.nytimes.com/games/connections)\n[Real Wordle](https://www.nytimes.com/games/wordle/index.html)"
         await channel.send(embed=embed)
@@ -37,7 +36,7 @@ class Wordle:
         guessed_word = guessed_word.strip().lower()
 
         if self.correct_guess:
-            await ctx.response.send_message(embed=discord.Embed(title="The daily wordle has already been guessed"))
+            await ctx.response.send_message(embed=discord.Embed(title="The daily wordle has already been finished."))
             return
         if ctx.user.id in self.users_that_guessed:
             await ctx.response.send_message(embed=discord.Embed(title="You have already guessed"))
@@ -48,6 +47,13 @@ class Wordle:
         if guessed_word not in valid_words:
             await ctx.response.send_message(embed=discord.Embed(title=f"{guessed_word.upper()} is not a valid word"))
             return
+        # If you want to block unavailable letters
+        # for letter in guessed_word:
+        #     if letter not in self.available_letters:
+        #         embed = discord.Embed(title=f"{letter.upper()} is not available.")
+        #         embed.description = await self.format_available_letters()
+        #         await ctx.response.send_message(embed=embed)
+        #         return
 
         self.guessed_words.add(guessed_word)
         self.users_that_guessed.add(ctx.user.id)
@@ -76,10 +82,12 @@ class Wordle:
             # If no match
             else:
                 guess_result.append(":red_square:")
+                if letter in self.available_letters:
+                    self.available_letters.remove(letter)
 
-        # Three whitespaces
+        # Four whitespaces
         seperator = "\u00A0\u00A0\u00A0\u00A0"
-        self.display_list.append([ctx.user.id, seperator.join(guessed_word.upper()), ' '.join(guess_result)])         # TODO: Add 2 whitespaces before the first letter
+        self.display_list.append([ctx.user.id, seperator.join(guessed_word.upper()), ' '.join(guess_result)])
 
         await ctx.response.send_message(embed=await self.make_embed())
 
@@ -95,8 +103,13 @@ class Wordle:
             embed.add_field(name=f"‎ **{guessed_word}**     <-  {user.name}",
                             value=f"{guess_result}",
                             inline=False)
+            embed.set_footer(text=await self.format_available_letters())
 
         return embed
+
+    async def format_available_letters(self):
+        available_letters_list = [string.upper() for string in sorted(list(self.available_letters))]
+        return f"Available letters:\n{' '.join(available_letters_list[:-1])} and {available_letters_list[-1]}"
 
 
 wordle = Wordle()
@@ -132,8 +145,3 @@ async def guess_daily_wordle(ctx, guessed_word: str):
     global wordle
 
     await wordle.guess_word(ctx, guessed_word)
-
-
-
-
-
