@@ -12,6 +12,7 @@ class Wordle:
     correct_guess = False
     guessed_words = set()
     users_that_guessed = set()
+    known = set()
     available_letters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
                          'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
 
@@ -24,6 +25,7 @@ class Wordle:
         self.guessed_words.clear()
         self.users_that_guessed.clear()
         self.display_list.clear()
+        self.known = set()
         self.available_letters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
                                   'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
         self.correct_guess = False
@@ -70,16 +72,18 @@ class Wordle:
                 guess_result[index] = ":green_square:"
                 # if a letter is found, we don't want it to be found again
                 yellow_checker.remove(letter)
+                self.known.add(letter)
 
         # Check for letters that are in the word, but in the wrong place
         for index, letter in enumerate(guessed_word):
             if letter in yellow_checker and not letter == self.daily_word[index]:
                 guess_result[index] = ":yellow_square:"
                 yellow_checker.remove(letter)
+                self.known.add(letter)
 
         # Remove unused letters from available letters
         for letter in guessed_word:
-            if letter not in self.daily_word and letter in self.available_letters:
+            if letter in self.available_letters:
                 self.available_letters.remove(letter)
 
         # Four whitespaces
@@ -109,7 +113,10 @@ class Wordle:
 
     async def format_available_letters(self):
         sorted_available_letters = sorted(list(self.available_letters))
-        return f"Available letters:\n{' '.join(sorted_available_letters[:-1])} and {sorted_available_letters[-1]}"
+        sorted_known_letters = sorted(list(self.known))
+        known = f"Known letters:\n{' '.join(sorted_known_letters)}"
+        rest = f"Available letters:\n{' '.join(sorted_available_letters)}"
+        return f"{known}\n{rest}"
 
 
 wordle = Wordle()
