@@ -28,16 +28,16 @@ class Wordle:
                                   'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
         self.correct_guess = False
 
-        if testing:
+        if not testing:
             # Test channel
-            channel = client.get_channel(839100318893211669)
-        else:
-            # Gammin
+            # channel = client.get_channel(839100318893211669)
+            # Gammin channel
             channel = client.get_channel(1111353625638350893)
-        embed = discord.Embed(title="New Daily Wordle dropped! :fire: :fire: ")
-        embed.description = (f"[Connections](https://www.nytimes.com/games/connections)\n" +
-                             f"[Real Wordle](https://www.nytimes.com/games/wordle/index.html)")
-        await channel.send(embed=embed)
+            embed = discord.Embed(title="New Daily Wordle dropped! :fire: :fire: ")
+
+            embed.description = (f"[Connections](https://www.nytimes.com/games/connections)\n" +
+                                 f"[Real Wordle](https://www.nytimes.com/games/wordle/index.html)")
+            await channel.send(embed=embed)
 
     async def guess_word(self, ctx, guessed_word: str):
         guessed_word = guessed_word.strip().upper()
