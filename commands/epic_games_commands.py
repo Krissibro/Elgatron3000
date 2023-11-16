@@ -57,4 +57,3 @@ async def schedule_post_free_games():
     scheduler.add_job(scheduled_post_free_games, trigger)
     scheduler.start()
 
-    scheduler.print_jobs()
