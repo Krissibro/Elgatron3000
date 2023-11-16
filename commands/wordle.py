@@ -12,16 +12,20 @@ class Wordle:
     correct_guess = False
     guessed_words = set()
     users_that_guessed = set()
-    available_letters = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
-                         't', 'u', 'v', 'w', 'x', 'y', 'z'}
+    available_letters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
+                         'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
 
     display_list = []
 
     async def pick_new_word(self):
-        self.daily_word = random.sample(word_bank, 1)[0]
+        random_word = random.sample(word_bank, 1)[0]
+        self.daily_word = random_word.upper()
+        self.daily_word = "XOXOX"
         self.guessed_words.clear()
         self.users_that_guessed.clear()
         self.display_list.clear()
+        self.available_letters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
+                                  'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
         self.correct_guess = False
 
         if testing:
@@ -36,7 +40,7 @@ class Wordle:
         await channel.send(embed=embed)
 
     async def guess_word(self, ctx, guessed_word: str):
-        guessed_word = guessed_word.strip().lower()
+        guessed_word = guessed_word.strip().upper()
 
         if self.correct_guess:
             await ctx.response.send_message(embed=discord.Embed(title="The daily wordle has already been guessed"))
@@ -49,43 +53,44 @@ class Wordle:
                 await ctx.response.send_message(embed=discord.Embed(title="You have already guessed"))
                 return
             if guessed_word not in valid_words:
-                await ctx.response.send_message(embed=discord.Embed(title=f"{guessed_word.upper()} is not a valid word"))
+                await ctx.response.send_message(embed=discord.Embed(title=f"{guessed_word} is not a valid word"))
                 return
 
         self.guessed_words.add(guessed_word)
         self.users_that_guessed.add(ctx.user.id)
         self.correct_guess = guessed_word == self.daily_word
 
+        # Initialize result with all red squares
         guess_result = [":red_square:"] * 5
-        wrong_spot = []
-        daily_word = list(self.daily_word)
+        yellow_checker = list(self.daily_word)
 
-        # check for correct placements
+        # Check for correct letters
         for index, letter in enumerate(guessed_word):
-            # Check if there are any letters in the right place, if not, add to list to be checked in next step
-            if letter == daily_word[len(wrong_spot)]:
+            if letter == self.daily_word[index]:
                 guess_result[index] = ":green_square:"
-                del daily_word[len(wrong_spot)]
-            else:
-                # to check in the next step
-                wrong_spot.append(guessed_word[index])
-
-        # check for letters in the wrong position
-        for index, letter in enumerate(wrong_spot):
-            if letter in daily_word:
                 # if a letter is found, we don't want it to be found again
+                yellow_checker.remove(letter)
+
+        # Check for letters that are in the word, but in the wrong place
+        for index, letter in enumerate(guessed_word):
+            if letter in yellow_checker and not letter == self.daily_word[index]:
                 guess_result[index] = ":yellow_square:"
-                daily_word.remove(letter)
+                yellow_checker.remove(letter)
+
+        # Remove unused letters from available letters
+        for letter in guessed_word:
+            if letter not in self.daily_word and letter in self.available_letters:
+                self.available_letters.remove(letter)
 
         # Four whitespaces
         seperator = "\u00A0\u00A0\u00A0\u00A0"
-        self.display_list.append([ctx.user.id, seperator.join(guessed_word.upper()), ' '.join(guess_result)])
+        self.display_list.append([ctx.user.id, seperator.join(guessed_word), ' '.join(guess_result)])
 
         await ctx.response.send_message(embed=await self.make_embed())
 
     async def make_embed(self):
         if self.correct_guess:
-            embed = discord.Embed(title=f"Congratulations! The word was {self.daily_word.upper()}!")
+            embed = discord.Embed(title=f"Congratulations! The word was {self.daily_word}!")
         else:
             embed = discord.Embed(title=f"Daily Wordle")
 
@@ -103,8 +108,8 @@ class Wordle:
         return embed
 
     async def format_available_letters(self):
-        available_letters_list = [string.upper() for string in sorted(list(self.available_letters))]
-        return f"Available letters:\n{' '.join(available_letters_list[:-1])} and {available_letters_list[-1]}"
+        sorted_available_letters = sorted(list(self.available_letters))
+        return f"Available letters:\n{' '.join(sorted_available_letters[:-1])} and {sorted_available_letters[-1]}"
 
 
 wordle = Wordle()
