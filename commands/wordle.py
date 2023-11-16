@@ -1,7 +1,7 @@
 import numpy as np
 import random
 from utilities.shared import *
-
+from utilities.settings import testing
 
 valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())
 word_bank = list(np.genfromtxt('./data/word-bank.csv', delimiter=',', dtype=str))
@@ -12,7 +12,8 @@ class Wordle:
     correct_guess = False
     guessed_words = set()
     users_that_guessed = set()
-    available_letters = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'}
+    available_letters = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
+                         't', 'u', 'v', 'w', 'x', 'y', 'z'}
 
     display_list = []
 
@@ -21,69 +22,60 @@ class Wordle:
         self.guessed_words.clear()
         self.users_that_guessed.clear()
         self.display_list.clear()
-        self.available_letters = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'}
         self.correct_guess = False
 
-        # Gammin
-        channel = client.get_channel(1111353625638350893)
-        # Test channel
-        # channel = client.get_channel(839100318893211669)
+        if testing:
+            # Test channel
+            channel = client.get_channel(839100318893211669)
+        else:
+            # Gammin
+            channel = client.get_channel(1111353625638350893)
         embed = discord.Embed(title="New Daily Wordle dropped! :fire: :fire: ")
-        embed.description = f"[Connections](https://www.nytimes.com/games/connections)\n[Real Wordle](https://www.nytimes.com/games/wordle/index.html)"
+        embed.description = (f"[Connections](https://www.nytimes.com/games/connections)\n" +
+                             f"[Real Wordle](https://www.nytimes.com/games/wordle/index.html)")
         await channel.send(embed=embed)
 
     async def guess_word(self, ctx, guessed_word: str):
         guessed_word = guessed_word.strip().lower()
 
         if self.correct_guess:
-            await ctx.response.send_message(embed=discord.Embed(title="The daily wordle has already been finished."))
-            return
-        if ctx.user.id in self.users_that_guessed:
-            await ctx.response.send_message(embed=discord.Embed(title="You have already guessed"))
+            await ctx.response.send_message(embed=discord.Embed(title="The daily wordle has already been guessed"))
             return
         if not len(guessed_word) == 5:
             await ctx.response.send_message(embed=discord.Embed(title="The word must be 5 letters long"))
             return
-        if guessed_word not in valid_words:
-            await ctx.response.send_message(embed=discord.Embed(title=f"{guessed_word.upper()} is not a valid word"))
-            return
-        # If you want to block unavailable letters
-        # for letter in guessed_word:
-        #     if letter not in self.available_letters:
-        #         embed = discord.Embed(title=f"{letter.upper()} is not available.")
-        #         embed.description = await self.format_available_letters()
-        #         await ctx.response.send_message(embed=embed)
-        #         return
+        if not testing:
+            if ctx.user.id in self.users_that_guessed:
+                await ctx.response.send_message(embed=discord.Embed(title="You have already guessed"))
+                return
+            if guessed_word not in valid_words:
+                await ctx.response.send_message(embed=discord.Embed(title=f"{guessed_word.upper()} is not a valid word"))
+                return
 
         self.guessed_words.add(guessed_word)
         self.users_that_guessed.add(ctx.user.id)
+        self.correct_guess = guessed_word == self.daily_word
 
-        if guessed_word == self.daily_word:
-            self.correct_guess = True
-            await ctx.response.send_message(embed=discord.Embed(
-                title=f"Congratulations! The word was {self.daily_word}!"))
+        guess_result = [":red_square:"] * 5
+        wrong_spot = []
+        daily_word = list(self.daily_word)
 
-        guess_result = []
-        yellow_checker = list(self.daily_word)
-
+        # check for correct placements
         for index, letter in enumerate(guessed_word):
-            # Check if there are any letters in the right place
-            if letter == self.daily_word[index]:
-                guess_result.append(":green_square:")
-
-            # Check if the letter is in the word, and avoid duplicate yellows with yellow_checker
-            elif letter in self.daily_word:
-                if letter in yellow_checker:
-                    yellow_checker.remove(letter)
-                    guess_result.append(":yellow_square:")
-                else:
-                    guess_result.append(":red_square:")
-
-            # If no match
+            # Check if there are any letters in the right place, if not, add to list to be checked in next step
+            if letter == daily_word[len(wrong_spot)]:
+                guess_result[index] = ":green_square:"
+                del daily_word[len(wrong_spot)]
             else:
-                guess_result.append(":red_square:")
-                if letter in self.available_letters:
-                    self.available_letters.remove(letter)
+                # to check in the next step
+                wrong_spot.append(guessed_word[index])
+
+        # check for letters in the wrong position
+        for index, letter in enumerate(wrong_spot):
+            if letter in daily_word:
+                # if a letter is found, we don't want it to be found again
+                guess_result[index] = ":yellow_square:"
+                daily_word.remove(letter)
 
         # Four whitespaces
         seperator = "\u00A0\u00A0\u00A0\u00A0"
@@ -92,7 +84,10 @@ class Wordle:
         await ctx.response.send_message(embed=await self.make_embed())
 
     async def make_embed(self):
-        embed = discord.Embed(title=f"Daily Wordle")
+        if self.correct_guess:
+            embed = discord.Embed(title=f"Congratulations! The word was {self.daily_word.upper()}!")
+        else:
+            embed = discord.Embed(title=f"Daily Wordle")
 
         if not self.display_list:
             embed.description = "No guesses yet"
