@@ -45,6 +45,7 @@ async def free_games_rn(ctx):
 
 
 async def scheduled_post_free_games():
+    # Gammin
     channel = client.get_channel(1111353625638350893)
     await channel.send(embed=await make_link_embed())
     await post_free_epic_games(channel)

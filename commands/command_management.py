@@ -26,7 +26,7 @@ class SimpleView(discord.ui.View):
         self.id= id
         self.command = running_commands_dict[self.id]
     
-    @discord.ui.button(emoji="🪦", style=discord.ButtonStyle.red)
+    @discord.ui.button(emoji="💀", style=discord.ButtonStyle.red)
     async def kill(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message(embed=discord.Embed(title=f"Command {self.id} Killed"), ephemeral=True)
         # ChatGPT made this, idk how it works
@@ -45,7 +45,7 @@ class SimpleView(discord.ui.View):
             await asyncio.sleep(1)
         self.command.info.message = modal.children[0]
         self.command.info.amount = literal_eval(str(modal.children[1]))
-        self.command.info.remaining = literal_eval(str(modal.children[2]))
+        self.command.info.remaining = literal_eval(str(modal.children[1]))
         self.command.info.interval = literal_eval(str(modal.children[2]))
 
 class DeleteButton(discord.ui.View):
