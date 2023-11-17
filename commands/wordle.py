@@ -54,7 +54,7 @@ class Wordle:
             if ctx.user.id in self.users_that_guessed:
                 await ctx.response.send_message(embed=discord.Embed(title="You have already guessed"))
                 return
-            if guessed_word not in valid_words:
+            if guessed_word.lower() not in valid_words:
                 await ctx.response.send_message(embed=discord.Embed(title=f"{guessed_word} is not a valid word"))
                 return
 
