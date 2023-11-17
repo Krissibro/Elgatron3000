@@ -21,7 +21,7 @@ class Wordle:
     async def pick_new_word(self):
         random_word = random.sample(word_bank, 1)[0]
         self.daily_word = random_word.upper()
-        self.daily_word = "XOXOX"
+        # self.daily_word = "XOXOX"
         self.guessed_words.clear()
         self.users_that_guessed.clear()
         self.display_list.clear()
