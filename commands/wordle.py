@@ -12,7 +12,7 @@ class Wordle:
     correct_guess = False
     guessed_words = set()
     users_that_guessed = set()
-    known = set()
+    known_letters = set()
     available_letters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
                          'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
 
@@ -25,7 +25,7 @@ class Wordle:
         self.guessed_words.clear()
         self.users_that_guessed.clear()
         self.display_list.clear()
-        self.known = set()
+        self.known_letters.clear()
         self.available_letters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
                                   'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
         self.correct_guess = False
@@ -72,14 +72,14 @@ class Wordle:
                 guess_result[index] = ":green_square:"
                 # if a letter is found, we don't want it to be found again
                 yellow_checker.remove(letter)
-                self.known.add(letter)
+                self.known_letters.add(letter)
 
         # Check for letters that are in the word, but in the wrong place
         for index, letter in enumerate(guessed_word):
             if letter in yellow_checker and not letter == self.daily_word[index]:
                 guess_result[index] = ":yellow_square:"
                 yellow_checker.remove(letter)
-                self.known.add(letter)
+                self.known_letters.add(letter)
 
         # Remove unused letters from available letters
         for letter in guessed_word:
@@ -107,16 +107,16 @@ class Wordle:
             embed.add_field(name=f"‎ **{guessed_word}**     <-  {user.name}",
                             value=f"{guess_result}",
                             inline=False)
-            embed.set_footer(text=await self.format_available_letters())
+            embed.set_footer(text=self.format_available_letters())
 
         return embed
 
-    async def format_available_letters(self):
+    def format_available_letters(self):
         sorted_available_letters = sorted(list(self.available_letters))
-        sorted_known_letters = sorted(list(self.known))
-        known = f"Known letters:\n{' '.join(sorted_known_letters)}"
+        sorted_known_letters = sorted(list(self.known_letters))
+        known_letters = f"Known letters:\n{' '.join(sorted_known_letters)}"
         rest = f"Available letters:\n{' '.join(sorted_available_letters)}"
-        return f"{known}\n{rest}"
+        return f"{known_letters}\n{rest}"
 
 
 wordle = Wordle()
