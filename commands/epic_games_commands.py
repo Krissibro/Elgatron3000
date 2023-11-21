@@ -7,7 +7,6 @@ async def make_link_embed():
     embed = discord.Embed(title="Free Games INCOMING!!!!")
     embed.description = (f"[Epic Games](https://store.epicgames.com/en-US/free-games)\n" +
                          f"[Playstation Games](https://www.playstation.com/en-us/ps-plus/whats-new/#monthly-games)")
-
     return embed
 
 
@@ -17,21 +16,24 @@ async def post_free_epic_games(channel):
 
     for game in free_games:
         # Check if there is a promotion
-        if game["promotions"] and game["promotions"]["promotionalOffers"]:
+        if not (game["promotions"] and game["promotions"]["promotionalOffers"]):
+            continue
 
-            # What the fuck is this nested garbage lmao
-            promotions = game["promotions"]["promotionalOffers"][0]["promotionalOffers"]
+        # What the fuck is this nested garbage lmao
+        promotions = game["promotions"]["promotionalOffers"][0]["promotionalOffers"]
 
+        for promotion in promotions:
             # Check that the current promotion is 0%
-            for promotion in promotions:
-                if promotion["discountSetting"]["discountPercentage"] == 0:
-                    embed = discord.Embed(title=game["title"], description=game["description"])
+            if promotion["discountSetting"]["discountPercentage"] != 0:
+                continue
 
-                    for image in game["keyImages"]:
-                        if image["type"] == "OfferImageWide":
-                            embed.set_image(url=image["url"])
+            embed = discord.Embed(title=game["title"], description=game["description"])
 
-                    await channel.send(embed=embed)
+            for image in game["keyImages"]:
+                if image["type"] == "OfferImageWide":
+                    embed.set_image(url=image["url"])
+
+            await channel.send(embed=embed)
 
 
 @tree.command(
