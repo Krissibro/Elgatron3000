@@ -25,7 +25,7 @@ class MessagingInfo:
         self.message: str = message
         self.amount: int = amount
         self.remaining: int = amount
-        self.interval : int = interval
+        self.interval: int = interval
         self.user: str = "" if user is None else user.mention
         self.messages = []
     
