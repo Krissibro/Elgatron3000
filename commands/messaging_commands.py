@@ -90,17 +90,12 @@ async def dm_spam_internal(ctx, command_info: MessagingInfo):
 
 @tree.command(
     name="get_attention",
-    description="Ping someone 100 times, once every 10 seconds until they react",
+    description="Ping someone once every 10 seconds 100 times or until they react",
     guild=discord.Object(id=guild_id)
 )
-async def get_attention(ctx, user: discord.User):
-    await execute_command(ctx,
-                          "get_attention",
-                          get_attention_internal,
-                          user,
-                          "WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP",
-                          100,
-                          10)
+async def get_attention(ctx, user: discord.User, message: str = "WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP", amount: int = 100, interval: str = "10"):
+    interval = literal_eval(interval)
+    await execute_command(ctx, "get_attention", get_attention_internal, user, message, amount, interval)
 
 
 class ReactButton(discord.ui.View):
