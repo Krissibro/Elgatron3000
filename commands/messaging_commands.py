@@ -90,21 +90,25 @@ async def dm_spam_internal(ctx, command_info: MessagingInfo):
 
 @tree.command(
     name="get_attention",
-    description="Ping someone X times, once every 60 seconds until they react",
+    description="Ping someone 100 times, once every 10 seconds until they react",
     guild=discord.Object(id=guild_id)
 )
-async def get_attention(ctx, message: str, amount: int, interval: str, user: discord.User):
-    interval = literal_eval(interval)
-    await execute_command(ctx, "get_attention", get_attention_internal, user, message, amount, interval)
+async def get_attention(ctx, user: discord.User):
+    await execute_command(ctx,
+                          "get_attention",
+                          get_attention_internal,
+                          user,
+                          "WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP",
+                          100,
+                          10)
 
 
-class SeenButton(discord.ui.View):
+class ReactButton(discord.ui.View):
     seen: bool = False
 
-    @discord.ui.button(emoji="👍", style=discord.ButtonStyle.success)
-    async def hello(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message(embed=discord.Embed(
-            title=f"Okay, i will stop annoying you now {interaction.user.nick} :)"))
+    @discord.ui.button(emoji="🤨", style=discord.ButtonStyle.success)
+    async def wake_up_bitch(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message(f"New death grips album dropping tomorrow :pensive:")
         self.seen = True
         self.stop()
 
@@ -112,16 +116,11 @@ class SeenButton(discord.ui.View):
 async def get_attention_internal(ctx, command_info: MessagingInfo):
     while command_info.remaining > 0:
         command_info.remaining -= 1
-        view = SeenButton(timeout=command_info.interval * 2)
+        view = ReactButton(timeout=command_info.interval * 2)
 
-        message = await ctx.channel.send(
-            f"{command_info.user}",
-            embed=discord.Embed(
-                title=f"{command_info.message}",
-                description="Press the button to stop being notified"
-                ),
-            view = view
-            )
+        message = await ctx.channel.send(command_info.user,
+                                         embed=discord.Embed(title=f"{command_info.message}"),
+                                         view=view)
         
         command_info.messages.append(message)
         
