@@ -1,6 +1,6 @@
 # Elgatron3000 Discord Bot 🤖
 
-Elgatron3000 is a very cool and epic Discord bot designed to provide a mix of reminders and peer preasure to our server.
+Elgatron3000 is a very cool and epic Discord bot designed to provide a mix of reminders, peer pressure and some fun features for our server.
 
 ## Features 🌟
 
@@ -23,12 +23,23 @@ Create a `token.env` file in the root directory and add your Discord bot token:
 TOKEN=YOUR_DISCORD_TOKEN_HERE
 ```
 
-3. **Install Dependencies**:
+3. **Set Up Config**: 
+Create a `config.json` file in the `utilities` directory. \
+Add your guild ID (server ID) and whether this instance of the bot is for testing or production.
+
+```
+{
+    "guild" : ID_GOES_HERE,
+    "testing" : BOOL_GOES_HERE
+}
+```
+
+4. **Install Dependencies**:
 ```bash
 pip install -r requirements.txt
 ```
 
-4. **Run the Bot**:
+5. **Run the Bot**:
 ```bash
 python3 bot.py
 ```
