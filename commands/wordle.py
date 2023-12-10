@@ -22,6 +22,7 @@ class Wordle:
         random_word = str(random.sample(word_bank, 1)[0])
         self.daily_word = random_word.upper()
         # self.daily_word = "XOXOX"
+        print(self.daily_word)
         self.guessed_words.clear()
         self.users_that_guessed.clear()
         self.display_list.clear()
@@ -94,7 +95,7 @@ class Wordle:
 
     async def make_embed(self):
         if self.correct_guess:
-            embed = discord.Embed(title=f"Congratulations! The word was {self.daily_word}!")
+            embed = discord.Embed(title=f"Congratulations! \nThe word was {self.daily_word}!")
         else:
             embed = discord.Embed(title=f"Daily Wordle")
 
@@ -119,36 +120,36 @@ class Wordle:
         return f"{known_letters}\n{rest}"
 
 
-wordle = Wordle()
+wordle_game = Wordle()
 
 
 async def initialize_wordle():
-    global wordle
+    global wordle_game
 
     trigger = CronTrigger(hour=8, minute=0, second=0, timezone='Europe/Oslo')
 
-    await wordle.pick_new_word()
-    scheduler.add_job(wordle.pick_new_word, trigger)
+    await wordle_game.pick_new_word()
+    scheduler.add_job(wordle_game.pick_new_word, trigger)
 
     scheduler.print_jobs()
 
 
 @tree.command(
-    name="daily_wordle",
+    name="wordle",
     description="See the current progress of the daily wordle!",
     guild=discord.Object(id=guild_id)
 )
-async def daily_wordle(ctx):
-    global wordle
-    await ctx.response.send_message(embed=await wordle.make_embed())
+async def wordle(ctx):
+    global wordle_game
+    await ctx.response.send_message(embed=await wordle_game.make_embed())
 
 
 @tree.command(
-    name="guess_daily_wordle",
+    name="guess_wordle",
     description="Attempt to guess the daily wordle!",
     guild=discord.Object(id=guild_id)
 )
-async def guess_daily_wordle(ctx, guessed_word: str):
-    global wordle
+async def guess_wordle(ctx, guessed_word: str):
+    global wordle_game
 
-    await wordle.guess_word(ctx, guessed_word)
+    await wordle_game.guess_word(ctx, guessed_word)
