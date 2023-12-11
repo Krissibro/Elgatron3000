@@ -1,4 +1,5 @@
-from utilities.shared import *
+from command_objects.Command import *
+from command_objects.MessagingInfo import *
 from ast import literal_eval
 
 
@@ -28,25 +29,39 @@ async def validate_amount(ctx, amount):
 
 
 async def execute_command(ctx, command_name, internal_function, user: discord.User, message: str, amount: int, interval:int):
+    """
+    Executes a specified command with validation, tracking, and response handling.
+
+    Args:
+        ctx (Context): The context in which the command is being executed.
+        command_name (str): The name of the command to be executed.
+        internal_function (Coroutine): The asynchronous function representing the command's logic.
+        user (discord.User): The Discord user who is targeted or involved in the command.
+        message (str): A message associated with the command.
+        amount (int): The amount of times a command is to be executed.
+        interval (int): The time intervals for the command's operation.
+
+    Description:
+        This function validates user input, creates a command with necessary information, and tracks it using a command tracker.
+        It sends an ephemeral response message with the command details, executes the command, and cleans up after completion.
+        If validation fails at any step, the function exits without executing the command.
+    """
+
     # Error handling
     if not (await validate_user(ctx, user) and await validate_amount(ctx, amount) and await validate_interval(ctx, interval)):
         return
 
-    # Make Command info
-    command_info = MessagingInfo(command_name, user, message, amount, interval)
-    
-    # Make Command and add to command Tracker
-    command = asyncio.create_task(internal_function(ctx, command_info))
-    command_tracker = Command(command_info, command)
-    running_commands_dict[command_tracker.id] = command_tracker
+    # Create a Command object with the given information
+    messaging_info = MessagingInfo(command_name, user, message, amount, interval)
+    async_task = asyncio.create_task(internal_function(ctx, messaging_info))
+    command = Command(messaging_info, async_task)
 
-    # Run Command
-    await ctx.response.send_message(embed=command_info.make_embed(), ephemeral=True)
-    await command
+    # Run the given command
+    await ctx.response.send_message(embed=messaging_info.make_embed(), ephemeral=True)
+    await async_task
 
     # Clean up after Command
-    del running_commands_dict[command_tracker.id]
-    Command.current_ids.remove(command_tracker.id)
+    command.end()
 
 
 @tree.command(
