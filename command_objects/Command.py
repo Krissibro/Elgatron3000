@@ -1,9 +1,9 @@
 from utilities.shared import *
 from command_objects.IInfo import *
+from typing import List
 
 
 class Command:
-    current_ids = set()
     running_commands_dict = {}
 
     def __init__(self, info: IInfo, task):
@@ -13,37 +13,34 @@ class Command:
         self.running_commands_dict[self.id] = self
 
     # Assigns the lowest ID
-    def assign_id(self):
+    def assign_id(self) -> int:
         i = 1
-        while i in self.current_ids:
+        while i in self.running_commands_dict.keys():
             i += 1
-        self.current_ids.add(i)
         return i
 
     @classmethod
-    def get_ids(cls):
-        return cls.current_ids
+    def get_ids(cls) -> List[int]:
+        return list(cls.running_commands_dict.keys())
 
-    def get_embed(self):
+    def get_embed(self) -> discord.Embed:
         embed = self.info.make_embed()
         embed.add_field(name="ID:", value=f"{self.id}", inline=True)
         return embed
 
     @classmethod
-    def get_embed_by_id(cls, command_id):
+    def get_embed_by_id(cls, command_id) -> discord.Embed:
         return cls.running_commands_dict[command_id].get_embed()
 
-    def end(self):
-        self.current_ids.remove(self.id)
+    def end(self) -> None:
         del self.running_commands_dict[self.id]
 
-    def kill(self):
+    def kill(self) -> None:
         self.process.cancel()
-        Command.current_ids.remove(self.id)
         del self.running_commands_dict[self.id]
 
     @classmethod
-    def kill_all(cls):
+    def kill_all(cls) -> None:
         for command in cls.running_commands_dict.values():
             command.kill()
 
