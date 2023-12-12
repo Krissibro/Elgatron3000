@@ -23,38 +23,45 @@ class EditMessagingCommandWindow(discord.ui.Modal):
     async def on_submit(self, interaction: discord.Interaction):
         await interaction.response.defer()
         self.stop()
-        self.finished_event.set()   # Signal that the modal is closed
+        self.finished_event.set()  # Signal that the modal is closed
 
 
-class SimpleView(discord.ui.View):
-    def __init__(self):
+class ManageCommandsButtons(discord.ui.View):
+    def __init__(self, message_ctx):
         super().__init__()
-        self.ids = list(Command.get_ids())
+        self.ids = Command.get_ids()
         self.current_page = 0
+        self.message_ctx = message_ctx
 
     async def get_first_embed(self):
         return Command.get_embed_by_id(self.ids[0])
 
     async def update_embed(self, interaction: discord.Interaction):
-        await interaction.edit_original_response(embed=Command.get_embed_by_id(self.ids[self.current_page]))
+
+        view = self if len(self.ids) > 0 else None
+        embed = Command.get_embed_by_id(self.ids[self.current_page]) if len(self.ids) > 0 \
+            else discord.Embed(title="There are no more running commands")
+
+        await self.message_ctx.edit_original_response(embed=embed, view=view)
 
     @discord.ui.button(emoji="◀", style=discord.ButtonStyle.blurple)
-    async def previous(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if self.current_page > 0:
-            self.current_page -= 1
-            await self.update_embed(interaction)
-
-
+    async def previous_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.current_page = (self.current_page - 1) % len(self.ids)
+        await self.update_embed(interaction)
+        await interaction.response.defer()
 
     @discord.ui.button(emoji="💀", style=discord.ButtonStyle.red)
-    async def kill(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def kill_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         current_command = Command.get_command(self.ids[self.current_page])
         await asyncio.gather(*[i.delete() for i in current_command.info.messages])
+
         current_command.kill()
         del self.ids[self.current_page]
+        self.current_page = min(self.current_page, len(self.ids) - 1)
 
         # TODO: Index out of range muligens her
         await self.update_embed(interaction)
+        await interaction.response.defer()
 
         # await interaction.response.send_message(embed=discord.Embed(title=f"Command {self.id} Killed"), ephemeral=True)
         # # ChatGPT made this, IDK how it works
@@ -65,14 +72,14 @@ class SimpleView(discord.ui.View):
         # self.stop()
 
     @discord.ui.button(emoji="🪶", style=discord.ButtonStyle.green)
-    async def edit_command(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def edit_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         current_command = Command.get_command(self.ids[self.current_page])
         command_info = current_command.info
 
         modal = EditMessagingCommandWindow(command_info.message, command_info.remaining, command_info.interval)
         await interaction.response.send_modal(modal)
 
-        await modal.finished_event.wait()       # Wait for the modal to be closed
+        await modal.finished_event.wait()  # Wait for the modal to be closed
 
         # Then edit the command info to the new values
         command_info.message = str(modal.children[0])
@@ -80,25 +87,13 @@ class SimpleView(discord.ui.View):
         command_info.remaining = literal_eval(str(modal.children[1]))
         command_info.interval = literal_eval(str(modal.children[2]))
 
+        await self.update_embed(interaction)
+
     @discord.ui.button(emoji="▶", style=discord.ButtonStyle.blurple)
-    async def next(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if self.current_page < len(self.ids) - 1:
-            self.current_page += 1
-            await self.update_embed(interaction)
-
-
-
-
-# class DeleteButton(discord.ui.View):
-#     def __init__(self, messages):
-#         super().__init__()
-#         self.messages = messages
-#
-#     @discord.ui.button(emoji="🗑️", style=discord.ButtonStyle.green)
-#     async def text_box(self, interaction: discord.Interaction, button: discord.ui.Button):
-#         await interaction.response.defer()
-#         await asyncio.gather(*[i.delete() for i in self.messages])
-#         self.stop()
+    async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.current_page = (self.current_page + 1) % len(self.ids)
+        await self.update_embed(interaction)
+        await interaction.response.defer()
 
 
 @tree.command(
@@ -111,42 +106,9 @@ async def manage_commands(ctx):
         await ctx.response.send_message(embed=discord.Embed(title="No commands running"), ephemeral=True)
         return
 
-    view = SimpleView()
+    view = ManageCommandsButtons(ctx)
     first_embed = await view.get_first_embed()
     await ctx.response.send_message(embed=first_embed, view=view, ephemeral=True)
-
-    # if not running_commands_dict:
-    #     await ctx.response.send_message(embed=discord.Embed(title="No commands running"), ephemeral=True)
-    #     return
-    #
-    # messages = []
-    #
-    # for message_id, command in running_commands_dict.items():
-    #     embed = command.get_embed()
-    #     message = await ctx.channel.send(embed=embed,
-    #                                      view=SimpleView(message_id))
-    #     messages.append(message)
-    #
-    # # TODO: i want this to be ephimeral, but i also want it to be visible to everyone, hmmmmm
-    # await ctx.response.send_message(embed=discord.Embed(title="Showing all running processes"),
-    #                                 view=DeleteButton(messages))
-
-
-# Not sure if this is needed anymore
-# @tree.command(
-#     name="kill_command",
-#     description="Kill a specific running command using an ID",
-#     guild=discord.Object(id=guild_id)
-# )
-# async def kill_command(ctx, message_id: int):
-#     if message_id not in running_commands_dict:
-#         await ctx.response.send_message(embed=discord.Embed(title=f"Command with the ID {message_id} does not exist"),
-#                                         ephemeral=True)
-#         return
-#
-#     running_commands_dict[message_id].kill()
-#     del running_commands_dict[message_id]
-#     await ctx.response.send_message(embed=discord.Embed(title=f"Command {message_id} has been terminated"), ephemeral=True)
 
 
 @tree.command(

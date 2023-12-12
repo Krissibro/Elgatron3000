@@ -8,5 +8,5 @@ class IInfo(ABC):
         self.messages = []
 
     @abstractmethod
-    def make_embed(self):
+    def make_embed(self) -> discord.Embed:
         pass
