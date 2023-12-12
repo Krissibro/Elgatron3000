@@ -28,7 +28,7 @@ async def validate_amount(ctx, amount):
     return True
 
 
-async def execute_command(ctx, command_name, internal_function, user: discord.User, message: str, amount: int, interval:int):
+async def execute_command(ctx, command_name, internal_function, user: discord.User, message: str, amount: int, interval:int, channel: discord.TextChannel):
     """
     Executes a specified command with validation, tracking, and response handling.
 
@@ -40,6 +40,7 @@ async def execute_command(ctx, command_name, internal_function, user: discord.Us
         message (str): A message associated with the command.
         amount (int): The amount of times a command is to be executed.
         interval (int): The time intervals for the command's operation.
+        channel (discord.TextChannel): The channel in which the command is being executed.
 
     Description:
         This function validates user input, creates a command with necessary information, and tracks it using a command tracker.
@@ -52,7 +53,7 @@ async def execute_command(ctx, command_name, internal_function, user: discord.Us
         return
 
     # Create a Command object with the given information
-    messaging_info = MessagingInfo(command_name, user, message, amount, interval)
+    messaging_info = MessagingInfo(command_name, user, message, amount, interval, channel)
     async_task = asyncio.create_task(internal_function(ctx, messaging_info))
     command = Command(messaging_info, async_task)
 
@@ -71,14 +72,14 @@ async def execute_command(ctx, command_name, internal_function, user: discord.Us
 )
 async def annoy(ctx, message: str, amount: int, interval: str, user: discord.User = None):
     interval = literal_eval(interval)
-    await execute_command(ctx, "annoy", annoy_internal, user, message, amount, interval)
+    await execute_command(ctx, "annoy", annoy_internal, user, message, amount, interval, ctx.channel)
 
 
 async def annoy_internal(ctx, command_info: MessagingInfo):
     while command_info.remaining > 0:
         command_info.remaining -= 1
         message = await ctx.channel.send(f"{command_info.user} {command_info.message}")
-        command_info.messages.append(message)
+        command_info.add_message(message)
         await asyncio.sleep(command_info.interval)
 
 
@@ -89,7 +90,7 @@ async def annoy_internal(ctx, command_info: MessagingInfo):
 )
 async def dm_aga(ctx, message: str, amount: int, interval: str):
     interval = literal_eval(interval)
-    await execute_command(ctx, "dm_spam_internal", dm_spam_internal, client.fetch_user(276441391502983170), message, amount, interval)
+    await execute_command(ctx, "dm_spam_internal", dm_spam_internal, client.fetch_user(276441391502983170), message, amount, interval, ctx.channel)
 
 
 async def dm_spam_internal(ctx, command_info: MessagingInfo):
@@ -110,7 +111,7 @@ async def dm_spam_internal(ctx, command_info: MessagingInfo):
 )
 async def get_attention(ctx, user: discord.User, message: str = "WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP", amount: int = 100, interval: str = "10"):
     interval = literal_eval(interval)
-    await execute_command(ctx, "get_attention", get_attention_internal, user, message, amount, interval)
+    await execute_command(ctx, "get_attention", get_attention_internal, user, message, amount, interval, ctx.channel)
 
 
 class ReactButton(discord.ui.View):
@@ -131,9 +132,9 @@ async def get_attention_internal(ctx, command_info: MessagingInfo):
         message = await ctx.channel.send(command_info.user,
                                          embed=discord.Embed(title=f"{command_info.message}"),
                                          view=view)
-        
-        command_info.messages.append(message)
-        
+
+        command_info.add_message(message)
+
         await asyncio.sleep(command_info.interval)
         if view.seen:
             break

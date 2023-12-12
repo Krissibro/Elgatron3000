@@ -1,16 +1,16 @@
 from utilities.shared import *
-from command_objects.IInfo import *
+from command_objects.CommandInfo import *
 
 
-class MessagingInfo(IInfo):
-    def __init__(self, command: str, user: discord.User, message: str, amount: int, interval: int):
+class MessagingInfo(CommandInfo):
+    def __init__(self, command: str, user: discord.User, message: str, amount: int, interval: int, channel: discord.TextChannel):
+        super().__init__(channel)
         self.command: str = command
         self.message: str = message
         self.amount: int = amount
         self.remaining: int = amount
         self.interval: int = interval
         self.user: str = "" if user is None else user.mention
-        self.messages = []
 
     def make_embed(self):
         embed = discord.Embed(

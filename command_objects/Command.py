@@ -1,12 +1,12 @@
 from utilities.shared import *
-from command_objects.IInfo import *
+from command_objects.CommandInfo import *
 from typing import List
 
 
 class Command:
     running_commands_dict = {}
 
-    def __init__(self, info: IInfo, task):
+    def __init__(self, info: CommandInfo, task):
         self.id = self.assign_id()
         self.info = info
         self.process = task

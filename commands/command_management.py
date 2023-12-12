@@ -1,27 +1,47 @@
 from command_objects.Command import *
+from commands.messaging_commands import *
 from ast import literal_eval
 
 
 class EditMessagingCommandWindow(discord.ui.Modal):
-    def __init__(self, old_message: str, old_amount: int, old_interval: int):
+    def __init__(self, command_info: MessagingInfo):
         super().__init__(title="Edit")
-        self.add_item(discord.ui.TextInput(label="Message:",
-                                           style=discord.TextStyle.short,
-                                           default=old_message)
-                      )
-        self.add_item(discord.ui.TextInput(label="Amount:",
-                                           style=discord.TextStyle.short,
-                                           default=str(old_amount))
-                      )
-        self.add_item(discord.ui.TextInput(label="Interval:",
-                                           style=discord.TextStyle.short,
-                                           default=str(old_interval))
-                      )
+        self.command_info = command_info
+
+        self.message_input = discord.ui.TextInput(
+            label="Message:",
+            style=discord.TextStyle.short,
+            default=command_info.message
+        )
+        self.amount_input = discord.ui.TextInput(
+            label="Amount:",
+            style=discord.TextStyle.short,
+            default=str(command_info.amount)
+        )
+        self.interval_input = discord.ui.TextInput(
+            label="Interval:",
+            style=discord.TextStyle.short,
+            default=str(command_info.interval)
+        )
+        self.add_item(self.message_input)
+        self.add_item(self.amount_input)
+        self.add_item(self.interval_input)
 
         self.finished_event = asyncio.Event()
 
     async def on_submit(self, interaction: discord.Interaction):
+        if (not await validate_amount(interaction, literal_eval(self.amount_input.value))
+                or not await validate_interval(interaction, literal_eval(self.interval_input.value))):
+            self.finished_event.set()
+            return
+
         await interaction.response.defer()
+
+        self.command_info.message = self.message_input.value
+        self.command_info.amount = literal_eval(self.amount_input.value)
+        self.command_info.remaining = literal_eval(self.amount_input.value)
+        self.command_info.remaining = literal_eval(self.amount_input.value)
+
         self.stop()
         self.finished_event.set()  # Signal that the modal is closed
 
@@ -37,7 +57,6 @@ class ManageCommandsButtons(discord.ui.View):
         return Command.get_embed_by_id(self.ids[0])
 
     async def update_embed(self, interaction: discord.Interaction):
-
         view = self if len(self.ids) > 0 else None
         embed = Command.get_embed_by_id(self.ids[self.current_page]) if len(self.ids) > 0 \
             else discord.Embed(title="There are no more running commands")
@@ -52,31 +71,26 @@ class ManageCommandsButtons(discord.ui.View):
 
     @discord.ui.button(emoji="💀", style=discord.ButtonStyle.red)
     async def kill_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        current_command = Command.get_command(self.ids[self.current_page])
-        await asyncio.gather(*[i.delete() for i in current_command.info.messages])
+        await interaction.response.defer()
 
+        current_command = Command.get_command(self.ids[self.current_page])
         current_command.kill()
         del self.ids[self.current_page]
         self.current_page = min(self.current_page, len(self.ids) - 1)
 
         await self.update_embed(interaction)
-        await interaction.response.defer()
+
+        await current_command.info.delete_messages()
 
     @discord.ui.button(emoji="🪶", style=discord.ButtonStyle.green)
     async def edit_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         current_command = Command.get_command(self.ids[self.current_page])
         command_info = current_command.info
 
-        modal = EditMessagingCommandWindow(command_info.message, command_info.remaining, command_info.interval)
+        modal = EditMessagingCommandWindow(command_info)
         await interaction.response.send_modal(modal)
 
         await modal.finished_event.wait()  # Wait for the modal to be closed
-
-        # Then edit the command info to the new values
-        command_info.message = str(modal.children[0])
-        command_info.amount = literal_eval(str(modal.children[1]))
-        command_info.remaining = literal_eval(str(modal.children[1]))
-        command_info.interval = literal_eval(str(modal.children[2]))
 
         await self.update_embed(interaction)
 
