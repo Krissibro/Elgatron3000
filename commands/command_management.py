@@ -59,17 +59,8 @@ class ManageCommandsButtons(discord.ui.View):
         del self.ids[self.current_page]
         self.current_page = min(self.current_page, len(self.ids) - 1)
 
-        # TODO: Index out of range muligens her
         await self.update_embed(interaction)
         await interaction.response.defer()
-
-        # await interaction.response.send_message(embed=discord.Embed(title=f"Command {self.id} Killed"), ephemeral=True)
-        # # ChatGPT made this, IDK how it works
-        # await asyncio.gather(*[i.delete() for i in self.command.info.messages])
-        # self.command.kill()
-        # del self.command
-        #
-        # self.stop()
 
     @discord.ui.button(emoji="🪶", style=discord.ButtonStyle.green)
     async def edit_button(self, interaction: discord.Interaction, button: discord.ui.Button):
