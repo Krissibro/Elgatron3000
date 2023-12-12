@@ -58,7 +58,7 @@ async def execute_command(ctx, command_name, internal_function, user: discord.Us
     command = Command(messaging_info, async_task)
 
     # Run the given command
-    await ctx.response.send_message(embed=messaging_info.make_embed(), ephemeral=True)
+    await ctx.response.send_message(embed=messaging_info.make_embed(), ephemeral=True, delete_after=10)
     await async_task
 
     # Clean up after Command
@@ -119,7 +119,8 @@ class ReactButton(discord.ui.View):
 
     @discord.ui.button(emoji="🤨", style=discord.ButtonStyle.success)
     async def wake_up_bitch(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message(f"New death grips album dropping tomorrow :pensive:")
+        await interaction.channel.send(f"New death grips album dropping tomorrow :pensive:")
+        await interaction.response.defer()
         self.seen = True
         self.stop()
 
@@ -137,4 +138,5 @@ async def get_attention_internal(ctx, command_info: MessagingInfo):
 
         await asyncio.sleep(command_info.interval)
         if view.seen:
+            await command_info.delete_messages()
             break
