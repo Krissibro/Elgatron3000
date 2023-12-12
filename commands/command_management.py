@@ -3,6 +3,65 @@ from commands.messaging_commands import *
 from ast import literal_eval
 
 
+def ids():
+    return Command.get_ids()
+
+
+async def get_first_embed():
+    return Command.get_embed_by_id(ids()[0])
+
+
+class ManageCommandsButtons(discord.ui.View):
+    def __init__(self, message_ctx):
+        super().__init__()
+        self.current_page = 1
+        self.message_ctx = message_ctx
+
+    async def update_embed(self, interaction: discord.Interaction):
+        view = self if len(ids()) > 0 else None
+        embed = Command.get_embed_by_id(ids()[self.current_page]) if len(ids()) > 0 \
+            else discord.Embed(title="There are no more running commands")
+
+        await self.message_ctx.edit_original_response(embed=embed, view=view)
+
+    @discord.ui.button(emoji="◀", style=discord.ButtonStyle.blurple)
+    async def previous_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.current_page = (self.current_page - 1) % len(ids())
+        await self.update_embed(interaction)
+        await interaction.response.defer()
+
+    @discord.ui.button(emoji="💀", style=discord.ButtonStyle.red)
+    async def kill_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.defer()
+
+        current_command = Command.get_command(ids()[self.current_page])
+        current_command.kill()
+        # del ids()[self.current_page]
+        self.current_page = min(self.current_page, len(ids()) - 1)
+
+        await self.update_embed(interaction)
+
+        await current_command.info.delete_messages()
+
+    @discord.ui.button(emoji="🪶", style=discord.ButtonStyle.green)
+    async def edit_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        current_command = Command.get_command(ids()[self.current_page])
+        command_info = current_command.info
+
+        modal = EditMessagingCommandWindow(command_info)
+        await interaction.response.send_modal(modal)
+
+        await modal.finished_event.wait()  # Wait for the modal to be closed
+
+        await self.update_embed(interaction)
+
+    @discord.ui.button(emoji="▶", style=discord.ButtonStyle.blurple)
+    async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.current_page = (self.current_page + 1) % len(ids())
+        await self.update_embed(interaction)
+        await interaction.response.defer()
+
+
 class EditMessagingCommandWindow(discord.ui.Modal):
     def __init__(self, command_info: MessagingInfo):
         super().__init__(title="Edit")
@@ -46,61 +105,6 @@ class EditMessagingCommandWindow(discord.ui.Modal):
         self.finished_event.set()  # Signal that the modal is closed
 
 
-class ManageCommandsButtons(discord.ui.View):
-    def __init__(self, message_ctx):
-        super().__init__()
-        self.ids = Command.get_ids()
-        self.current_page = 0
-        self.message_ctx = message_ctx
-
-    async def get_first_embed(self):
-        return Command.get_embed_by_id(self.ids[0])
-
-    async def update_embed(self, interaction: discord.Interaction):
-        view = self if len(self.ids) > 0 else None
-        embed = Command.get_embed_by_id(self.ids[self.current_page]) if len(self.ids) > 0 \
-            else discord.Embed(title="There are no more running commands")
-
-        await self.message_ctx.edit_original_response(embed=embed, view=view)
-
-    @discord.ui.button(emoji="◀", style=discord.ButtonStyle.blurple)
-    async def previous_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        self.current_page = (self.current_page - 1) % len(self.ids)
-        await self.update_embed(interaction)
-        await interaction.response.defer()
-
-    @discord.ui.button(emoji="💀", style=discord.ButtonStyle.red)
-    async def kill_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.defer()
-
-        current_command = Command.get_command(self.ids[self.current_page])
-        current_command.kill()
-        del self.ids[self.current_page]
-        self.current_page = min(self.current_page, len(self.ids) - 1)
-
-        await self.update_embed(interaction)
-
-        await current_command.info.delete_messages()
-
-    @discord.ui.button(emoji="🪶", style=discord.ButtonStyle.green)
-    async def edit_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        current_command = Command.get_command(self.ids[self.current_page])
-        command_info = current_command.info
-
-        modal = EditMessagingCommandWindow(command_info)
-        await interaction.response.send_modal(modal)
-
-        await modal.finished_event.wait()  # Wait for the modal to be closed
-
-        await self.update_embed(interaction)
-
-    @discord.ui.button(emoji="▶", style=discord.ButtonStyle.blurple)
-    async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        self.current_page = (self.current_page + 1) % len(self.ids)
-        await self.update_embed(interaction)
-        await interaction.response.defer()
-
-
 @tree.command(
     name="manage_commands",
     description="See and manage running commands",
@@ -112,7 +116,7 @@ async def manage_commands(ctx):
         return
 
     view = ManageCommandsButtons(ctx)
-    first_embed = await view.get_first_embed()
+    first_embed = await get_first_embed()
     await ctx.response.send_message(embed=first_embed, view=view, ephemeral=True)
 
 
