@@ -16,5 +16,8 @@ class CommandInfo(ABC):
         self.messages.append(message)
 
     async def delete_messages(self):
-        await self.channel.delete_messages(self.messages)
+        await self.channel.delete_messages(self.messages[1:])
         # await asyncio.gather(*[i.delete() for i in current_command.info.messages])
+
+    # async def delete_messages_except_first(self):
+    #     await self.channel.delete_messages(self.messages[1:])

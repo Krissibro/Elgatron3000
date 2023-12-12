@@ -82,26 +82,7 @@ async def annoy_internal(ctx, command_info: MessagingInfo):
         command_info.add_message(message)
         await asyncio.sleep(command_info.interval)
 
-
-@tree.command(
-    name="dm_aga",
-    description="Annoy HA as many times as you would like with a given interval!",
-    guild=discord.Object(id=guild_id)
-)
-async def dm_aga(ctx, message: str, amount: int, interval: str):
-    interval = literal_eval(interval)
-    await execute_command(ctx, "dm_spam_internal", dm_spam_internal, client.fetch_user(276441391502983170), message, amount, interval, ctx.channel)
-
-
-async def dm_spam_internal(ctx, command_info: MessagingInfo):
-    try:
-        while command_info.remaining > 0:
-            command_info.remaining -= 1
-            await command_info.user.send(command_info.message)
-            await asyncio.sleep(command_info.interval)
-
-    except discord.Forbidden:
-        await ctx.followup.send(embed=discord.Embed(title="I don't have permission to send messages to that user!"), ephemeral=True)
+    await command_info.delete_messages()
 
 
 @tree.command(
@@ -138,5 +119,27 @@ async def get_attention_internal(ctx, command_info: MessagingInfo):
 
         await asyncio.sleep(command_info.interval)
         if view.seen:
-            await command_info.delete_messages()
             break
+
+    await command_info.delete_messages()
+
+    @tree.command(
+        name="dm_aga",
+        description="Annoy HA as many times as you would like with a given interval!",
+        guild=discord.Object(id=guild_id)
+    )
+    async def dm_aga(ctx, message: str, amount: int, interval: str):
+        interval = literal_eval(interval)
+        await execute_command(ctx, "dm_spam_internal", dm_spam_internal, client.fetch_user(276441391502983170), message,
+                              amount, interval, ctx.channel)
+
+    async def dm_spam_internal(ctx, command_info: MessagingInfo):
+        try:
+            while command_info.remaining > 0:
+                command_info.remaining -= 1
+                await command_info.user.send(command_info.message)
+                await asyncio.sleep(command_info.interval)
+
+        except discord.Forbidden:
+            await ctx.followup.send(embed=discord.Embed(title="I don't have permission to send messages to that user!"),
+                                    ephemeral=True)
