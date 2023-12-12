@@ -17,7 +17,9 @@ class ManageCommandsButtons(discord.ui.View):
         self.current_page = 1
         self.message_ctx = message_ctx
 
-    async def update_embed(self, interaction: discord.Interaction):
+    async def update_embed(self):
+        self.current_page = min(self.current_page, len(ids()) - 1)
+
         view = self if len(ids()) > 0 else None
         embed = Command.get_embed_by_id(ids()[self.current_page]) if len(ids()) > 0 \
             else discord.Embed(title="There are no more running commands")
@@ -36,10 +38,8 @@ class ManageCommandsButtons(discord.ui.View):
 
         current_command = Command.get_command(ids()[self.current_page])
         current_command.kill()
-        # del ids()[self.current_page]
-        self.current_page = min(self.current_page, len(ids()) - 1)
 
-        await self.update_embed(interaction)
+        await self.update_embed()
 
         await current_command.info.delete_messages()
 
