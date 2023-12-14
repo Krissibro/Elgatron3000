@@ -9,10 +9,6 @@ def ids():
     return Command.get_ids()
 
 
-async def get_first_embed():
-    return Command.get_embed_by_id(ids()[0])
-
-
 class Dropdown(discord.ui.Select):
     def __init__(self, message_ctx):
         self.message_ctx = message_ctx
@@ -41,15 +37,16 @@ class ManageCommandsButtons(discord.ui.View):
         self.command = command
 
     async def update_embed(self):
-        view = self if len(ids()) > 0 else None
-        embed = Command.get_embed_by_id(ids()[0]) if len(ids()) > 0 \
+        view = ManageCommandsButtons(self.message_ctx, self.command) if len(ids()) > 0 else None
+        embed = self.command.get_embed() if len(ids()) > 0 \
             else discord.Embed(title="There are no more running commands")
 
         await self.message_ctx.edit_original_response(embed=embed, view=view)
 
     async def return_to_dropdown(self):
         view = ManageCommandsDropDown(self.message_ctx) if len(ids()) > 0 else None
-        embed = await Command.make_overview_embed() if len(ids()) > 0 else discord.Embed(title="There are no more running commands")
+        embed = Command.make_overview_embed() if len(ids()) > 0 else discord.Embed(
+            title="There are no more running commands")
         await self.message_ctx.edit_original_response(view=view, embed=embed)
 
     @discord.ui.button(emoji="📄", style=discord.ButtonStyle.blurple)
@@ -101,12 +98,12 @@ class EditMessagingCommandWindow(discord.ui.Modal):
         self.finished_event = asyncio.Event()
 
     async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+
         if (not await validate_amount(interaction, literal_eval(self.amount_input.value))
                 or not await validate_interval(interaction, literal_eval(self.interval_input.value))):
             self.finished_event.set()
             return
-
-        await interaction.response.defer()
 
         self.command_info.message = self.message_input.value
         self.command_info.amount = literal_eval(self.amount_input.value)
@@ -126,9 +123,8 @@ async def manage_commands(ctx):
     if Command.is_empty():
         await ctx.response.send_message(embed=discord.Embed(title="No commands running"), ephemeral=True)
         return
-
     view = ManageCommandsDropDown(ctx)
-    first_embed = await Command.make_overview_embed()
+    first_embed = (Command.make_overview_embed())
     await ctx.response.send_message(embed=first_embed, view=view, ephemeral=True)
 
 

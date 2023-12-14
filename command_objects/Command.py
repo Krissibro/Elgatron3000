@@ -55,7 +55,7 @@ class Command:
         return not cls.running_commands_dict
 
     @classmethod
-    async def make_overview_embed(cls):
+    def make_overview_embed(cls):
         # TODO beautify this embed
         embed = discord.Embed(title="Showing all running processes:")
         for (i, j) in cls.running_commands_dict.items():
