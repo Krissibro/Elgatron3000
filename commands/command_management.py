@@ -1,3 +1,5 @@
+import discord.ui
+
 from command_objects.Command import *
 from commands.messaging_commands import *
 from ast import literal_eval
@@ -11,55 +13,66 @@ async def get_first_embed():
     return Command.get_embed_by_id(ids()[0])
 
 
-class ManageCommandsButtons(discord.ui.View):
+class Dropdown(discord.ui.Select):
+    def __init__(self, message_ctx):
+        self.message_ctx = message_ctx
+        options = [discord.SelectOption(label=str(x), value=str(x)) for x in ids()]
+        super().__init__(placeholder='Which command would you like to edit?', min_values=1, max_values=1,
+                         options=options)
+
+    async def callback(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+        command_id = int(self.values[0])
+        await self.message_ctx.edit_original_response(
+            embed=Command.get_embed_by_id(command_id),
+            view=ManageCommandsButtons(self.message_ctx, command=Command.get_command(command_id)))
+
+
+class ManageCommandsDropDown(discord.ui.View):
     def __init__(self, message_ctx):
         super().__init__()
-        self.current_page = 1
+        self.add_item(Dropdown(message_ctx))
+
+
+class ManageCommandsButtons(discord.ui.View):
+    def __init__(self, message_ctx, command):
+        super().__init__()
         self.message_ctx = message_ctx
+        self.command = command
 
     async def update_embed(self):
-        self.current_page = min(self.current_page, len(ids()) - 1)
-
         view = self if len(ids()) > 0 else None
-        embed = Command.get_embed_by_id(ids()[self.current_page]) if len(ids()) > 0 \
+        embed = Command.get_embed_by_id(ids()[0]) if len(ids()) > 0 \
             else discord.Embed(title="There are no more running commands")
 
         await self.message_ctx.edit_original_response(embed=embed, view=view)
 
-    @discord.ui.button(emoji="◀", style=discord.ButtonStyle.blurple)
-    async def previous_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        self.current_page = (self.current_page - 1) % len(ids())
-        await self.update_embed(interaction)
+    async def return_to_dropdown(self):
+        view = ManageCommandsDropDown(self.message_ctx) if len(ids()) > 0 else None
+        embed = await get_first_embed() if len(ids()) > 0 else discord.Embed(title="There are no more running commands")
+        await self.message_ctx.edit_original_response(view=view)
+
+    @discord.ui.button(emoji="📄", style=discord.ButtonStyle.blurple)
+    async def return_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer()
+        await self.return_to_dropdown()
 
     @discord.ui.button(emoji="💀", style=discord.ButtonStyle.red)
     async def kill_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer()
 
-        current_command = Command.get_command(ids()[self.current_page])
-        current_command.kill()
-
-        await self.update_embed()
-
-        await current_command.info.delete_messages()
+        self.command.kill()
+        await self.return_to_dropdown()
+        await self.command.info.delete_messages()
 
     @discord.ui.button(emoji="🪶", style=discord.ButtonStyle.green)
     async def edit_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        current_command = Command.get_command(ids()[self.current_page])
-        command_info = current_command.info
-
-        modal = EditMessagingCommandWindow(command_info)
+        modal = EditMessagingCommandWindow(self.command.info)
         await interaction.response.send_modal(modal)
 
         await modal.finished_event.wait()  # Wait for the modal to be closed
 
-        await self.update_embed(interaction)
-
-    @discord.ui.button(emoji="▶", style=discord.ButtonStyle.blurple)
-    async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        self.current_page = (self.current_page + 1) % len(ids())
-        await self.update_embed(interaction)
-        await interaction.response.defer()
+        await self.update_embed()
 
 
 class EditMessagingCommandWindow(discord.ui.Modal):
@@ -115,7 +128,7 @@ async def manage_commands(ctx):
         await ctx.response.send_message(embed=discord.Embed(title="No commands running"), ephemeral=True)
         return
 
-    view = ManageCommandsButtons(ctx)
+    view = ManageCommandsDropDown(ctx)
     first_embed = await get_first_embed()
     await ctx.response.send_message(embed=first_embed, view=view, ephemeral=True)
 
