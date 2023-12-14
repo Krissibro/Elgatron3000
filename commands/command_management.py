@@ -49,8 +49,8 @@ class ManageCommandsButtons(discord.ui.View):
 
     async def return_to_dropdown(self):
         view = ManageCommandsDropDown(self.message_ctx) if len(ids()) > 0 else None
-        embed = await get_first_embed() if len(ids()) > 0 else discord.Embed(title="There are no more running commands")
-        await self.message_ctx.edit_original_response(view=view)
+        embed = await Command.make_overview_embed() if len(ids()) > 0 else discord.Embed(title="There are no more running commands")
+        await self.message_ctx.edit_original_response(view=view, embed=embed)
 
     @discord.ui.button(emoji="📄", style=discord.ButtonStyle.blurple)
     async def return_button(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -69,7 +69,6 @@ class ManageCommandsButtons(discord.ui.View):
     async def edit_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         modal = EditMessagingCommandWindow(self.command.info)
         await interaction.response.send_modal(modal)
-
         await modal.finished_event.wait()  # Wait for the modal to be closed
 
         await self.update_embed()
@@ -129,7 +128,7 @@ async def manage_commands(ctx):
         return
 
     view = ManageCommandsDropDown(ctx)
-    first_embed = await get_first_embed()
+    first_embed = await Command.make_overview_embed()
     await ctx.response.send_message(embed=first_embed, view=view, ephemeral=True)
 
 

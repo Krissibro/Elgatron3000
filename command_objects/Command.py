@@ -1,3 +1,5 @@
+import discord
+
 from utilities.shared import *
 from command_objects.CommandInfo import *
 from typing import List
@@ -51,3 +53,11 @@ class Command:
     @classmethod
     def is_empty(cls):
         return not cls.running_commands_dict
+
+    @classmethod
+    async def make_overview_embed(cls):
+        # TODO beautify this embed
+        embed = discord.Embed(title="Showing all running processes:")
+        for (i, j) in cls.running_commands_dict.items():
+            embed.add_field(name=f"{i}: {j.info.command}", value=j.info.user, inline=False)
+        return embed
