@@ -5,14 +5,10 @@ from commands.messaging_commands import *
 from ast import literal_eval
 
 
-def ids():
-    return Command.get_ids()
-
-
 class Dropdown(discord.ui.Select):
     def __init__(self, message_ctx):
         self.message_ctx = message_ctx
-        options = [discord.SelectOption(label=str(x), value=str(x)) for x in ids()]
+        options = [discord.SelectOption(label=str(x), value=str(x)) for x in Command.get_ids()]
         super().__init__(placeholder='Which command would you like to edit?', min_values=1, max_values=1,
                          options=options)
 
@@ -37,15 +33,15 @@ class ManageCommandsButtons(discord.ui.View):
         self.command = command
 
     async def update_embed(self):
-        view = ManageCommandsButtons(self.message_ctx, self.command) if len(ids()) > 0 else None
-        embed = self.command.get_embed() if len(ids()) > 0 \
+        view = ManageCommandsButtons(self.message_ctx, self.command) if not Command.is_empty() else None
+        embed = self.command.get_embed() if not Command.is_empty() \
             else discord.Embed(title="There are no more running commands")
 
         await self.message_ctx.edit_original_response(embed=embed, view=view)
 
     async def return_to_dropdown(self):
-        view = ManageCommandsDropDown(self.message_ctx) if len(ids()) > 0 else None
-        embed = Command.make_overview_embed() if len(ids()) > 0 else discord.Embed(
+        view = ManageCommandsDropDown(self.message_ctx) if not Command.is_empty() else None
+        embed = Command.make_overview_embed() if not Command.is_empty() else discord.Embed(
             title="There are no more running commands")
         await self.message_ctx.edit_original_response(view=view, embed=embed)
 
