@@ -8,7 +8,7 @@ from ast import literal_eval
 class Dropdown(discord.ui.Select):
     def __init__(self, message_ctx):
         self.message_ctx = message_ctx
-        options = [discord.SelectOption(label=str(x), value=str(x)) for x in Command.get_ids()]
+        options = Command.make_dropdown_options()
         super().__init__(placeholder='Which command would you like to edit?', min_values=1, max_values=1,
                          options=options)
 
@@ -32,7 +32,7 @@ class ManageCommandsButtons(discord.ui.View):
         self.message_ctx = message_ctx
         self.command = command
 
-    async def update_embed(self):
+    async def make_command_embed(self):
         view = ManageCommandsButtons(self.message_ctx, self.command) if not Command.is_empty() else None
         embed = self.command.get_embed() if not Command.is_empty() \
             else discord.Embed(title="There are no more running commands")
@@ -42,7 +42,8 @@ class ManageCommandsButtons(discord.ui.View):
     async def return_to_dropdown(self):
         view = ManageCommandsDropDown(self.message_ctx) if not Command.is_empty() else None
         embed = Command.make_overview_embed() if not Command.is_empty() else discord.Embed(
-            title="There are no more running commands")
+            title="There are no more running commands",
+            color=discord.Color.red())
         await self.message_ctx.edit_original_response(view=view, embed=embed)
 
     @discord.ui.button(emoji="📄", style=discord.ButtonStyle.blurple)
@@ -64,7 +65,7 @@ class ManageCommandsButtons(discord.ui.View):
         await interaction.response.send_modal(modal)
         await modal.finished_event.wait()  # Wait for the modal to be closed
 
-        await self.update_embed()
+        await self.make_command_embed()
 
 
 class EditMessagingCommandWindow(discord.ui.Modal):
@@ -120,7 +121,7 @@ async def manage_commands(ctx):
         await ctx.response.send_message(embed=discord.Embed(title="No commands running"), ephemeral=True)
         return
     view = ManageCommandsDropDown(ctx)
-    first_embed = (Command.make_overview_embed())
+    first_embed = Command.make_overview_embed()
     await ctx.response.send_message(embed=first_embed, view=view, ephemeral=True)
 
 
@@ -130,10 +131,11 @@ async def manage_commands(ctx):
     guild=discord.Object(id=guild_id)
 )
 async def kill_all_commands(ctx):
-    Command.kill_all()
-
     await ctx.response.send_message(embed=discord.Embed(title="All running commands have been terminated."),
-                                    ephemeral=True)
+                                    ephemeral=True,
+                                    delete_after=10)
+
+    Command.kill_all()
 
 
 @tree.command(
@@ -147,7 +149,9 @@ async def cleanup(ctx, messages_amount: int):
         return
     await ctx.response.defer()
     await ctx.channel.purge(limit=messages_amount, check=lambda m: m.author == client.user)
-    await ctx.response.send_message(embed=discord.Embed(title=f"Deleted {messages_amount} messages"), ephemeral=True)
+    await ctx.response.send_message(embed=discord.Embed(title=f"Deleted {messages_amount} messages"),
+                                    ephemeral=True,
+                                    delete_after=10)
 
 
 @tree.command(

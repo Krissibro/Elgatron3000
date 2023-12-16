@@ -43,7 +43,8 @@ class Command:
 
     @classmethod
     def kill_all(cls) -> None:
-        for command in cls.running_commands_dict.values():
+        commands_to_kill = list(cls.running_commands_dict.values())
+        for command in commands_to_kill:
             command.kill()
 
     @classmethod
@@ -56,8 +57,14 @@ class Command:
 
     @classmethod
     def make_overview_embed(cls):
-        # TODO beautify this embed
-        embed = discord.Embed(title="Showing all running processes:")
-        for (i, j) in cls.running_commands_dict.items():
-            embed.add_field(name=f"{i}: {j.info.command}", value=j.info.user, inline=False)
+        embed = discord.Embed(title="Showing all running processes:",
+                              color=discord.Color.red())
+
+        for index, command in cls.running_commands_dict.items():
+            embed = command.info.make_overview(index, embed)
+
         return embed
+
+    @classmethod
+    def make_dropdown_options(cls):
+        return [command.info.make_select_option(index) for index, command in cls.running_commands_dict.items()]
