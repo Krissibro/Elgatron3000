@@ -68,3 +68,7 @@ class Command:
     @classmethod
     def make_dropdown_options(cls):
         return [command.info.make_select_option(index) for index, command in cls.running_commands_dict.items()]
+
+    @classmethod
+    def check_if_command_exists(cls, command_id):
+        return command_id in cls.running_commands_dict.keys()

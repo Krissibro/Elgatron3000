@@ -12,12 +12,22 @@ class Dropdown(discord.ui.Select):
         super().__init__(placeholder='Which command would you like to edit?', min_values=1, max_values=1,
                          options=options)
 
+    #TODO: Fix this
     async def callback(self, interaction: discord.Interaction):
-        await interaction.response.defer()
-        command_id = int(self.values[0])
-        await self.message_ctx.edit_original_response(
-            embed=Command.get_embed_by_id(command_id),
-            view=ManageCommandsButtons(self.message_ctx, command=Command.get_command(command_id)))
+        selected_command_id = int(self.values[0])
+
+        if selected_command_id in Command.get_ids():
+            await interaction.response.defer()
+            await self.message_ctx.edit_original_response(
+                embed=Command.get_embed_by_id(selected_command_id),
+                view=ManageCommandsButtons(self.message_ctx,
+                                           command=Command.get_command(selected_command_id)))
+
+        else:
+            await interaction.response.send_message(embed=discord.Embed(title="This command is no longer running"),
+                                                    ephemeral=True, delete_after=10)
+            await self.message_ctx.edit_original_response(embed=Command.make_overview_embed(),
+                                                          view=ManageCommandsDropDown(self.message_ctx))
 
 
 class ManageCommandsDropDown(discord.ui.View):
@@ -53,19 +63,29 @@ class ManageCommandsButtons(discord.ui.View):
 
     @discord.ui.button(emoji="💀", style=discord.ButtonStyle.red)
     async def kill_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.defer()
-
-        self.command.kill()
-        await self.return_to_dropdown()
-        await self.command.info.delete_messages()
+        if await self.silliness_check(interaction):
+            await interaction.response.defer()
+            self.command.kill()
+            await self.return_to_dropdown()
+            await self.command.info.delete_messages()
 
     @discord.ui.button(emoji="🪶", style=discord.ButtonStyle.green)
     async def edit_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        modal = EditMessagingCommandWindow(self.command.info)
-        await interaction.response.send_modal(modal)
-        await modal.finished_event.wait()  # Wait for the modal to be closed
+        if await self.silliness_check(interaction):
+            modal = EditMessagingCommandWindow(self.command.info)
+            await interaction.response.send_modal(modal)
+            await modal.finished_event.wait()  # Wait for the modal to be closed
 
-        await self.make_command_embed()
+            await self.make_command_embed()
+
+    #TODO: Fix this
+    async def silliness_check(self, interaction: discord.Interaction):
+        if not Command.check_if_command_exists(self.command.id):
+            await interaction.response.send_message(embed=discord.Embed(title="This command is no longer running"),
+                                                    ephemeral=True, delete_after=10)
+            await self.return_to_dropdown()
+            return False
+        return True
 
 
 class EditMessagingCommandWindow(discord.ui.Modal):
