@@ -3,6 +3,7 @@ import discord.ui
 from command_objects.Command import *
 from commands.messaging_commands import *
 from ast import literal_eval
+from utilities.helper_functions import parse_time
 
 
 class Dropdown(discord.ui.Select):
@@ -117,15 +118,16 @@ class EditMessagingCommandWindow(discord.ui.Modal):
     async def on_submit(self, interaction: discord.Interaction):
         await interaction.response.defer()
 
-        if (not await validate_amount(interaction, literal_eval(self.amount_input.value))
-                or not await validate_interval(interaction, literal_eval(self.interval_input.value))):
+        #TODO i dont understand this. but you said something was broken here xD
+        if (   not await validate_amount  (interaction, literal_eval(self.amount_input.value))
+            or not await validate_interval(interaction, parse_time  (self.interval_input.value))):
             self.finished_event.set()
             return
 
         self.command_info.message = self.message_input.value
         self.command_info.amount = literal_eval(self.amount_input.value)
         self.command_info.remaining = literal_eval(self.amount_input.value)
-        self.command_info.remaining = literal_eval(self.amount_input.value)
+        self.command_info.interval = parse_time(self.interval_input.value)
 
         self.stop()
         self.finished_event.set()  # Signal that the modal is closed

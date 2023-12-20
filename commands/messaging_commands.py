@@ -1,17 +1,6 @@
 from command_objects.Command import *
 from command_objects.MessagingInfo import *
-from ast import literal_eval
-
-
-async def validate_user(ctx:discord.Interaction, user:discord.User):
-    if user is None:
-        return True
-    """ Doesnt work RN
-    elif user in ctx.guild.members:
-        await ctx.response.send_message(embed=discord.Embed(title="User could not be found"), ephemeral=True)
-        return False
-    """
-    return True
+from utilities.helper_functions import parse_time
 
 
 async def validate_interval(ctx, interval):
@@ -28,7 +17,7 @@ async def validate_amount(ctx, amount):
     return True
 
 
-async def execute_command(ctx, command_name, internal_function, user: discord.User, message: str, amount: int, interval:int, channel: discord.TextChannel):
+async def execute_command(ctx, command_name, internal_function, user: discord.User, message: str, amount: int, interval: int, channel: discord.TextChannel):
     """
     Executes a specified command with validation, tracking, and response handling.
 
@@ -71,7 +60,7 @@ async def execute_command(ctx, command_name, internal_function, user: discord.Us
     guild=discord.Object(id=guild_id)
 )
 async def annoy(ctx, message: str, amount: int, interval: str, user: discord.User = None):
-    interval = literal_eval(interval)
+    interval = parse_time(interval)
     await execute_command(ctx, "annoy", annoy_internal, user, message, amount, interval, ctx.channel)
 
 
@@ -91,7 +80,7 @@ async def annoy_internal(ctx, command_info: MessagingInfo):
     guild=discord.Object(id=guild_id)
 )
 async def get_attention(ctx, user: discord.User, message: str = "WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP", amount: int = 100, interval: str = "10"):
-    interval = literal_eval(interval)
+    interval = parse_time(interval)
     await execute_command(ctx, "get_attention", get_attention_internal, user, message, amount, interval, ctx.channel)
 
 
@@ -123,23 +112,24 @@ async def get_attention_internal(ctx, command_info: MessagingInfo):
 
     await command_info.delete_messages()
 
-    @tree.command(
-        name="dm_aga",
-        description="Annoy HA as many times as you would like with a given interval!",
-        guild=discord.Object(id=guild_id)
-    )
-    async def dm_aga(ctx, message: str, amount: int, interval: str):
-        interval = literal_eval(interval)
-        await execute_command(ctx, "dm_spam_internal", dm_spam_internal, client.fetch_user(276441391502983170), message,
-                              amount, interval, ctx.channel)
 
-    async def dm_spam_internal(ctx, command_info: MessagingInfo):
-        try:
-            while command_info.remaining > 0:
-                command_info.remaining -= 1
-                await command_info.user.send(command_info.message)
-                await asyncio.sleep(command_info.interval)
+@tree.command(
+    name="dm_spam",
+    description="Annoy someone as many times as you would like with a given interval!",
+    guild=discord.Object(id=guild_id)
+)
+async def dm_aga(ctx, user: discord.User, message: str, amount: int, interval: str):
+    interval = parse_time(interval)
+    await execute_command(ctx, "dm_spam_internal", dm_spam_internal, user, message, amount, interval, ctx.channel)
 
-        except discord.Forbidden:
-            await ctx.followup.send(embed=discord.Embed(title="I don't have permission to send messages to that user!"),
-                                    ephemeral=True)
+
+async def dm_spam_internal(ctx, command_info: MessagingInfo):
+    try:
+        while command_info.remaining > 0:
+            command_info.remaining -= 1
+            await command_info.user.send(command_info.message)
+            await asyncio.sleep(command_info.interval)
+
+    except discord.Forbidden:
+        await ctx.followup.send(embed=discord.Embed(title="I don't have permission to send messages to that user!"),
+                                ephemeral=True)
