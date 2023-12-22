@@ -13,7 +13,7 @@ class Dropdown(discord.ui.Select):
         super().__init__(placeholder='Which command would you like to edit?', min_values=1, max_values=1,
                          options=options)
 
-    #TODO: Fix this
+    # TODO: Fix this
     async def callback(self, interaction: discord.Interaction):
         selected_command_id = int(self.values[0])
 
@@ -79,7 +79,7 @@ class ManageCommandsButtons(discord.ui.View):
 
             await self.make_command_embed()
 
-    #TODO: Fix this
+    # TODO: Fix this
     async def silliness_check(self, interaction: discord.Interaction):
         if not Command.check_if_command_exists(self.command.id):
             await interaction.response.send_message(embed=discord.Embed(title="This command is no longer running"),
@@ -118,9 +118,11 @@ class EditMessagingCommandWindow(discord.ui.Modal):
     async def on_submit(self, interaction: discord.Interaction):
         await interaction.response.defer()
 
-        #TODO i dont understand this. but you said something was broken here xD
-        if (   not await validate_amount  (interaction, literal_eval(self.amount_input.value))
-            or not await validate_interval(interaction, parse_time  (self.interval_input.value))):
+        # TODO i dont understand this. but you said something was broken here xD
+        if (
+                not await validate_amount(interaction, int(self.amount_input.value)) or
+                not await validate_interval(interaction, parse_time(self.interval_input.value))
+        ):
             self.finished_event.set()
             return
 

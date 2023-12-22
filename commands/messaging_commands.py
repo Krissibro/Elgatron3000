@@ -5,12 +5,12 @@ from utilities.helper_functions import parse_time
 
 async def validate_interval(ctx, interval):
     if interval <= 0:
-        await ctx.response.send_message(embed=discord.Embed(title="Interval cannot be less than or equal to 0"), ephemeral=True)
+        await ctx.response.send_message(embed=discord.Embed(title="Input must be formatted as _d_h_m_s, i.e. 10m10s."), ephemeral=True)
         return False
     return True
 
 
-async def validate_amount(ctx, amount):
+async def validate_amount(ctx, amount: int):
     if amount <= 0:
         await ctx.response.send_message(embed=discord.Embed(title="Amount cannot be less than or equal to 0"), ephemeral=True)
         return False
@@ -38,7 +38,7 @@ async def execute_command(ctx, command_name, internal_function, user: discord.Us
     """
 
     # Error handling
-    if not (await validate_user(ctx, user) and await validate_amount(ctx, amount) and await validate_interval(ctx, interval)):
+    if not (await validate_amount(ctx, amount) and await validate_interval(ctx, interval)):
         return
 
     # Create a Command object with the given information
@@ -79,7 +79,7 @@ async def annoy_internal(ctx, command_info: MessagingInfo):
     description="Ping someone once every 10 seconds 100 times or until they react",
     guild=discord.Object(id=guild_id)
 )
-async def get_attention(ctx, user: discord.User, message: str = "WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP", amount: int = 100, interval: str = "10"):
+async def get_attention(ctx, user: discord.User, message: str = "WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP", amount: int = 100, interval: str = "10s"):
     interval = parse_time(interval)
     await execute_command(ctx, "get_attention", get_attention_internal, user, message, amount, interval, ctx.channel)
 
