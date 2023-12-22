@@ -3,7 +3,7 @@ import discord.ui
 from command_objects.Command import *
 from commands.messaging_commands import *
 from ast import literal_eval
-from utilities.helper_functions import parse_time
+from utilities.helper_functions import parse_time, format_seconds
 
 
 class Dropdown(discord.ui.Select):
@@ -107,7 +107,7 @@ class EditMessagingCommandWindow(discord.ui.Modal):
         self.interval_input = discord.ui.TextInput(
             label="Interval:",
             style=discord.TextStyle.short,
-            default=str(command_info.interval)
+            default=format_seconds(command_info.interval)
         )
         self.add_item(self.message_input)
         self.add_item(self.amount_input)
