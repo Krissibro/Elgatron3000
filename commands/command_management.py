@@ -116,15 +116,15 @@ class EditMessagingCommandWindow(discord.ui.Modal):
         self.finished_event = asyncio.Event()
 
     async def on_submit(self, interaction: discord.Interaction):
-        await interaction.response.defer()
-
         # TODO i dont understand this. but you said something was broken here xD
         if (
+                not await validate_numeric(interaction, self.amount_input.value, "Amount must be numeric") or
                 not await validate_amount(interaction, int(self.amount_input.value)) or
                 not await validate_interval(interaction, parse_time(self.interval_input.value))
         ):
             self.finished_event.set()
             return
+        await interaction.response.defer()
 
         self.command_info.message = self.message_input.value
         self.command_info.amount = literal_eval(self.amount_input.value)

@@ -12,19 +12,12 @@ def parse_time(time_str: str) -> int:
 
 
 def format_seconds(seconds: int) -> str:
-    days, remainder = divmod(seconds, 86400)
-    hours, remainder = divmod(remainder, 3600)
-    minutes, seconds = divmod(remainder, 60)
 
     formatted_time = ""
-    if days:
-        formatted_time += f"{days}d"
-    if hours:
-        formatted_time += f"{hours}h"
-    if minutes:
-        formatted_time += f"{minutes}m"
-    if seconds:
-        formatted_time += f"{seconds}s"
+    for unit, divisor in [('d', 86400), ('h', 3600), ('m', 60), ('s', 1)]:
+        value, seconds = divmod(seconds, divisor)
+        if value:
+            formatted_time += f"{value}{unit}"
 
     return formatted_time if formatted_time else "0s"
 

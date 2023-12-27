@@ -17,6 +17,13 @@ async def validate_amount(ctx, amount: int):
     return True
 
 
+async def validate_numeric(ctx, amount: str, error_msg: str):
+    if not amount.isnumeric():
+        await ctx.response.send_message(embed=discord.Embed(title=error_msg), ephemeral=True)
+        return False
+    return True
+
+
 async def execute_command(ctx, command_name, internal_function, user: discord.User, message: str, amount: int, interval: int, channel: discord.TextChannel):
     """
     Executes a specified command with validation, tracking, and response handling.
