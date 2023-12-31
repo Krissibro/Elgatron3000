@@ -10,8 +10,7 @@ class Dropdown(discord.ui.Select):
     def __init__(self, message_ctx):
         self.message_ctx = message_ctx
         options = Command.make_dropdown_options()
-        super().__init__(placeholder='Which command would you like to edit?', min_values=1, max_values=1,
-                         options=options)
+        super().__init__(placeholder="Which command would you like to edit?", min_values=1, max_values=1, options=options)
 
     # TODO: Fix this
     async def callback(self, interaction: discord.Interaction):

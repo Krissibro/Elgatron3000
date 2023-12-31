@@ -26,11 +26,12 @@ async def post_free_epic_games(channel):
             # Check that the current promotion is 0%
             if promotion["discountSetting"]["discountPercentage"] != 0:
                 continue
+            print(game)
 
-            embed = discord.Embed(title=game["title"], description=game["description"])
+            embed = discord.Embed(title=game["title"], description=f"[link](https://store.epicgames.com/en-US/p/{game['productSlug']})\n{game['description']}")
 
             for image in game["keyImages"]:
-                if image["type"] == "OfferImageWide":
+                if image["type"] == "DieselStoreFrontWide":
                     embed.set_image(url=image["url"])
 
             await channel.send(embed=embed)
