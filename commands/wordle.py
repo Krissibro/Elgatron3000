@@ -2,6 +2,7 @@ import numpy as np
 import random
 from utilities.shared import *
 from utilities.settings import testing
+from utilities.helper_functions import char_to_emoji
 
 valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())
 word_bank = list(np.genfromtxt('./data/word-bank.csv', delimiter=',', dtype=str))
@@ -88,8 +89,7 @@ class Wordle:
                 self.available_letters.remove(letter)
 
         # Four whitespaces
-        seperator = "\u00A0\u00A0\u00A0\u00A0"
-        self.display_list.append([ctx.user.id, seperator.join(guessed_word), ' '.join(guess_result)])
+        self.display_list.append([ctx.user.id, guessed_word, ' '.join(guess_result)])
 
         await ctx.response.send_message(embed=await self.make_embed())
 
@@ -105,7 +105,7 @@ class Wordle:
 
         for user_id, guessed_word, guess_result in self.display_list:
             user = await client.fetch_user(user_id)
-            embed.add_field(name=f"‎ **{guessed_word}**     <-  {user.name}",
+            embed.add_field(name=f"{char_to_emoji(guessed_word).replace('::', ': :')}   <-  {user.name}",
                             value=f"{guess_result}",
                             inline=False)
             embed.set_footer(text=self.format_available_letters())

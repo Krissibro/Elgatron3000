@@ -117,9 +117,9 @@ class EditMessagingCommandWindow(discord.ui.Modal):
     async def on_submit(self, interaction: discord.Interaction):
         # TODO i dont understand this. but you said something was broken here xD
         if (
-                not await validate_numeric(interaction, self.amount_input.value, "Amount must be numeric") or
-                not await validate_amount(interaction, int(self.amount_input.value)) or
-                not await validate_interval(interaction, parse_time(self.interval_input.value))
+            not await validate_numeric(interaction, self.amount_input.value, "Amount must be numeric") or
+            not await validate_amount(interaction, int(self.amount_input.value)) or
+            not await validate_interval(interaction, parse_time(self.interval_input.value))
         ):
             self.finished_event.set()
             return
