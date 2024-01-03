@@ -78,7 +78,7 @@ class ManageCommandsButtons(discord.ui.View):
 
             await self.make_command_embed()
 
-    # TODO: Fix this
+    # Check if the command still exists
     async def silliness_check(self, interaction: discord.Interaction):
         if not Command.check_if_command_exists(self.command.id):
             await interaction.response.send_message(embed=discord.Embed(title="This command is no longer running"),
@@ -115,12 +115,12 @@ class EditMessagingCommandWindow(discord.ui.Modal):
         self.finished_event = asyncio.Event()
 
     async def on_submit(self, interaction: discord.Interaction):
-        # TODO i dont understand this. but you said something was broken here xD
         if (
-                not await validate_numeric(interaction, self.amount_input.value, "Amount must be numeric") or
-                not await validate_amount(interaction, int(self.amount_input.value)) or
-                not await validate_interval(interaction, parse_time(self.interval_input.value))
+            not await validate_numeric(interaction, self.amount_input.value, "Amount must be numeric") or
+            not await validate_amount(interaction, int(self.amount_input.value)) or
+            not await validate_interval(interaction, parse_time(self.interval_input.value))
         ):
+            self.stop()
             self.finished_event.set()
             return
         await interaction.response.defer()

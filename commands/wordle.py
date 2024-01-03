@@ -32,10 +32,9 @@ class Wordle:
         self.correct_guess = False
 
         if not testing:
-            # Test channel
-            # channel = client.get_channel(839100318893211669)
-            # Gammin channel
-            channel = client.get_channel(1111353625638350893)
+            # channel = client.get_channel(839100318893211669)      # Test channel
+            channel = client.get_channel(1111353625638350893)       # Gaming channel
+
             embed = discord.Embed(title="New Daily Wordle dropped! :fire: :fire: ")
 
             embed.description = (f"[Connections](https://www.nytimes.com/games/connections)\n" +
