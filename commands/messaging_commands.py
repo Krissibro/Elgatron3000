@@ -125,7 +125,7 @@ async def get_attention_internal(ctx, command_info: MessagingInfo):
     description="Annoy someone as many times as you would like with a given interval!",
     guild=discord.Object(id=guild_id)
 )
-async def dm_aga(ctx, user: discord.User, message: str, amount: int, interval: str):
+async def dm_spam(ctx, user: discord.User, message: str, amount: int, interval: str):
     interval = parse_time(interval)
     await execute_command(ctx, "dm_spam_internal", dm_spam_internal, user, message, amount, interval, ctx.channel)
 
