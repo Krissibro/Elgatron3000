@@ -6,7 +6,7 @@ from commands.command_management import manage_commands, kill_all_commands, clea
 from commands.messaging_commands import annoy, get_attention, dm_spam
 from commands.epic_games_commands import schedule_post_free_games, free_games_rn
 from commands.wordle import initialize_wordle, wordle, guess_wordle
-from commands.polls import start_poll
+from commands.polls import start_poll, start_poll_simple
 from utilities.settings import testing
 
 if testing:
