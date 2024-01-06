@@ -7,15 +7,17 @@ from collections import Counter
 class Dropdown(discord.ui.Select):
     votes = {}
 
-    def __init__(self, message_ctx):
-        super().__init__()
+    def __init__(self, message_ctx, title, description, option_text):
         self.message_ctx: discord.Interaction = message_ctx
-        options = [discord.SelectOption(label=str(i)) for i in [1, 2, 3]]
+        self.title = title
+        self.description = description
+
+        options = [discord.SelectOption(label=i) for i in option_text]
         super().__init__(placeholder="select what you wanna", min_values=1, max_values=3, options=options)
 
     async def callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
-        self.votes[interaction.user] = self.values
+        self.votes[interaction.user.name] = self.values
         self.count_votes()
 
         await self.message_ctx.edit_original_response(content="test", embed=self.make_embed())
@@ -28,16 +30,17 @@ class Dropdown(discord.ui.Select):
         return c.items()
 
     def make_embed(self):
-        embed = discord.Embed(title="Poll", description="vote info")
+        embed = discord.Embed(title=self.title, description=self.description)
         for i, j in self.count_votes():
-            embed.add_field(name=i, value=":green_square:"*j, inline=False)
+            embed.add_field(name=i, value=f"‎{':green_square:' * j}", inline=False)
+        embed.set_footer(text=f"{', '.join(self.votes.keys())} has voted")
         return embed
 
 
 class ManageCommandsDropDown(discord.ui.View):
-    def __init__(self, message_ctx):
+    def __init__(self, message_ctx, title, description, options):
         super().__init__()
-        self.add_item(Dropdown(message_ctx))
+        self.add_item(Dropdown(message_ctx, title, description, options))
 
 
 @tree.command(
@@ -45,7 +48,13 @@ class ManageCommandsDropDown(discord.ui.View):
     description="start a poll",
     guild=discord.Object(id=guild_id)
 )
-async def start_poll(ctx):
-    view = ManageCommandsDropDown(ctx)
+async def start_poll(ctx:discord.Interaction, title: str, description: str, option1: str, option2: str, option3: str = None, option4: str = None, option5: str = None,
+                     option6: str = None, option7: str = None, option8: str = None, option9: str = None,
+                     option10: str = None):
+    options = [option1, option2, option3, option4, option5, option6, option7, option8, option9, option10]
+    options = [i for i in options if i]  # remove option if it's not defined
+    view = ManageCommandsDropDown(ctx, title, description, options)
     first_embed = discord.Embed(title="test poll")
-    await ctx.response.send_message(embed=first_embed, view=view, ephemeral=True)
+    await ctx.response.send_message(embed=first_embed, view=view)
+    msg = await ctx.original_response()
+    await msg.create_thread(name=title)
