@@ -6,11 +6,11 @@ from commands.command_management import manage_commands, kill_all_commands, clea
 from commands.messaging_commands import annoy, get_attention, dm_spam
 from commands.epic_games_commands import schedule_post_free_games, free_games_rn
 from commands.wordle import initialize_wordle, wordle, guess_wordle
-from commands.polls import start_poll
 from utilities.settings import testing
+from utilities.shared import *
 
 if testing:
-    from commands.test_commands import *
+    from commands.test_commands import collect_data
 
 
 @client.event
