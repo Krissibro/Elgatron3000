@@ -1,5 +1,6 @@
 from utilities.shared import *
 from command_objects.CommandInfo import *
+from utilities.helper_functions import char_to_emoji
 
 
 class MessagingInfo(CommandInfo):
@@ -25,7 +26,7 @@ class MessagingInfo(CommandInfo):
 
     def make_overview(self, index, embed):
         formatted_command_string = " ".join(self.command.split("_")).capitalize()
-        embed.add_field(name=f"{CommandInfo.id_to_emoji(index)} {formatted_command_string}",
+        embed.add_field(name=f"{char_to_emoji(index)} {formatted_command_string}",
                         value=f"{self.user}\n{self.message}",
                         inline=False)
 

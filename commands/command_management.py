@@ -6,13 +6,12 @@ from ast import literal_eval
 from utilities.helper_functions import parse_time, format_seconds
 
 
-class Dropdown(discord.ui.Select):
+class MessageSelectDropdown(discord.ui.Select):
     def __init__(self, message_ctx):
         self.message_ctx = message_ctx
         options = Command.make_dropdown_options()
         super().__init__(placeholder="Which command would you like to edit?", min_values=1, max_values=1, options=options)
 
-    # TODO: Fix this
     async def callback(self, interaction: discord.Interaction):
         selected_command_id = int(self.values[0])
 
@@ -33,7 +32,7 @@ class Dropdown(discord.ui.Select):
 class ManageCommandsDropDown(discord.ui.View):
     def __init__(self, message_ctx):
         super().__init__()
-        self.add_item(Dropdown(message_ctx))
+        self.add_item(MessageSelectDropdown(message_ctx))
 
 
 class ManageCommandsButtons(discord.ui.View):
