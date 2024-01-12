@@ -8,8 +8,8 @@ previous_free_games = []
 
 async def make_link_embed():
     embed = discord.Embed(title="Free Games INCOMING!!!!")
-    embed.description = (f"[***Epic Games***](https://store.epicgames.com/en-US/free-games)\n" +
-                         f"[***Playstation Games***](https://www.playstation.com/en-us/ps-plus/whats-new/#monthly-games)")
+    embed.description = (f"[**Epic Games**](https://store.epicgames.com/en-US/free-games)\n" +
+                         f"[**Playstation Games**](https://www.playstation.com/en-us/ps-plus/whats-new/#monthly-games)")
     return embed
 
 
@@ -39,7 +39,7 @@ async def get_free_games():
 async def make_game_embeds(channel, games):
     for game in games:
         embed = discord.Embed(title=f"{game['title']}",
-                              description=f"[***Link***](https://store.epicgames.com/en-US/p/{game['productSlug']})")
+                              description=f"[**Link**](https://store.epicgames.com/en-US/p/{game['productSlug']})")
         for image in game["keyImages"]:
             if image["type"] in ["OfferImageWide", "DieselStoreFrontWide"]:
                 embed.set_image(url=image["url"])
