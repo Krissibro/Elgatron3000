@@ -61,7 +61,6 @@ def char_to_emoji(command_id) -> str:
                   "z": "🇿"
                   }
     temp = ""
-    print(command_id)
     for i in str(command_id).lower():
         temp += emoji_dict[str(i)]
     return temp
