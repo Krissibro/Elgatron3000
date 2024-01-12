@@ -40,9 +40,8 @@ async def make_game_embeds(channel, games):
     for game in games:
         embed = discord.Embed(title=f"{game['title']}",
                               description=f"[***Link***](https://store.epicgames.com/en-US/p/{game['productSlug']})")
-
         for image in game["keyImages"]:
-            if image["type"] == "DieselStoreFrontWide":
+            if image["type"] in ["OfferImageWide", "DieselStoreFrontWide"]:
                 embed.set_image(url=image["url"])
 
         await channel.send(embed=embed)
