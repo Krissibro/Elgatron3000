@@ -6,6 +6,7 @@ Elgatron3000 is a very cool and epic Discord bot designed to provide a mix of re
 
 - **Attention Grabber**: Ping someone at intervals until they go mad.
 - **Management of Running Commands**: End commands early if someone are too annoyed.
+- **Reaction Polls**: Automatically make polls with a threads to discuss.
 - **Epic Games Integration**: Get information about the currently free games on Epic Games Store.
 - **Wordle but Epic**: Play wordle with your friends, only one guess each. Resets daily.
 
