@@ -57,6 +57,10 @@ class Wordle:
             if guessed_word.lower() not in valid_words:
                 await ctx.response.send_message(embed=discord.Embed(title=f"{guessed_word} is not a valid word"))
                 return
+            if guessed_word in self.guessed_words:
+                await ctx.response.send_message(embed=discord.Embed(title=f"{guessed_word} has already been guessed"))
+                return
+
 
         self.guessed_words.add(guessed_word)
         self.users_that_guessed.add(ctx.user.id)

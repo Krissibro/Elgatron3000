@@ -61,7 +61,6 @@ def char_to_emoji(command_id) -> str:
                   "z": ":regional_indicator_z:"
                   }
     temp = ""
-    print(command_id)
     for i in str(command_id).lower():
         print(str(i))
         temp += emoji_dict[str(i)]
