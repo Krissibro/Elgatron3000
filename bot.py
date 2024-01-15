@@ -25,4 +25,8 @@ async def on_ready():
 
 
 load_dotenv("token.env")
-client.run(os.getenv("TOKEN"))
+
+try:
+    client.run(os.getenv("TOKEN"))
+finally:
+    database.close()

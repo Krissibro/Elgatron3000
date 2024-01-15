@@ -1,5 +1,6 @@
 __pycache__/
 token.env
 .idea
+*.db
 venv
 utilities/config.json

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import numpy as np
 import random
 from utilities.shared import *
@@ -31,6 +33,10 @@ class Wordle:
                                   'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
         self.correct_guess = False
 
+        self.date = datetime.now().strftime("%Y-%m-%d")
+        cursor.execute(f"INSERT INTO wordle (game, word) VALUES ('{self.date}', '{self.daily_word}')")
+        database.commit()
+
         if not testing:
             # channel = client.get_channel(839100318893211669)      # Test channel
             channel = client.get_channel(1111353625638350893)       # Gaming channel
@@ -61,6 +67,8 @@ class Wordle:
                 await ctx.response.send_message(embed=discord.Embed(title=f"{guessed_word} has already been guessed"))
                 return
 
+        cursor.execute(f"INSERT INTO wordle_guesses (game, guess_nr, guess, person) VALUES ('{self.date}', {len(self.guessed_words)}, '{guessed_word}', '{ctx.user.name}')")
+        database.commit()
 
         self.guessed_words.add(guessed_word)
         self.users_that_guessed.add(ctx.user.id)
