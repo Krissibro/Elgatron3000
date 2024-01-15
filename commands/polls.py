@@ -14,13 +14,13 @@ async def start_poll(ctx: discord.Interaction, title: str, option1: str, option2
                      option3: str = None, option4: str = None, option5: str = None, option6: str = None,
                      option7: str = None, option8: str = None, option9: str = None, option10: str = None):
 
-    # sort out options
+    # Make list with valid options
     options = [option1, option2, option3, option4, option5, option6, option7, option8, option9, option10]
     options = [option for option in options if option]  # remove option if it's not defined
 
-    # make the embed
+    # Make the embed
     embed = discord.Embed(title=title, description=description)
-    content = "\n".join([f"{char_to_emoji(i)} {j}" for i, j in enumerate(options)])
+    content = "\n".join([f"{char_to_emoji(i+1)} {j}" for i, j in enumerate(options)])
     embed.add_field(name=content, value="", inline=False)
 
     # Send message and add reactions and thread
