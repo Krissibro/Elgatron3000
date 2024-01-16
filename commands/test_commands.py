@@ -1,5 +1,6 @@
 from utilities.shared import *
 from ast import literal_eval
+import csv
 
 
 @tree.command(
@@ -10,6 +11,16 @@ from ast import literal_eval
 @app_commands.checks.bot_has_permissions(read_message_history=True)
 async def collect_data(ctx: discord.Interaction):
     await ctx.response.defer()
-    data = [[message.channel.name, message.author.name, message.clean_content] async for message in ctx.channel.history(limit=200)]
-    for i in data:
-        print(i) if i[2] else None
+    messages = []
+    for i in ctx.guild.text_channels:
+        print(i.name)
+        if i.name in ["logs", "fishing-pond"]:
+            continue
+        try:
+            messages.extend([[message.created_at.year, message.created_at.month, message.created_at.day, message.created_at.hour] async for message in i.history(limit=100000) if message.author == ctx.user and message.clean_content])
+        except:
+            continue
+    with open('data/messages.csv', 'w', newline='') as csvfile:
+        print("finished!")
+        writer = csv.writer(csvfile)
+        writer.writerows(messages)
