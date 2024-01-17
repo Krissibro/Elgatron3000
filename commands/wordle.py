@@ -37,8 +37,9 @@ class Wordle:
 
             embed = discord.Embed(title="New Daily Wordle dropped! :fire: :fire: ")
 
-            embed.description = (f"[Connections](https://www.nytimes.com/games/connections)\n" +
-                                 f"[Real Wordle](https://www.nytimes.com/games/wordle/index.html)")
+            embed.description = ("[Connections](https://www.nytimes.com/games/connections)\n" +
+                                 "[Real Wordle](https://www.nytimes.com/games/wordle/index.html)\n" +
+                                 "[Pokedoku](https://pokedoku.com/)")
             await channel.send(embed=embed)
 
     async def guess_word(self, ctx, guessed_word: str):
