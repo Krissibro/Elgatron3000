@@ -10,6 +10,7 @@ word_bank = list(np.genfromtxt('./data/word-bank.csv', delimiter=',', dtype=str)
 class Wordle:
     daily_word = ""
     correct_guess = False
+    whitelisted_words = ["SKIBIDI"]
     guessed_words = set()
     users_that_guessed = set()
     known_letters = set()
