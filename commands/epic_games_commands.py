@@ -37,10 +37,11 @@ async def get_free_games():
 
 async def make_game_embeds(channel, games):
     for game in games:
+        page_slug = game["catalogNs"]["mappings"][0]["pageSlug"]
+        url = f"\n[**Link**](https://store.epicgames.com/en-US/p/{page_slug})" if page_slug else ""
+
         embed = discord.Embed(title=f"{game['title']}",
-                              description=f"{game['description']}"
-                                          + (f"\n[**Link**](https://store.epicgames.com/en-US/p/{game['productSlug']}"
-                                             if game['productSlug'] else ""))
+                              description=f"{game['description']}" + url)
         for image in game["keyImages"]:
             if image["type"] in ["OfferImageWide", "DieselStoreFrontWide"]:
                 embed.set_image(url=image["url"])
