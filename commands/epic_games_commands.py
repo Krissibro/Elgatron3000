@@ -16,25 +16,23 @@ async def make_link_embed():
 async def get_free_games():
     api = EpicGamesStoreAPI()
     free_games = api.get_free_games()["data"]["Catalog"]["searchStore"]["elements"]
-    return free_games
 
-    # free_promotions = []
-    #
-    # for game in free_games:
-    #     print(game)
-    #     # Check if there is a promotion
-    #     if not (game["promotions"] and game["promotions"]["promotionalOffers"]):
-    #         continue
-    #
-    #     # Accessing the nested promotional offers
-    #     nested_promotions = game["promotions"]["promotionalOffers"][0]["promotionalOffers"]
-    #
-    #     for promotion in nested_promotions:
-    #         # Check that the current promotion is 0%
-    #         if promotion["discountSetting"]["discountPercentage"] == 0:
-    #             free_promotions.append(game)
-    #             break  # Assuming only one free promotion per game
-    # return free_promotions
+    free_promotions = []
+
+    for game in free_games:
+        # Check if there is a promotion
+        if not (game["promotions"] and game["promotions"]["promotionalOffers"]):
+            continue
+
+        # Accessing the nested promotional offers
+        nested_promotions = game["promotions"]["promotionalOffers"][0]["promotionalOffers"]
+
+        for promotion in nested_promotions:
+            # Check that the current promotion is 0%
+            if promotion["discountSetting"]["discountPercentage"] == 0:
+                free_promotions.append(game)
+                break  # Assuming only one free promotion per game
+    return free_promotions
 
 
 async def make_game_embeds(channel, games):
@@ -66,7 +64,7 @@ async def scheduled_post_free_games():
     free_games = await get_free_games()
     game_titles = [game["title"] for game in free_games]
 
-    if game_titles == previous_free_games:
+    if game_titles == previous_free_games or not free_games:
         return
     previous_free_games = game_titles
     if not testing:

@@ -2,6 +2,7 @@ from utilities.shared import *
 from ast import literal_eval
 import csv
 from commands.wordle import wordle_game
+from commands.epic_games_commands import *
 
 @tree.command(
     name="collect_data",
@@ -34,3 +35,12 @@ async def collect_data(ctx: discord.Interaction):
 async def reset_wordle(ctx):
     await wordle_game.pick_new_word()
     await ctx.response.send_message(embed=discord.Embed(title="Wordle has been reset!"), ephemeral=True, delete_after=1)
+
+@tree.command(
+    name="test_epic_games_scheduler",
+    description="testing",
+    guild=discord.Object(id=guild_id)
+)
+async def test_epic_games_scheduler(ctx):
+    await ctx.response.send_message(embed=discord.Embed(title="Testing!"), ephemeral=True, delete_after=1)
+    await scheduled_post_free_games()
