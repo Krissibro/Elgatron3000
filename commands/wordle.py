@@ -53,31 +53,34 @@ class Wordle:
         if self.correct_guess:
             await ctx.response.send_message(embed=discord.Embed(title="The daily wordle has already been guessed"))
             return
-        if not len(guessed_word) == 5:
-            await ctx.response.send_message(embed=discord.Embed(title="The word must be 5 letters long"))
-            return
+
         if not testing:
             if ctx.user.id in self.users_that_guessed:
                 await ctx.response.send_message(embed=discord.Embed(title="You have already guessed"))
                 return
-            if guessed_word.lower() not in valid_words:
-                await ctx.response.send_message(embed=discord.Embed(title=f"{guessed_word} is not a valid word"))
-                return
+            if guessed_word not in self.whitelisted_words:
+                if not len(guessed_word) == 5:
+                    await ctx.response.send_message(embed=discord.Embed(title="The word must be 5 letters long"))
+                    return
+                if guessed_word.lower() not in valid_words:
+                    await ctx.response.send_message(embed=discord.Embed(title=f"{guessed_word} is not a valid word"))
+                    return
             if guessed_word in self.guessed_words:
                 await ctx.response.send_message(embed=discord.Embed(title=f"{guessed_word} has already been guessed"))
                 return
-
 
         self.guessed_words.add(guessed_word)
         self.users_that_guessed.add(ctx.user.id)
         self.correct_guess = guessed_word == self.daily_word
 
         # Initialize result with all red squares
-        guess_result = [":red_square:"] * 5
+        guess_result = [":red_square:"] * len(guessed_word)
         yellow_checker = list(self.daily_word)
 
         # Check for correct letters
         for index, letter in enumerate(guessed_word):
+            if index >= len(self.daily_word):
+                break
             if letter == self.daily_word[index]:
                 guess_result[index] = ":green_square:"
                 # if a letter is found, we don't want it to be found again
@@ -86,7 +89,9 @@ class Wordle:
 
         # Check for letters that are in the word, but in the wrong place
         for index, letter in enumerate(guessed_word):
-            if letter in yellow_checker and not letter == self.daily_word[index]:
+            if index < len(self.daily_word) and letter == self.daily_word[index]:
+                continue
+            if letter in yellow_checker:
                 guess_result[index] = ":yellow_square:"
                 yellow_checker.remove(letter)
                 self.known_letters.add(letter)
@@ -162,3 +167,5 @@ async def guess_wordle(ctx, guessed_word: str):
     global wordle_game
 
     await wordle_game.guess_word(ctx, guessed_word)
+
+
