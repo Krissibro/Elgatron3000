@@ -4,9 +4,9 @@ from utilities.helper_functions import char_to_emoji
 
 
 class MessagingInfo(CommandInfo):
-    def __init__(self, command: str, user: discord.User, message: str, amount: int, interval: int, channel: discord.TextChannel):
+    def __init__(self, command_name: str, user: discord.User, message: str, amount: int, interval: int, channel: discord.TextChannel):
         super().__init__(channel)
-        self.command: str = command
+        self.command_name: str = command_name
         self.message: str = message
         self.amount: int = amount
         self.remaining: int = amount
@@ -16,7 +16,7 @@ class MessagingInfo(CommandInfo):
 
     def make_embed(self):
         embed = discord.Embed(
-            title=f"Command: {self.command}",
+            title=f"Command: {self.command_name}",
             description=f"Message: {self.message}"
         )
         embed.add_field(name="User:", value=f"{self.user}", inline=False)
@@ -25,7 +25,7 @@ class MessagingInfo(CommandInfo):
         return embed
 
     def make_overview(self, index, embed):
-        formatted_command_string = " ".join(self.command.split("_")).capitalize()
+        formatted_command_string = " ".join(self.command_name.split("_")).capitalize()
         embed.add_field(name=f"{char_to_emoji(index)} {formatted_command_string}",
                         value=f"{self.user}\n{self.message}",
                         inline=False)
