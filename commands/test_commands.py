@@ -1,7 +1,7 @@
 from utilities.shared import *
 from ast import literal_eval
 import csv
-
+from commands.wordle import wordle_game
 
 @tree.command(
     name="collect_data",
@@ -24,3 +24,13 @@ async def collect_data(ctx: discord.Interaction):
         print("finished!")
         writer = csv.writer(csvfile)
         writer.writerows(messages)
+
+
+@tree.command(
+    name="reset_wordle",
+    description="Reset the daily wordle",
+    guild=discord.Object(id=guild_id)
+)
+async def reset_wordle(ctx):
+    await wordle_game.pick_new_word()
+    await ctx.response.defer()
