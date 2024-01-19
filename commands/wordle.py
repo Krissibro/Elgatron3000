@@ -19,6 +19,10 @@ class Wordle:
     display_list = []
 
     async def pick_new_word(self):
+        if not self.correct_guess and not self.daily_word == "":
+            await client.get_channel(839100318893211669).send(embed=discord.Embed(
+                title=f"The previous word was {self.daily_word.upper()}"))
+
         random_word = str(random.sample(word_bank, 1)[0])
         self.daily_word = random_word.upper()
         # self.daily_word = "XOXOX"
