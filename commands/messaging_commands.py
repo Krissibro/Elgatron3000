@@ -74,7 +74,7 @@ async def annoy(ctx, message: str, amount: int, interval: str, user: discord.Use
 async def annoy_internal(ctx, command_info: MessagingInfo):
     while command_info.remaining > 0:
         command_info.remaining -= 1
-        message = await ctx.channel.send(f"{command_info.user} {command_info.message}")
+        message = await ctx.channel.send(f"{command_info.get_mention()} {command_info.message}")
         command_info.add_message(message)
         await asyncio.sleep(command_info.interval)
 
@@ -107,7 +107,7 @@ async def get_attention_internal(ctx, command_info: MessagingInfo):
         command_info.remaining -= 1
         view = ReactButton(timeout=command_info.interval * 2)
 
-        message = await ctx.channel.send(command_info.user,
+        message = await ctx.channel.send(command_info.get_mention(),
                                          embed=discord.Embed(title=f"{command_info.message}"),
                                          view=view)
 
@@ -127,7 +127,7 @@ async def get_attention_internal(ctx, command_info: MessagingInfo):
 )
 async def dm_spam(ctx, user: discord.User, message: str, amount: int, interval: str):
     interval = parse_time(interval)
-    await execute_command(ctx, "dm_spam_internal", dm_spam_internal, user, message, amount, interval, ctx.channel)
+    await execute_command(ctx, "dm_spam", dm_spam_internal, user, message, amount, interval, ctx.channel)
 
 
 async def dm_spam_internal(ctx, command_info: MessagingInfo):
