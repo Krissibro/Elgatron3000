@@ -7,9 +7,7 @@ valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=s
 word_bank = list(np.genfromtxt('./data/word-bank.csv', delimiter=',', dtype=str))
 
 whitelisted_words = {"ELGA3", "SKIBIDI", "GYATT"}
-
-for word in whitelisted_words:
-    word_bank.append(word)
+word_bank.extend(whitelisted_words)
 
 
 class Wordle:
