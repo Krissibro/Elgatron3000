@@ -1,5 +1,5 @@
 from epicstore_api import EpicGamesStoreAPI
-from utilities.settings import testing
+from utilities.settings import testing, game_channel_id, testing_channel_id
 from utilities.shared import *
 
 
@@ -69,9 +69,9 @@ async def scheduled_post_free_games():
         return
     previous_free_games = game_titles
     if not testing:
-        channel = client.get_channel(1111353625638350893)       # Gaming channel
+        channel = client.get_channel(game_channel_id)       # Gaming channel
     else:
-        channel = client.get_channel(839100318893211669)      # Test channel
+        channel = client.get_channel(testing_channel_id)      # Test channel
 
     await channel.send(embed=await make_link_embed())
     await make_game_embeds(channel, free_games)

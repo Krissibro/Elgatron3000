@@ -176,29 +176,3 @@ async def cleanup(ctx, messages_amount: int):
                                     delete_after=10)
 
 
-@tree.command(
-    name="help",
-    description="Bot info!",
-    guild=discord.Object(id=guild_id)
-)
-async def help(ctx):
-    embed = discord.Embed(title="📚 Help")
-    embed.add_field(name="/annoy <message> <amount> <interval> (<user>)",
-                    value="Sends a message every given interval", inline=False)
-    embed.add_field(name="/dm_aga <message> <amount> <interval>",
-                    value="Sends a message to HA every given interval", inline=False)
-    embed.add_field(name="/get_attention <user> <message> <amount> <interval> ",
-                    value="Mention someone X times, every given interval until they react", inline=False)
-    embed.add_field(name="/free_games_rn",
-                    value="See free games from Epic Games and Playstation", inline=False)
-    embed.add_field(name="/cleanup <messages_amount>",
-                    value="Deletes the given amount of messages", inline=False)
-    embed.add_field(name="/manage_commands",
-                    value="Manage and see info about running commands", inline=False)
-    embed.add_field(name="/kill_command <ID>",
-                    value="Kills the command with the corresponding ID", inline=False)
-    embed.add_field(name="/kill_all_commands",
-                    value="Kill all commands, try to use /kill_command first", inline=False)
-    embed.set_footer(text="<interval> is in seconds, but can be evaluated by for example 20*60")
-
-    await ctx.response.send_message(embed=embed, ephemeral=True)

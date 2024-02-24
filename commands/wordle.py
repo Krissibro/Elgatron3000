@@ -1,16 +1,20 @@
 import numpy as np
 import random
 from utilities.shared import *
-from utilities.settings import testing
+from utilities.settings import testing, testing_channel_id, game_channel_id
 
 valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())
 word_bank = list(np.genfromtxt('./data/word-bank.csv', delimiter=',', dtype=str))
+
+whitelisted_words = {"SKIBIDI", "GYATT", "ELGA3"}
+
+for word in whitelisted_words:
+    word_bank.append(word)
 
 
 class Wordle:
     daily_word = ""
     correct_guess = False
-    whitelisted_words = ["SKIBIDI"]
     guessed_words = set()
     users_that_guessed = set()
     known_letters = set()
@@ -21,7 +25,7 @@ class Wordle:
 
     async def pick_new_word(self):
         if not self.correct_guess and not self.daily_word == "":
-            await client.get_channel(839100318893211669).send(embed=discord.Embed(
+            await client.get_channel(game_channel_id).send(embed=discord.Embed(
                 title=f"The previous word was {self.daily_word.upper()}"))
 
         random_word = str(random.sample(word_bank, 1)[0])
@@ -37,8 +41,8 @@ class Wordle:
         self.correct_guess = False
 
         if not testing:
-            # channel = client.get_channel(839100318893211669)      # Test channel
-            channel = client.get_channel(1111353625638350893)       # Gaming channel
+            # channel = client.get_channel(testing_channel_id)      # Test channel
+            channel = client.get_channel(game_channel_id)       # Gaming channel
 
             embed = discord.Embed(title="New Daily Wordle dropped! :fire: :fire: ")
 
@@ -58,7 +62,7 @@ class Wordle:
             if ctx.user.id in self.users_that_guessed:
                 await ctx.response.send_message(embed=discord.Embed(title="You have already guessed"))
                 return
-            if guessed_word not in self.whitelisted_words:
+            if guessed_word not in whitelisted_words:
                 if not len(guessed_word) == 5:
                     await ctx.response.send_message(embed=discord.Embed(title="The word must be 5 letters long"))
                     return
@@ -140,11 +144,10 @@ wordle_game = Wordle()
 async def initialize_wordle():
     global wordle_game
 
-    trigger = CronTrigger(hour=8, minute=0, second=0, timezone='Europe/Oslo')
-
     await wordle_game.pick_new_word()
-    scheduler.add_job(wordle_game.pick_new_word, trigger)
 
+    trigger = CronTrigger(hour=8, minute=0, second=0, timezone='Europe/Oslo')
+    scheduler.add_job(wordle_game.pick_new_word, trigger)
     scheduler.print_jobs()
 
 
