@@ -6,7 +6,7 @@ from utilities.settings import testing, testing_channel_id, game_channel_id
 valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())
 word_bank = list(np.genfromtxt('./data/word-bank.csv', delimiter=',', dtype=str))
 
-whitelisted_words = {"SKIBIDI", "GYATT", "ELGA3"}
+whitelisted_words = {"ELGA3", "SKIBIDI", "GYATT"}
 
 for word in whitelisted_words:
     word_bank.append(word)
