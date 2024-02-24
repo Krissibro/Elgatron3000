@@ -9,6 +9,7 @@ from commands.epic_games_commands import schedule_post_free_games, free_games_rn
 from commands.wordle import initialize_wordle, wordle, guess_wordle
 from commands.random import *
 from commands.help import help_command
+from commands.guess_that_pin import *
 
 from utilities.settings import testing
 from utilities.shared import *
@@ -23,6 +24,8 @@ async def on_ready():
 
     client.loop.create_task(schedule_post_free_games())
     client.loop.create_task(initialize_wordle())
+
+    await initialize_guess_that_pin()
 
     print("Ready!")
 
