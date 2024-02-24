@@ -142,8 +142,6 @@ wordle_game = Wordle()
 
 
 async def initialize_wordle():
-    global wordle_game
-
     await wordle_game.pick_new_word()
 
     trigger = CronTrigger(hour=8, minute=0, second=0, timezone='Europe/Oslo')
@@ -157,7 +155,6 @@ async def initialize_wordle():
     guild=discord.Object(id=guild_id)
 )
 async def wordle(ctx):
-    global wordle_game
     await ctx.response.send_message(embed=await wordle_game.make_embed())
 
 
@@ -167,8 +164,6 @@ async def wordle(ctx):
     guild=discord.Object(id=guild_id)
 )
 async def guess_wordle(ctx, guessed_word: str):
-    global wordle_game
-
     await wordle_game.guess_word(ctx, guessed_word)
 
 
