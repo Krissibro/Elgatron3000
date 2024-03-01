@@ -3,3 +3,4 @@ token.env
 .idea
 venv
 utilities/config.json
+pin_storage/
