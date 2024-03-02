@@ -43,7 +43,7 @@ class PinManager:
 
             self.pin_count = len(pins)
             self.chunk_size = round(sqrt(self.pin_count))
-            self.store_pin_count(len(pins))
+            self.store_count_and_chunk_size(self.pin_count, self.chunk_size)
             self.save_chunks(pins)
 
             del pins
@@ -63,26 +63,22 @@ class PinManager:
 
     def count_chunks(self):
         """Returns the number of chunks in pin_storage."""
-
         directory = os.listdir("./data/pin_storage/")
         chunks = [file for file in directory if file.startswith(self.base_filename)]
         return len(chunks)
 
-    def store_pin_count(self, data):
+    def store_count_and_chunk_size(self, count, chunk_size):
         """Stores the number of pins in metadata.json."""
-
         with open(f"./data/pin_storage/metadata.json", "w") as file:
-            json.dump(data, file)
+            json.dump([count, chunk_size], file)
 
     def read_pin_count(self):
         """Reads the number of pins from metadata.json."""
-
         with open(f"./data/pin_storage/metadata.json", "r") as file:
-            self.pin_count = json.load(file)
+            self.pin_count, self.chunk_size = json.load(file)
 
     def load_random_pin(self):
         """Loads a random pin from the stored chunks."""
-
         random_pin_index = random.randint(0, self.pin_count - 1)
         chunk_index = random_pin_index // self.chunk_size
         pin_index_within_chunk = random_pin_index % self.chunk_size
@@ -96,7 +92,7 @@ class PinManager:
 
         # Update the pin count
         self.pin_count += 1
-        pin_manager.store_pin_count(self.pin_count)
+        pin_manager.store_count_and_chunk_size(self.pin_count)
 
         # Calculate the index of the last chunk
         latest_chunk_index = (pin_manager.pin_count - 1) // pin_manager.chunk_size
@@ -125,7 +121,7 @@ class PinManager:
 
         # Update the pin count
         self.pin_count -= 1
-        pin_manager.store_pin_count(self.pin_count)
+        pin_manager.store_count_and_chunk_size(self.pin_count)
 
         # Go through each chunk, newest to oldest, till the pin is found, then remove it and update the file
         for chunk_index in range(self.count_chunks() - 1, 0, -1):
@@ -173,7 +169,7 @@ class PinView(discord.ui.View):
         embed = await self.make_first_embed()
 
         embed.add_field(name="By",
-                        value=f"**@{self.pin.author}**", inline=True)
+                        value=f"{self.pin.author}", inline=True)
         embed.add_field(name="Context",
                         value=f"https://discord.com/channels/{guild_id}/{self.pin.channel}/{self.pin.id}")
 
