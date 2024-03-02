@@ -147,7 +147,6 @@ class PinView(discord.ui.View):
         super().__init__()
         self.pin = pin
         self.message_ctx = message_ctx
-        self.sent_attachments = False
 
     async def make_first_embed(self):
         """Creates the embed containing the title and the selected pin.
@@ -156,11 +155,12 @@ class PinView(discord.ui.View):
         embed = discord.Embed(title="Guess the pin!",
                               description=self.pin.content if self.pin.content else None)
 
-        if not self.sent_attachments and self.pin.attachments:
-            await self.message_ctx.channel.send("\n".join(attachment for attachment in self.pin.attachments))
-            self.sent_attachments = True
-
         return embed
+
+    async def send_attachments(self):
+        """Sends the attachments of the pin to the channel if there are any."""
+        if self.pin.attachments:
+            await self.message_ctx.channel.send("\n".join(attachment for attachment in self.pin.attachments))
 
     @discord.ui.button(label="Reveal the sinner!", style=discord.ButtonStyle.success)
     async def reveal_button(self, button: discord.ui.Button, interaction: discord.Interaction):
@@ -192,6 +192,7 @@ async def guess_that_pin(ctx):
     embed = await view.make_first_embed()
 
     await ctx.response.send_message(embed=embed, view=view)
+    await view.send_attachments()
 
 
 @client.event
