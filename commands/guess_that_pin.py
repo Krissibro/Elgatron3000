@@ -27,16 +27,13 @@ class PinManager:
 
         if not self.count_chunks():
             pins = []
-
             guild = client.get_guild(guild_id)
 
-
             # Fetch pins from all channels
-            for channel in guild.text_channels:
-                print(f"Fetching pins from {channel.name}")
+            for i, channel in enumerate(guild.text_channels):
+                print(f"|{(i * '#'):<{len(guild.text_channels)}}| {len(pins):<{4}} | {channel.name}", end="\n")
                 try:
                     channel_pins = await channel.pins()
-                    print(f"Fetched {len(channel_pins)} pins")
                     # TODO: Make display_name better looking, it was good before but now it doesnt work??
                     pins.extend(
                         [Pin(pin.author.display_name, pin.content, [attachment.url for attachment in pin.attachments],
@@ -45,8 +42,6 @@ class PinManager:
                     print(f"Failed to fetch pins from {channel.name}: {e}")
 
             print(f"Initialized with {len(pins)} pins")
-
-            print(pins)
 
             self.store_pin_count(len(pins))
             self.save_chunks(pins)
