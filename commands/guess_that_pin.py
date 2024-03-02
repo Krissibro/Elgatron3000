@@ -19,7 +19,7 @@ class PinManager:
     async def initialize(self):
         """Fetches all pinned messages from the guild and stores them in chunks of 150 pins each."""
 
-        os.makedirs("./pin_storage/", exist_ok=True)
+        os.makedirs("./data/pin_storage/", exist_ok=True)
 
         if not self.count_chunks():
             pins = []
@@ -55,26 +55,26 @@ class PinManager:
 
         for i in range(0, len(data), self.chunk_size):
             chunk = data[i:i+self.chunk_size]
-            with open(f"./pin_storage/{self.base_filename}_{i // self.chunk_size}.pkl", "wb") as file:
+            with open(f"./data/pin_storage/{self.base_filename}_{i // self.chunk_size}.pkl", "wb") as file:
                 pickle.dump(chunk, file)
 
     def count_chunks(self):
         """Returns the number of chunks in pin_storage."""
 
-        directory = os.listdir("./pin_storage/")
+        directory = os.listdir("./data/pin_storage/")
         chunks = [file for file in directory if file.startswith(self.base_filename)]
         return len(chunks)
 
     def store_pin_count(self, data):
         """Stores the number of pins in metadata.json."""
 
-        with open(f"./pin_storage/metadata.json", "w") as file:
+        with open(f"./data/pin_storage/metadata.json", "w") as file:
             json.dump(data, file)
 
     def read_pin_count(self):
         """Reads the number of pins from metadata.json."""
 
-        with open(f"./pin_storage/metadata.json", "r") as file:
+        with open(f"./data/pin_storage/metadata.json", "r") as file:
             self.pin_count = json.load(file)
 
     def load_random_pin(self):
@@ -84,9 +84,56 @@ class PinManager:
         chunk_index = random_pin_index // self.chunk_size
         pin_index_within_chunk = random_pin_index % self.chunk_size
 
-        with open(f"./pin_storage/{self.base_filename}_{chunk_index}.pkl", "rb") as file:
+        with open(f"./data/pin_storage/{self.base_filename}_{chunk_index}.pkl", "rb") as file:
             chunk = pickle.load(file)
             return chunk[pin_index_within_chunk]
+
+    def add_pin_to_storage(self, pin):
+        """Adds a pin to the storage."""
+
+        # Update the pin count
+        self.pin_count += 1
+        pin_manager.store_pin_count(self.pin_count)
+
+        # Calculate the index of the last chunk
+        latest_chunk_index = (pin_manager.pin_count - 1) // pin_manager.chunk_size
+
+        pin = Pin(pin.author.display_name, pin.content, [attachment.url for attachment in pin.attachments], pin.channel.id, pin.id)
+
+        # Open that last chunk
+        with open(f"./data/pin_storage/{self.base_filename}_{latest_chunk_index}.pkl", "rb") as file:
+            chunk = pickle.load(file)
+
+        # Check if a chunk is at capacity, if so make a new chunk
+        if len(chunk) == pin_manager.chunk_size:
+            latest_chunk_index += 1
+            chunk = [pin]
+            write_destination = f"./data/pin_storage/{self.base_filename}_{latest_chunk_index}.pkl"
+        else:
+            chunk.append(pin)
+            write_destination = f"./data/pin_storage/{self.base_filename}_{latest_chunk_index}.pkl"
+
+        # Write to either the last chunk or a new chunk
+        with open(write_destination, "wb") as file:
+            pickle.dump(chunk, file)
+
+    def remove_pin_from_storage(self, pin):
+        """Removes a pin from the storage."""
+
+        # Update the pin count
+        self.pin_count -= 1
+        pin_manager.store_pin_count(self.pin_count)
+
+        # Go through each chunk, newest to oldest, till the pin is found, then remove it and update the file
+        for chunk_index in range(self.count_chunks() - 1, 0, -1):
+            with open(f"./data/pin_storage/{self.base_filename}_{chunk_index}.pkl", "rb") as file:
+                chunk = pickle.load(file)
+                for stored_pin in chunk:
+                    if stored_pin.id == pin.id:
+                        chunk.remove(stored_pin)
+                        with open(f"./data/pin_storage/{self.base_filename}_{chunk_index}.pkl", "wb") as file:
+                            pickle.dump(chunk, file)
+                        return
 
 
 pin_manager = PinManager()
@@ -104,7 +151,8 @@ class PinView(discord.ui.View):
         self.sent_attachments = False
 
     async def make_first_embed(self):
-        """Creates the first embed for the game."""
+        """Creates the embed containing the title and the selected pin.
+        Also appends the attachments if there are any"""
 
         embed = discord.Embed(title="Guess the pin!",
                               description=self.pin.content if self.pin.content else None)
@@ -127,7 +175,6 @@ class PinView(discord.ui.View):
                         value=f"https://discord.com/channels/{guild_id}/{self.pin.channel}/{self.pin.id}")
 
         await self.message_ctx.edit_original_response(embed=embed, view=None)
-        # self.stop()
 
 
 @tree.command(
@@ -146,5 +193,44 @@ async def guess_that_pin(ctx):
     embed = await view.make_first_embed()
 
     await ctx.response.send_message(embed=embed, view=view)
+
+
+@client.event
+async def on_message_edit(before, after):
+    """Detects if a message has been edited.
+    If a message is pinned, it is saved to the storage.
+    If a message is unpinned, it is removed from storage"""
+
+    # If pinned
+    if not before.pinned and after.pinned:
+        pin_manager.add_pin_to_storage(after)
+        # print(f"Message {after.id} in channel {after.channel.id} was pinned.")
+
+    # If unpinned
+    if before.pinned and not after.pinned:
+        pin_manager.remove_pin_from_storage(after)
+        # print(f"Message {after.id} in channel {after.channel.id} was unpinned.")
+
+    # print(pin_manager.pin_count)
+    # with open("./data/pin_storage/pins_8.pkl", "rb") as file:
+    #     print(pickle.load(file))
+
+# Todo: handle if a pinned message is deleted or ehhhhhh?
+
+
+# Alternative method, but without the previous state of the message
+# @client.event
+# async def on_raw_message_edit(payload):
+#     """Detects if any message has been edited.
+#     If a message is pinned or have been pinned previously and just edited, it is detected."""
+#     print(f"Edit detected")
+#     if not client.get_channel(payload.channel_id):
+#         return
+#     if payload.data["pinned"]:
+#         print("Get pinned bitch")
+
+
+
+
 
 

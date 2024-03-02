@@ -10,6 +10,8 @@ from utilities.settings import guild_id
 
 # Shared Variables
 intents = discord.Intents.default()
+intents.members = True
+intents.messages = True
 intents.message_content = True
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
