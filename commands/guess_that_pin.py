@@ -3,7 +3,6 @@ from utilities.settings import guild_id
 import random
 import pickle
 import os
-import json
 from collections import namedtuple
 
 # Pickle will not store the message object itself, so it had to be dumbed down to a namedtuple
@@ -22,7 +21,7 @@ class PinManager:
 
         # load if it already exists, else find all pins
         try:
-            self.pins = pickle.load(open("pins.pkl", "rb"))
+            self.pins = pickle.load(open("data/pins.pkl", "rb"))
         except (OSError, IOError) as e:
             self.pins = []
             guild = client.get_guild(guild_id)
@@ -41,7 +40,7 @@ class PinManager:
                     print(f"Failed to fetch pins from {channel.name}: {e}")
 
             print(f"Initialized with {len(self.pins)} pins")
-            with open("pins.pkl", "wb") as file:
+            with open("data/pins.pkl", "wb") as file:
                 pickle.dump(self.pins, file)
 
     def load_random_pin(self):
@@ -55,7 +54,7 @@ class PinManager:
         self.pins.append(pin)
 
         # this could maybe be done at bot termination
-        with open("pins.pkl", "wb") as file:
+        with open("data/pins.pkl", "wb") as file:
             pickle.dump(self.pins, file)
 
     def remove_pin(self, pin):
@@ -156,9 +155,3 @@ async def on_message_edit(before, after):
 #         return
 #     if payload.data["pinned"]:
 #         print("Get pinned bitch")
-
-
-
-
-
-
