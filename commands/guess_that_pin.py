@@ -6,7 +6,9 @@ import os
 import json
 from collections import namedtuple
 
+# Pickle will not store the message object itself, so it had to be dumbed down to a namedtuple
 Pin = namedtuple("Pin", ["author", "content", "attachments", "channel", "id"])
+
 
 class PinManager:
     def __init__(self):
@@ -15,15 +17,9 @@ class PinManager:
         self.pin_count = 0
 
     async def initialize(self):
-        os.makedirs("./pin_storage/", exist_ok=True)
+        """Fetches all pinned messages from the guild and stores them in chunks of 150 pins each."""
 
-        # pins = []
-        # guild = client.get_guild(guild_id)
-        # # only fetch pins from the bruh channel
-        # channel_pins = await guild.text_channels[4].pins()
-        #
-        # for pin in channel_pins:
-        #     print(pin.author.display_name)
+        os.makedirs("./pin_storage/", exist_ok=True)
 
         if not self.count_chunks():
             pins = []
@@ -31,6 +27,7 @@ class PinManager:
 
             # Fetch pins from all channels
             for i, channel in enumerate(guild.text_channels):
+                # Loading bar for fun
                 print(f"|{(i * '#'):<{len(guild.text_channels)}}| {len(pins):<{4}} | {channel.name}", end="\n")
                 try:
                     channel_pins = await channel.pins()
@@ -54,25 +51,35 @@ class PinManager:
             print(f"Found {self.count_chunks()} chunks with {self.pin_count} pins")
 
     def save_chunks(self, data):
+        """Saves the data in chunks of 150 pins each as pickle objects in pin_storage."""
+
         for i in range(0, len(data), self.chunk_size):
             chunk = data[i:i+self.chunk_size]
             with open(f"./pin_storage/{self.base_filename}_{i // self.chunk_size}.pkl", "wb") as file:
                 pickle.dump(chunk, file)
 
     def count_chunks(self):
+        """Returns the number of chunks in pin_storage."""
+
         directory = os.listdir("./pin_storage/")
         chunks = [file for file in directory if file.startswith(self.base_filename)]
         return len(chunks)
 
     def store_pin_count(self, data):
+        """Stores the number of pins in metadata.json."""
+
         with open(f"./pin_storage/metadata.json", "w") as file:
             json.dump(data, file)
 
     def read_pin_count(self):
+        """Reads the number of pins from metadata.json."""
+
         with open(f"./pin_storage/metadata.json", "r") as file:
             self.pin_count = json.load(file)
 
     def load_random_pin(self):
+        """Loads a random pin from the stored chunks."""
+
         random_pin_index = random.randint(0, self.pin_count - 1)
         chunk_index = random_pin_index // self.chunk_size
         pin_index_within_chunk = random_pin_index % self.chunk_size
@@ -89,8 +96,42 @@ async def initialize_guess_that_pin():
     await pin_manager.initialize()
 
 
+class PinView(discord.ui.View):
+    def __init__(self, message_ctx, pin):
+        super().__init__()
+        self.pin = pin
+        self.message_ctx = message_ctx
+        self.sent_attachments = False
+
+    async def make_first_embed(self):
+        """Creates the first embed for the game."""
+
+        embed = discord.Embed(title="Guess the pin!",
+                              description=self.pin.content if self.pin.content else None)
+
+        if not self.sent_attachments and self.pin.attachments:
+            await self.message_ctx.channel.send("\n".join(attachment for attachment in self.pin.attachments))
+            self.sent_attachments = True
+
+        return embed
+
+    @discord.ui.button(label="Reveal the sinner!", style=discord.ButtonStyle.success)
+    async def reveal_button(self, button: discord.ui.Button, interaction: discord.Interaction):
+        """Reveals the author of the pinned message and removes the view from the message."""
+
+        embed = await self.make_first_embed()
+
+        embed.add_field(name="By",
+                        value=f"**@{self.pin.author}**", inline=True)
+        embed.add_field(name="Context",
+                        value=f"https://discord.com/channels/{guild_id}/{self.pin.channel}/{self.pin.id}")
+
+        await self.message_ctx.edit_original_response(embed=embed, view=None)
+        # self.stop()
+
+
 @tree.command(
-    name="guess_that_pin",
+    name="guess_the_pin",
     description="Guess the pin!",
     guild=discord.Object(id=guild_id)
 )
@@ -101,23 +142,9 @@ async def guess_that_pin(ctx):
 
     pin = pin_manager.load_random_pin()
 
-    for member in client.get_guild(guild_id).members:
-        print(member.display_name, len(member.display_name))
+    view = PinView(ctx, pin)
+    embed = await view.make_first_embed()
 
-    # Pad the username to make it hard to see who made the pin
-    # max_username_length = max(len(user.display_name) for user in client.get_guild(guild_id).members)
-    # pin_author = pin.author.display_name + "\u00A0" * (max_username_length - len(pin.author.display_name))
-
-    embed = discord.Embed(title="Guess the pin!",
-                          description=pin.content if pin.content else "No text :thinking:")
-    embed.add_field(name="By",
-                    value=f"||{pin.author}||", inline=True)
-    embed.add_field(name="Context",
-                    value=f"https://discord.com/channels/{guild_id}/{pin.channel}/{pin.id}")
-
-    await ctx.response.send_message(embed=embed)
-
-    if pin.attachments:
-        await ctx.channel.send("\n".join(attachment for attachment in pin.attachments))
+    await ctx.response.send_message(embed=embed, view=view)
 
 
