@@ -5,6 +5,7 @@ import pickle
 import os
 import json
 from collections import namedtuple
+from math import sqrt
 
 # Pickle will not store the message object itself, so it had to be dumbed down to a namedtuple
 Pin = namedtuple("Pin", ["author", "content", "attachments", "channel", "id"])
@@ -13,7 +14,7 @@ Pin = namedtuple("Pin", ["author", "content", "attachments", "channel", "id"])
 class PinManager:
     def __init__(self):
         self.base_filename = "pins"
-        self.chunk_size = 150
+        self.chunk_size = 100
         self.pin_count = 0
 
     async def initialize(self):
@@ -40,6 +41,8 @@ class PinManager:
 
             print(f"Initialized with {len(pins)} pins")
 
+            self.pin_count = len(pins)
+            self.chunk_size = round(sqrt(self.pin_count))
             self.store_pin_count(len(pins))
             self.save_chunks(pins)
 
