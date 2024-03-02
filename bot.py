@@ -7,7 +7,7 @@ from commands.messaging_commands import annoy, get_attention, dm_spam
 from commands.polls import start_poll
 from commands.epic_games_commands import schedule_post_free_games, free_games_rn
 from commands.wordle import initialize_wordle, wordle, guess_wordle
-from commands.random import *
+from commands.random_commands import *
 from commands.help import help_command
 from commands.guess_that_pin import *
 
