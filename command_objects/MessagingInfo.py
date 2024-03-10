@@ -1,5 +1,8 @@
-from utilities.shared import *
-from command_objects.CommandInfo import *
+import discord
+
+from datetime import timedelta
+
+from command_objects.CommandInfo import CommandInfo
 from utilities.helper_functions import char_to_emoji
 
 

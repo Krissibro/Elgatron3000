@@ -1,7 +1,12 @@
-import numpy as np
+import discord
 import random
-from utilities.shared import *
-from utilities.settings import testing, testing_channel_id, game_channel_id
+import numpy as np
+
+from apscheduler.triggers.cron import CronTrigger
+
+from utilities.shared import tree, client, scheduler
+from utilities.settings import testing, game_channel_id, guild_id
+
 
 valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())
 word_bank = list(np.genfromtxt('./data/word-bank.csv', delimiter=',', dtype=str))
@@ -113,7 +118,7 @@ class Wordle:
         if self.correct_guess:
             embed = discord.Embed(title=f"Congratulations! \nThe word was {self.daily_word}!")
         else:
-            embed = discord.Embed(title=f"Daily Wordle")
+            embed = discord.Embed(title="Daily Wordle")
 
         if not self.display_list:
             embed.description = "No guesses yet"

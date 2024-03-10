@@ -1,8 +1,8 @@
 import discord
 
-from utilities.shared import *
-from collections import Counter
 from utilities.helper_functions import char_to_emoji
+from utilities.shared import tree
+from utilities.settings import guild_id
 
 
 @tree.command(

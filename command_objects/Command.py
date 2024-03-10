@@ -1,8 +1,8 @@
 import discord
 
-from utilities.shared import *
-from command_objects.CommandInfo import *
 from typing import List
+
+from command_objects.CommandInfo import CommandInfo
 
 
 class Command:

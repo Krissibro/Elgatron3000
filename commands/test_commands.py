@@ -1,8 +1,10 @@
-from utilities.shared import *
-from ast import literal_eval
+import discord
 import csv
+
+from utilities.shared import app_commands, tree
+from utilities.settings import guild_id
 from commands.wordle import wordle_game
-from commands.epic_games_commands import *
+from commands.epic_games_commands import scheduled_post_free_games
 
 @tree.command(
     name="collect_data",
@@ -19,7 +21,7 @@ async def collect_data(ctx: discord.Interaction):
             continue
         try:
             messages.extend([[message.created_at.year, message.created_at.month, message.created_at.day, message.created_at.hour] async for message in i.history(limit=100000) if message.author == ctx.user and message.clean_content])
-        except:
+        except:  # TODO specify what kind of error can occur here?
             continue
     with open('data/messages.csv', 'w', newline='') as csvfile:
         print("finished!")

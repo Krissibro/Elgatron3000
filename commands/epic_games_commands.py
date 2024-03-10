@@ -1,6 +1,11 @@
+import discord
+
 from epicstore_api import EpicGamesStoreAPI
+from apscheduler.triggers.cron import CronTrigger
+
 from utilities.settings import testing, game_channel_id, testing_channel_id
-from utilities.shared import *
+from utilities.shared import client, scheduler, tree
+from utilities.settings import guild_id
 
 
 previous_free_games = []
@@ -8,8 +13,8 @@ previous_free_games = []
 
 async def make_link_embed():
     embed = discord.Embed(title="Free Games INCOMING!!!!")
-    embed.description = (f"[**Epic Games**](https://store.epicgames.com/en-US/free-games)\n" +
-                         f"[**Playstation Games**](https://www.playstation.com/en-us/ps-plus/whats-new/#monthly-games)")
+    embed.description = ("[**Epic Games**](https://store.epicgames.com/en-US/free-games)\n" +
+                         "[**Playstation Games**](https://www.playstation.com/en-us/ps-plus/whats-new/#monthly-games)")
     return embed
 
 

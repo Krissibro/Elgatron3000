@@ -1,27 +1,11 @@
-from command_objects.Command import *
-from command_objects.MessagingInfo import *
-from utilities.helper_functions import parse_time
+import discord
+import asyncio
 
-
-async def validate_interval(ctx, interval):
-    if interval <= 0:
-        await ctx.response.send_message(embed=discord.Embed(title="Input must be formatted as _d_h_m_s, i.e. 10m10s."), ephemeral=True)
-        return False
-    return True
-
-
-async def validate_amount(ctx, amount: int):
-    if amount <= 0:
-        await ctx.response.send_message(embed=discord.Embed(title="Amount cannot be less than or equal to 0"), ephemeral=True)
-        return False
-    return True
-
-
-async def validate_numeric(ctx, amount: str, error_msg: str):
-    if not amount.isnumeric():
-        await ctx.response.send_message(embed=discord.Embed(title=error_msg), ephemeral=True)
-        return False
-    return True
+from command_objects.Command import Command
+from command_objects.MessagingInfo import MessagingInfo
+from utilities.helper_functions import parse_time, validate_interval, validate_amount
+from utilities.shared import tree
+from utilities.settings import guild_id
 
 
 async def execute_command(ctx, command_name, internal_function, user: discord.User, message: str, amount: int, interval: int, channel: discord.TextChannel):
@@ -96,7 +80,7 @@ class ReactButton(discord.ui.View):
 
     @discord.ui.button(emoji="🤨", style=discord.ButtonStyle.success)
     async def wake_up_bitch(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.channel.send(f"New death grips album dropping tomorrow :pensive:")
+        await interaction.channel.send("New death grips album dropping tomorrow :pensive:")
         await interaction.response.defer()
         self.seen = True
         self.stop()

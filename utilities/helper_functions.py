@@ -1,5 +1,30 @@
+import discord
 import re
+
 from datetime import timedelta
+
+
+async def validate_interval(ctx, interval):
+    if interval <= 0:
+        await ctx.response.send_message(embed=discord.Embed(title="Input must be formatted as _d_h_m_s, i.e. 10m10s."),
+                                        ephemeral=True)
+        return False
+    return True
+
+
+async def validate_amount(ctx, amount: int):
+    if amount <= 0:
+        await ctx.response.send_message(embed=discord.Embed(title="Amount cannot be less than or equal to 0"),
+                                        ephemeral=True)
+        return False
+    return True
+
+
+async def validate_numeric(ctx, amount: str, error_msg: str):
+    if not amount.isnumeric():
+        await ctx.response.send_message(embed=discord.Embed(title=error_msg), ephemeral=True)
+        return False
+    return True
 
 
 def parse_time(time_str: str) -> int:
@@ -12,7 +37,6 @@ def parse_time(time_str: str) -> int:
 
 
 def format_seconds(seconds: int) -> str:
-
     formatted_time = ""
     for unit, divisor in [('d', 86400), ('h', 3600), ('m', 60), ('s', 1)]:
         value, seconds = divmod(seconds, divisor)

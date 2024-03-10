@@ -1,5 +1,6 @@
+import discord
+
 from abc import ABC, abstractmethod
-from utilities.shared import *
 
 
 class CommandInfo(ABC):
