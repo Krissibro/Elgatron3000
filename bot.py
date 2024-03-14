@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from time import time
 
 # Commands from other files
 from commands.command_management import manage_commands, kill_all_commands, cleanup
@@ -34,4 +35,5 @@ load_dotenv("token.env")
 try:
     client.run(os.getenv("TOKEN"))
 finally:
-    PinManager.close()
+    # stuff we have to do before terminating the bot
+    pin_manager.dump_pins()

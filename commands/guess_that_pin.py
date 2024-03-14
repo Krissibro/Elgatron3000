@@ -40,8 +40,7 @@ class PinManager:
                     print(f"Failed to fetch pins from {channel.name}: {e}")
 
             print(f"Initialized with {len(self.pins)} pins")
-            with open("data/pins.pkl", "wb") as file:
-                pickle.dump(self.pins, file)
+            self.dump_pins()
 
     def load_random_pin(self):
         """Loads a random pin from the stored chunks."""
@@ -59,7 +58,7 @@ class PinManager:
 
         self.pins.remove(pin)
 
-    def close(self):
+    def dump_pins(self):
         """Saves all the pins to the disk."""
 
         with open("data/pins.pkl", "wb") as file:
