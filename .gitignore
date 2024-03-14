@@ -1,16 +1,15 @@
 # file extentions
 
 .pkl
-.idea
 
 
 # folders
 
 __pycache__/
-
+venv/
+.idea/
 
 # speciffic files:
 
 token.env
-venv
 utilities/config.json
