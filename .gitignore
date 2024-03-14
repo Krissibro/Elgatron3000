@@ -1,6 +1,15 @@
+# file extentions
+
+.pkl
+
+
+# folders
+
 __pycache__/
+venv/
+.idea/
+
+# speciffic files:
+
 token.env
-.idea
-venv
 utilities/config.json
-data/pin_storage/
