@@ -1,7 +1,7 @@
 import discord
 import csv
 
-from utilities.shared import app_commands, tree
+from utilities.shared import tree
 from utilities.settings import guild_id
 from commands.wordle import wordle_game
 from commands.epic_games_commands import scheduled_post_free_games
@@ -11,7 +11,7 @@ from commands.epic_games_commands import scheduled_post_free_games
     description="testing data collection",
     guild=discord.Object(id=guild_id)
 )
-@app_commands.checks.bot_has_permissions(read_message_history=True)
+@discord.app_commands.checks.bot_has_permissions(read_message_history=True)
 async def collect_data(ctx: discord.Interaction):
     await ctx.response.defer()
     messages = []
