@@ -31,9 +31,5 @@ async def on_ready():
 
 
 load_dotenv("token.env")
+client.run(os.getenv("TOKEN"))
 
-try:
-    client.run(os.getenv("TOKEN"))
-finally:
-    # stuff we have to do before terminating the bot
-    pin_manager.dump_pins()
