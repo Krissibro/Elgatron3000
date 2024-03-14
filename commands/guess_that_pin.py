@@ -53,14 +53,17 @@ class PinManager:
 
         self.pins.append(pin)
 
-        # this could maybe be done at bot termination
-        with open("data/pins.pkl", "wb") as file:
-            pickle.dump(self.pins, file)
 
     def remove_pin(self, pin):
         """Removes a pin from the storage."""
 
         self.pins.remove(pin)
+
+    def close(self):
+        """Saves all the pins to the disk."""
+
+        with open("data/pins.pkl", "wb") as file:
+            pickle.dump(self.pins, file)
 
 
 pin_manager = PinManager()
