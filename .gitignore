@@ -3,4 +3,4 @@ token.env
 .idea
 venv
 utilities/config.json
-data/pin_storage/
+data/pins.pkl
