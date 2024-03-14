@@ -11,7 +11,7 @@ from utilities.settings import testing, game_channel_id, guild_id
 valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())
 word_bank = list(np.genfromtxt('./data/word-bank.csv', delimiter=',', dtype=str))
 
-whitelisted_words = {"ELGA3", "SKIBIDI", "GYATT"}
+whitelisted_words = {"ELGA3", "SKIBIDI", "GYATT", "BRIAN"}
 word_bank.extend(whitelisted_words)
 
 
