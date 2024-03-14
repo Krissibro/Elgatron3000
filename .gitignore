@@ -1,6 +1,16 @@
-__pycache__/
-token.env
+# file extentions
+
+.pkl
 .idea
+
+
+# folders
+
+__pycache__/
+
+
+# speciffic files:
+
+token.env
 venv
 utilities/config.json
-data/pins.pkl
