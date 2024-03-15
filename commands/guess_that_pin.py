@@ -70,16 +70,24 @@ async def initialize_guess_that_pin():
 
 
 class PinView(discord.ui.View):
-    def __init__(self, message_ctx, pin):
-        super().__init__()
-        self.pin = pin
+    def __init__(self, message_ctx, pin, timeout=15):
+        super().__init__(timeout=timeout)
+        self.pin: Pin = pin
         self.message_ctx = message_ctx
 
-    async def make_first_embed(self):
+    async def make_first_embed(self) -> discord.Embed:
         """Creates the embed containing the title and the selected pin.
         Also appends the attachments if there are any"""
-        embed = discord.Embed(title="Guess the pin!",
-                              description=self.pin.content if self.pin.content else None)
+        embed: discord.Embed = discord.Embed(title="Guess the pin!",
+                                             description=self.pin.content if self.pin.content else None)
+        return embed
+
+    async def make_sinner_embed(self) -> discord.Embed:
+        embed: discord.Embed = await self.make_first_embed()
+        embed.add_field(name="By",
+                        value=f"{self.pin.author}", inline=True)
+        embed.add_field(name="Context",
+                        value=f"https://discord.com/channels/{guild_id}/{self.pin.channel}/{self.pin.id}")
         return embed
 
     async def send_attachments(self):
@@ -88,15 +96,15 @@ class PinView(discord.ui.View):
             await self.message_ctx.channel.send("\n".join(attachment for attachment in self.pin.attachments))
 
     @discord.ui.button(label="Reveal the sinner!", style=discord.ButtonStyle.success)
-    async def reveal_button(self, button: discord.ui.Button, interaction: discord.Interaction):
+    async def reveal_button(self, button: discord.ui.Button, interaction: discord.Interaction) -> None:
         """Reveals the author of the pinned message and removes the view from the message."""
-        embed = await self.make_first_embed()
-        embed.add_field(name="By",
-                        value=f"{self.pin.author}", inline=True)
-        embed.add_field(name="Context",
-                        value=f"https://discord.com/channels/{guild_id}/{self.pin.channel}/{self.pin.id}")
+        sinner_ember = await self.make_sinner_embed()
+        await self.message_ctx.edit_original_response(embed=sinner_ember, view=None)
+        self.stop()
 
-        await self.message_ctx.edit_original_response(embed=embed, view=None)
+    async def on_timeout(self) -> None:
+        sinner_ember = await self.make_sinner_embed()
+        await self.message_ctx.edit_original_response(embed=sinner_ember, view=None)
 
 
 @tree.command(
@@ -131,7 +139,6 @@ async def on_message_edit(before, after):
     # If unpinned
     if before.pinned and not after.pinned:
         pin_manager.remove_pin(after)
-
 
 # Todo: handle if a pinned message is deleted or ehhhhhh?
 

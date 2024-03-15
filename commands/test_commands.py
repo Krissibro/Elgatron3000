@@ -6,6 +6,7 @@ from utilities.settings import guild_id
 from commands.wordle import wordle_game
 from commands.epic_games_commands import scheduled_post_free_games
 
+
 @tree.command(
     name="collect_data",
     description="testing data collection",
@@ -37,6 +38,7 @@ async def collect_data(ctx: discord.Interaction):
 async def reset_wordle(ctx):
     await wordle_game.pick_new_word()
     await ctx.response.send_message(embed=discord.Embed(title="Wordle has been reset!"), ephemeral=True, delete_after=1)
+
 
 @tree.command(
     name="test_epic_games_scheduler",
