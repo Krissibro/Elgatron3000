@@ -70,7 +70,7 @@ async def initialize_guess_that_pin():
 
 
 class PinView(discord.ui.View):
-    def __init__(self, message_ctx, pin, timeout=15*60):
+    def __init__(self, message_ctx, pin, timeout=15*60    ):
         super().__init__(timeout=timeout)
         self.pin: Pin = pin
         self.message_ctx = message_ctx
