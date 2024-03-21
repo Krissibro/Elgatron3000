@@ -12,23 +12,24 @@ class Emulator(PyBoy):
         self.images: List[Image] = []
 
     def sim_button_time(self, button: str, frames: int):
+        skipped_frames = 2
         self.button_press(button)
-        for _ in range(5):
-            self.tick()
+        for _ in range(5//skipped_frames):
+            self.tick(skipped_frames)
         self.button_release(button)
 
-        for _ in range(frames):
-            self.tick()
+        for _ in range(frames//skipped_frames):
+            self.tick(skipped_frames)
 
-    def make_gif(self):
+    def make_gif(self) -> io.BytesIO:
         img_byte_arr = io.BytesIO()
 
         self.images[0].save(img_byte_arr,
-                            duration=len(self.images)//3,
+                            duration=len(self.images)//12,
                             save_all=True,
                             append_images=self.images[1:],
                             format="GIF",
-                            loop=1)
+                            )
 
         self.images = []
         img_byte_arr.seek(0)
