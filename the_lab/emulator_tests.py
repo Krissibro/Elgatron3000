@@ -7,7 +7,7 @@ from typing import List
 
 class Emulator(PyBoy):
     def __init__(self, rom_path, **kwargs):
-        super().__init__(rom_path, **kwargs)
+        super().__init__(rom_path, sound_emulated=False, sound=False, **kwargs)
         self.set_emulation_speed(0)
         self.images: List[Image] = []
 
@@ -25,7 +25,7 @@ class Emulator(PyBoy):
         img_byte_arr = io.BytesIO()
 
         self.images[0].save(img_byte_arr,
-                            duration=len(self.images)//12,
+                            duration=len(self.images)/30,
                             save_all=True,
                             append_images=self.images[1:],
                             format="GIF",
