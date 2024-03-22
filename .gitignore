@@ -2,6 +2,8 @@
 
 *.pkl
 *.ram
+*.env
+*.db
 
 # folders
 
@@ -11,5 +13,4 @@ venv/
 
 # speciffic files:
 
-token.env
 utilities/config.json
