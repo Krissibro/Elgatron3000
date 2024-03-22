@@ -49,7 +49,7 @@ class EmulatorController(discord.ui.View):
 
         await self.message_ctx.edit_original_response(attachments=[file], view=self)
 
-    @discord.ui.button(emoji="🅰️", style=discord.ButtonStyle.blurple, row=0)
+    @discord.ui.button(emoji="🅰️", style=discord.ButtonStyle.red, row=0)
     async def A_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer()
         emu.sim_button_time("A", 200)
@@ -63,7 +63,7 @@ class EmulatorController(discord.ui.View):
 
         await self.update_gif()
 
-    @discord.ui.button(emoji="🅱️", style=discord.ButtonStyle.blurple, row=0)
+    @discord.ui.button(emoji="🅱️", style=discord.ButtonStyle.red, row=0)
     async def B_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer()
         emu.sim_button_time("B", 200)
@@ -88,5 +88,23 @@ class EmulatorController(discord.ui.View):
     async def right_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer()
         emu.sim_button_time("Right", 200)
+
+        await self.update_gif()
+
+    @discord.ui.button(emoji="📃", style=discord.ButtonStyle.grey, row=2)
+    async def start_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.defer()
+        emu.sim_button_time("start", 200)
+
+        await self.update_gif()
+
+    @discord.ui.button(emoji="🩶", style=discord.ButtonStyle.grey, row=2, disabled=True)
+    async def empty_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        pass
+
+    @discord.ui.button(emoji="🔎", style=discord.ButtonStyle.grey, row=2)
+    async def select_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.defer()
+        emu.sim_button_time("select", 200)
 
         await self.update_gif()
