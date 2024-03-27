@@ -1,41 +1,25 @@
-import io
-
 import discord
 
 from utilities.shared import tree
 from utilities.settings import guild_id
-from the_lab.emulator_tests import Emulator
+from command_objects.Emulator import Emulator
 # for debug
-emu = Emulator("./the_lab/Pokemon - Red Version (USA, Europe) (SGB Enhanced).gb")
+# emu = Emulator("./data/Pokemon - Red Version (USA, Europe) (SGB Enhanced).gb")
 # for bot
-#emu = Emulator("./the_lab/Pokemon - Red Version (USA, Europe) (SGB Enhanced).gb", window="null")
+emu = Emulator("./data/Pokemon - Red Version (USA, Europe) (SGB Enhanced).gb", window="null")
 
 
 @tree.command(
-    name="start_game",
-    description="start a poll",
+    name="pokemon",
+    description="Sends controller to play pokemon!",
     guild=discord.Object(id=guild_id)
 )
-async def start_game(ctx):
-    await ctx.response.send_message(view=EmulatorController(ctx))
-
-
-@tree.command(
-    name="pass_time",
-    description="start a poll",
-    guild=discord.Object(id=guild_id)
-)
-async def pass_time(ctx, time: int):
+async def pokemon(ctx):
     await ctx.response.defer()
-
-    for _ in range(time):
+    for _ in range(1500): #time needed to get to titlescreen
         emu.tick()
-
-    with open("emulator.gif", "wb") as file:
-        file.write(emu.make_gif().read())
-
     file = discord.File(fp=emu.make_gif(), filename="emulator.gif")
-    await ctx.followup.send(file=file)
+    await ctx.edit_original_response(attachments=[file], view=EmulatorController(ctx))
 
 
 class EmulatorController(discord.ui.View):
@@ -98,9 +82,13 @@ class EmulatorController(discord.ui.View):
 
         await self.update_gif()
 
-    @discord.ui.button(emoji="🩶", style=discord.ButtonStyle.grey, row=2, disabled=True)
+    @discord.ui.button(emoji="⌚", style=discord.ButtonStyle.grey, row=2)
     async def empty_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        pass
+        await interaction.response.defer()
+        for _ in range(500):
+            emu.tick()
+
+        await self.update_gif()
 
     @discord.ui.button(emoji="🔎", style=discord.ButtonStyle.grey, row=2)
     async def select_button(self, interaction: discord.Interaction, button: discord.ui.Button):
