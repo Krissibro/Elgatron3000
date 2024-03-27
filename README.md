@@ -30,9 +30,9 @@ Add your guild ID (server ID) and whether this instance of the bot is for testin
 
 ```
 {
-    "guild" : ID_GOES_HERE,
-    "game_channel_id" : "ID_GOES_HERE",
-    "testing_channel_id" : "ID_GOES_HERE",
+    "guild" : GUILD_ID_GOES_HERE,
+    "game_channel_id" : CHANNEL_ID_GOES_HERE,
+    "testing_channel_id" : CHANNEL_ID_GOES_HERE,
     "testing" : BOOL_GOES_HERE
 }
 ```
