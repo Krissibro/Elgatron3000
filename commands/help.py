@@ -38,9 +38,6 @@ async def help_command(ctx):
     embed.add_field(name="/manage_commands",
                     value="Manage the running commands, see info and edit/kill running commands", inline=False)
 
-    embed.add_field(name="/kill_all_commands",
-                    value="Kill all running commands, try to use /manage_commands first", inline=False)
-
     embed.add_field(name="Funny gifs and videos",
                     value='''/trout
                         /weave

@@ -152,19 +152,6 @@ async def manage_commands(ctx):
 
 
 @tree.command(
-    name="kill_all_commands",
-    description="Kill all running commands",
-    guild=discord.Object(id=guild_id)
-)
-async def kill_all_commands(ctx):
-    await ctx.response.send_message(embed=discord.Embed(title="All running commands have been terminated."),
-                                    ephemeral=True,
-                                    delete_after=10)
-
-    Command.kill_all()
-
-
-@tree.command(
     name="cleanup",
     description="Clean the current chat for bot messages",
     guild=discord.Object(id=guild_id)
