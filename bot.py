@@ -3,7 +3,7 @@ import discord
 from dotenv import load_dotenv
 
 # Commands from other files
-from commands.command_management import manage_commands, kill_all_commands, cleanup
+from commands.command_management import manage_commands, cleanup
 from commands.messaging_commands import annoy, get_attention, dm_spam
 from commands.polls import start_poll
 from commands.epic_games_commands import schedule_post_free_games, free_games_rn
