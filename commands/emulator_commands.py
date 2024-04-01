@@ -6,12 +6,12 @@ from command_objects.Emulator import Emulator
 # for debug
 # emu = Emulator("./data/Pokemon - Red Version (USA, Europe) (SGB Enhanced).gb")
 # for bot
-emu = Emulator("./data/Pokemon - Red Version (USA, Europe) (SGB Enhanced).gb", window="null")
+emu = Emulator("./data/Tottoko Hamutarou 2 - Hamu-chan Zu Daishuugou Dechu (J) [C][!].gbc", window="null")
 
 
 @tree.command(
-    name="pokemon",
-    description="Sends controller to play pokemon!",
+    name="tottoko_hamutarou",
+    description="Sends controller to play Tottoko Hamutarou!",
     guild=discord.Object(id=guild_id)
 )
 async def pokemon(ctx):
@@ -19,7 +19,9 @@ async def pokemon(ctx):
     for _ in range(1500): #time needed to get to titlescreen
         emu.tick()
     file = discord.File(fp=emu.make_gif(), filename="emulator.gif")
-    await ctx.edit_original_response(attachments=[file], view=EmulatorController(ctx))
+    msg = await ctx.edit_original_response(attachments=[file], view=EmulatorController(ctx))
+
+    await msg.create_thread(name="Discuss Tottoko Hamutarou!")
 
 
 class EmulatorController(discord.ui.View):
