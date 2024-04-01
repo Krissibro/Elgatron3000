@@ -16,7 +16,7 @@ emu = Emulator("./data/Tottoko Hamutarou 2 - Hamu-chan Zu Daishuugou Dechu (J) [
 )
 async def pokemon(ctx):
     await ctx.response.defer()
-    for _ in range(1500): #time needed to get to titlescreen
+    for _ in range(1500//emu.skipped_frames): #time needed to get to titlescreen
         emu.tick()
     file = discord.File(fp=emu.make_gif(), filename="emulator.gif")
     msg = await ctx.edit_original_response(attachments=[file], view=EmulatorController(ctx))
