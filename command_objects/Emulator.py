@@ -13,10 +13,11 @@ class Emulator(PyBoy):
         self.skipped_frames = 3
 
     def sim_button_time(self, button: str, frames: int):
-        self.button_press(button)
-        for _ in range(5 // self.skipped_frames):
-            self.tick(self.skipped_frames)
-        self.button_release(button)
+        if button:
+            self.button_press(button)
+            for _ in range(5 // self.skipped_frames):
+                self.tick(self.skipped_frames)
+            self.button_release(button)
 
         for _ in range(frames // self.skipped_frames):
             self.tick(self.skipped_frames)
