@@ -24,8 +24,6 @@ class Emulator(PyBoy):
     def make_gif(self) -> io.BytesIO:
         img_byte_arr = io.BytesIO()
 
-        print(len(self.images))
-
         self.images[0].save(img_byte_arr,
                             duration=1000 // (60//self.skipped_frames),  # 1000 (full sec) divided by frames per sec (30)
                             save_all=True,
