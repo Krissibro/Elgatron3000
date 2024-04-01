@@ -24,7 +24,10 @@ class MessageSelectDropdown(discord.ui.Select):
                 view=ManageCommandsButtons(Command.get_command(selected_command_id)))
 
         else:
-            await interaction.response.send_message(view=ManageCommandsDropDown())
+            await interaction.response.edit_message(
+                embed=Command.make_overview_embed(),
+                view=ManageCommandsDropDown()
+            )
 
 
 class ManageCommandsDropDown(discord.ui.View):
@@ -39,17 +42,21 @@ class ManageCommandsButtons(discord.ui.View):
         self.command = command
 
     async def make_command_embed(self, interaction: discord.Interaction):
-        view = ManageCommandsButtons(self.command) if not Command.is_empty() else None
-        embed = self.command.get_embed() if not Command.is_empty() \
-            else discord.Embed(title="There are no more running commands")
-
+        if not Command.is_empty():
+            view = ManageCommandsButtons(self.command)
+            embed = self.command.get_embed()
+        else:
+            view = None
+            embed = discord.Embed(title="No commands running", color=discord.Color.red())
         await interaction.edit_original_response(embed=embed, view=view)
 
     async def return_to_dropdown(self, interaction: discord.Interaction):
-        view = ManageCommandsDropDown() if not Command.is_empty() else None
-        embed = Command.make_overview_embed() if not Command.is_empty() else discord.Embed(
-            title="There are no more running commands",
-            color=discord.Color.red())
+        if not Command.is_empty():
+            view = ManageCommandsDropDown()
+            embed = Command.make_overview_embed()
+        else:
+            view = None
+            embed = discord.Embed(title="No commands running", color=discord.Color.red())
         await interaction.response.edit_message(view=view, embed=embed)
 
     @discord.ui.button(emoji="📄", style=discord.ButtonStyle.blurple)
@@ -133,7 +140,7 @@ class EditMessagingCommandWindow(discord.ui.Modal):
 )
 async def manage_commands(ctx):
     if Command.is_empty():
-        await ctx.response.send_message(embed=discord.Embed(title="No commands running"), ephemeral=True)
+        await ctx.response.send_message(embed=discord.Embed(title="No commands running", color=discord.Color.red()), ephemeral=True)
         return
     view = ManageCommandsDropDown()
     first_embed = Command.make_overview_embed()
