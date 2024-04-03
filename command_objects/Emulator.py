@@ -2,7 +2,7 @@ import io
 
 from pyboy import PyBoy
 from PIL import Image
-from typing import List
+from typing import List, Optional
 
 
 class Emulator(PyBoy):
@@ -12,7 +12,7 @@ class Emulator(PyBoy):
         self.images: List[Image] = []
         self.skipped_frames = 3
 
-    def sim_button_time(self, button: str, frames: int):
+    def sim_button_time(self, button: Optional[str], frames: int):
         if button:
             self.button_press(button)
             for _ in range(5 // self.skipped_frames):
