@@ -8,12 +8,12 @@ from typing import Optional
 # for debug
 # emu = Emulator("./data/Pokemon - Red Version (USA, Europe) (SGB Enhanced).gb")
 # for bot
-emu = Emulator("./data/Tottoko Hamutarou 2 - Hamu-chan Zu Daishuugou Dechu (J) [C][!].gbc", window="null")
+emu = Emulator("./data/Pokemon - Red Version (USA, Europe) (SGB Enhanced).gb", window="null")
 
 
 @tree.command(
-    name="tottoko_hamutarou",
-    description="Sends controller to play Tottoko Hamutarou!",
+    name="Pokemon",
+    description="Sends controller to play Pokemon!",
     guild=discord.Object(id=guild_id)
 )
 async def pokemon(ctx):
@@ -22,7 +22,7 @@ async def pokemon(ctx):
 
     await ctx.response.send_message(file=file, view=EmulatorController())
     msg = await ctx.original_response()
-    await msg.create_thread(name="Discuss Tottoko Hamutarou!")
+    await msg.create_thread(name="Discuss Pokemon!")
 
 
 class EmulatorController(discord.ui.View):

@@ -32,8 +32,8 @@ async def help_command(ctx):
     embed.add_field(name="/guess_wordle",
                     value="Guess the wordle word", inline=False)
 
-    embed.add_field(name="tottoko_hamutarou",
-                    value="Sends tottoko hamutaruo controller and gif",
+    embed.add_field(name="/pokemon",
+                    value="Sends pokemon controller and gif",
                     inline=False)
 
     embed.add_field(name="/cleanup",
