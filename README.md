@@ -9,6 +9,7 @@ Elgatron3000 is a very cool and epic Discord bot designed to provide a mix of re
 - **Reaction Polls**: Automatically make polls with a threads to discuss.
 - **Epic Games Integration**: Get information about the currently free games on Epic Games Store.
 - **Wordle but Epic**: Play wordle with your friends, only one guess each. Resets daily.
+- **Gameboy Emulator**: play any Gameboy game or Gameboy Colour game you would like!
 
 ## Installation 🛠️
 

@@ -12,7 +12,7 @@ emu = Emulator("./data/Pokemon - Red Version (USA, Europe) (SGB Enhanced).gb", w
 
 
 @tree.command(
-    name="Pokemon",
+    name="pokemon",
     description="Sends controller to play Pokemon!",
     guild=discord.Object(id=guild_id)
 )
