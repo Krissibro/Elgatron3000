@@ -17,11 +17,11 @@ emu = Emulator("./data/Pokemon - Red Version (USA, Europe) (SGB Enhanced).gb", w
     guild=discord.Object(id=guild_id)
 )
 async def pokemon(ctx):
+    await ctx.response.defer()
     emu.sim_button_time(None, 1500)
     file = discord.File(fp=emu.make_gif(), filename="emulator.gif")
 
-    await ctx.response.send_message(file=file, view=EmulatorController())
-    msg = await ctx.original_response()
+    msg = await ctx.edit_original_response(attachments=[file], view=EmulatorController())
     await msg.create_thread(name="Discuss Pokemon!")
 
 
