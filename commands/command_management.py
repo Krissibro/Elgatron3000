@@ -11,8 +11,7 @@ from utilities.shared import client, tree
 
 
 class MessageSelectDropdown(discord.ui.Select):
-    def __init__(self, message_ctx):
-        self.message_ctx = message_ctx
+    def __init__(self):
         options = Command.make_dropdown_options()
         super().__init__(placeholder="Which command would you like to edit?", min_values=1, max_values=1, options=options)
 
@@ -20,56 +19,55 @@ class MessageSelectDropdown(discord.ui.Select):
         selected_command_id = int(self.values[0])
 
         if selected_command_id in Command.get_ids():
-            await interaction.response.defer()
-            await self.message_ctx.edit_original_response(
+            await interaction.response.edit_message(
                 embed=Command.get_embed_by_id(selected_command_id),
-                view=ManageCommandsButtons(self.message_ctx,
-                                           command=Command.get_command(selected_command_id)))
+                view=ManageCommandsButtons(Command.get_command(selected_command_id)))
 
         else:
-            await interaction.response.send_message(embed=discord.Embed(title="This command is no longer running"),
-                                                    ephemeral=True, delete_after=10)
-            await self.message_ctx.edit_original_response(embed=Command.make_overview_embed(),
-                                                          view=ManageCommandsDropDown(self.message_ctx))
+            await interaction.response.edit_message(
+                embed=Command.make_overview_embed(),
+                view=ManageCommandsDropDown()
+            )
 
 
 class ManageCommandsDropDown(discord.ui.View):
-    def __init__(self, message_ctx):
+    def __init__(self):
         super().__init__()
-        self.add_item(MessageSelectDropdown(message_ctx))
+        self.add_item(MessageSelectDropdown())
 
 
 class ManageCommandsButtons(discord.ui.View):
-    def __init__(self, message_ctx, command):
+    def __init__(self, command):
         super().__init__()
-        self.message_ctx = message_ctx
         self.command = command
 
-    async def make_command_embed(self):
-        view = ManageCommandsButtons(self.message_ctx, self.command) if not Command.is_empty() else None
-        embed = self.command.get_embed() if not Command.is_empty() \
-            else discord.Embed(title="There are no more running commands")
+    async def make_command_embed(self, interaction: discord.Interaction):
+        if not Command.is_empty():
+            view = ManageCommandsButtons(self.command)
+            embed = self.command.get_embed()
+        else:
+            view = None
+            embed = discord.Embed(title="No commands running", color=discord.Color.red())
+        await interaction.edit_original_response(embed=embed, view=view)
 
-        await self.message_ctx.edit_original_response(embed=embed, view=view)
-
-    async def return_to_dropdown(self):
-        view = ManageCommandsDropDown(self.message_ctx) if not Command.is_empty() else None
-        embed = Command.make_overview_embed() if not Command.is_empty() else discord.Embed(
-            title="There are no more running commands",
-            color=discord.Color.red())
-        await self.message_ctx.edit_original_response(view=view, embed=embed)
+    async def return_to_dropdown(self, interaction: discord.Interaction):
+        if not Command.is_empty():
+            view = ManageCommandsDropDown()
+            embed = Command.make_overview_embed()
+        else:
+            view = None
+            embed = discord.Embed(title="No commands running", color=discord.Color.red())
+        await interaction.response.edit_message(view=view, embed=embed)
 
     @discord.ui.button(emoji="📄", style=discord.ButtonStyle.blurple)
     async def return_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.defer()
-        await self.return_to_dropdown()
+        await self.return_to_dropdown(interaction)
 
     @discord.ui.button(emoji="💀", style=discord.ButtonStyle.red)
     async def kill_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         if await self.silliness_check(interaction):
-            await interaction.response.defer()
             self.command.kill()
-            await self.return_to_dropdown()
+            await self.return_to_dropdown(interaction)
             await self.command.info.delete_messages()
 
     @discord.ui.button(emoji="🪶", style=discord.ButtonStyle.green)
@@ -79,14 +77,12 @@ class ManageCommandsButtons(discord.ui.View):
             await interaction.response.send_modal(modal)
             await modal.finished_event.wait()  # Wait for the modal to be closed
 
-            await self.make_command_embed()
+            await self.make_command_embed(interaction)
 
     # Check if the command still exists
     async def silliness_check(self, interaction: discord.Interaction):
         if not Command.check_if_command_exists(self.command.id):
-            await interaction.response.send_message(embed=discord.Embed(title="This command is no longer running"),
-                                                    ephemeral=True, delete_after=10)
-            await self.return_to_dropdown()
+            await self.return_to_dropdown(interaction)
             return False
         return True
 
@@ -144,9 +140,9 @@ class EditMessagingCommandWindow(discord.ui.Modal):
 )
 async def manage_commands(ctx):
     if Command.is_empty():
-        await ctx.response.send_message(embed=discord.Embed(title="No commands running"), ephemeral=True)
+        await ctx.response.send_message(embed=discord.Embed(title="No commands running", color=discord.Color.red()), ephemeral=True)
         return
-    view = ManageCommandsDropDown(ctx)
+    view = ManageCommandsDropDown()
     first_embed = Command.make_overview_embed()
     await ctx.response.send_message(embed=first_embed, view=view, ephemeral=True)
 
