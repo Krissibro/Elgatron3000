@@ -17,13 +17,11 @@ emu = Emulator("./data/Tottoko Hamutarou 2 - Hamu-chan Zu Daishuugou Dechu (J) [
     guild=discord.Object(id=guild_id)
 )
 async def pokemon(ctx):
-    # TODO i think some of this can be refactored to the update() func
-    await ctx.response.defer()
-    for _ in range(1500//emu.skipped_frames): #time needed to get to titlescreen
-        emu.tick()
+    emu.sim_button_time(None, 1500)
     file = discord.File(fp=emu.make_gif(), filename="emulator.gif")
-    msg = await ctx.edit_original_response(attachments=[file], view=EmulatorController())
 
+    await ctx.response.send_message(file=file, view=EmulatorController())
+    msg = await ctx.original_response()
     await msg.create_thread(name="Discuss Tottoko Hamutarou!")
 
 
