@@ -12,10 +12,15 @@ class Emulator(PyBoy):
         self.images: List[Image] = []
         self.skipped_frames = 3
 
-    def sim_button_time(self, button: Optional[str], frames: int):
+    def sim_button_time(self, button: Optional[str], frames: int) -> None:
+        """
+        :param button: Name of the button to press. can be 'up', 'down', 'left', 'right', 'a', 'b', 'start', 'select' or None.
+        :param frames: the amount of frames to simulate.
+        """
+
         if button:
             self.button_press(button)
-            for _ in range(5 // self.skipped_frames):
+            for _ in range(8 // self.skipped_frames): # we dont want to hold the button for too long, nor too short, this is a guess
                 self.tick(self.skipped_frames)
             self.button_release(button)
 
@@ -23,6 +28,10 @@ class Emulator(PyBoy):
             self.tick(self.skipped_frames)
 
     def make_gif(self) -> io.BytesIO:
+        """
+        Makes a gif from the simulated frames and empties the frame buffer.
+        :return: IO of the GIF that can be used as a file.
+        """
         img_byte_arr = io.BytesIO()
 
         self.images[0].save(img_byte_arr,
