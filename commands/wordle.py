@@ -26,7 +26,7 @@ class Wordle:
 
     display_list = []
 
-    async def pick_new_word(self):
+    async def pick_new_word(self) -> None:
         if not self.correct_guess and not self.daily_word == "":
             await client.get_channel(game_channel_id).send(embed=discord.Embed(
                 title=f"The previous word was {self.daily_word.upper()}"))
@@ -54,7 +54,7 @@ class Wordle:
                                  "[Pokedoku](https://pokedoku.com/)")
             await channel.send(embed=embed)
 
-    async def guess_word(self, ctx, guessed_word: str):
+    async def guess_word(self, ctx, guessed_word: str) -> None:
         guessed_word = guessed_word.strip().upper()
 
         if self.correct_guess:
@@ -114,7 +114,7 @@ class Wordle:
 
         await ctx.response.send_message(embed=await self.make_embed())
 
-    async def make_embed(self):
+    async def make_embed(self) -> discord.Embed:
         if self.correct_guess:
             embed = discord.Embed(title=f"Congratulations! \nThe word was {self.daily_word}!")
         else:
@@ -133,7 +133,7 @@ class Wordle:
 
         return embed
 
-    def format_available_letters(self):
+    def format_available_letters(self) -> str:
         sorted_available_letters = sorted(list(self.available_letters))
         sorted_known_letters = sorted(list(self.known_letters))
         known_letters = f"Known letters:\n{' '.join(sorted_known_letters)}"
@@ -144,7 +144,7 @@ class Wordle:
 wordle_game = Wordle()
 
 
-async def initialize_wordle():
+async def initialize_wordle() -> None:
     await wordle_game.pick_new_word()
 
     trigger = CronTrigger(hour=8, minute=0, second=0, timezone='Europe/Oslo')

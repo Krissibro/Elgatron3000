@@ -9,7 +9,7 @@ from utilities.settings import guild_id
     description="Bot info!",
     guild=discord.Object(id=guild_id)
 )
-async def help_command(ctx):
+async def help_command(ctx: discord.Interaction):
     embed = discord.Embed(title="📚 Help")
     embed.add_field(name="/annoy",
                     value="Sends a message every given interval", inline=False)

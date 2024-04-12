@@ -6,6 +6,7 @@ from apscheduler.triggers.cron import CronTrigger
 from utilities.settings import testing, game_channel_id, testing_channel_id
 from utilities.shared import client, scheduler, tree
 from utilities.settings import guild_id
+from typing import List, Dict
 
 
 previous_free_games = []
@@ -18,7 +19,7 @@ async def make_link_embed():
     return embed
 
 
-async def get_free_games():
+async def get_free_games() -> List[dict]:
     api = EpicGamesStoreAPI()
     free_games = api.get_free_games()["data"]["Catalog"]["searchStore"]["elements"]
 
@@ -37,10 +38,16 @@ async def get_free_games():
             if promotion["discountSetting"]["discountPercentage"] == 0:
                 free_promotions.append(game)
                 break  # Assuming only one free promotion per game
+
     return free_promotions
 
 
-async def make_game_embeds(channel, games):
+async def send_games_embed(channel: discord.TextChannel, games: List[dict]) -> None:
+    """
+    :param channel: The channel you want to send the Games Embed to
+    :param games: Dictionary with game data.
+    :return:
+    """
     for game in games:
         page_slug = game["catalogNs"]["mappings"][0]["pageSlug"]
         url = f"\n[**Link**](https://store.epicgames.com/en-US/p/{page_slug})" if page_slug else ""
@@ -59,13 +66,13 @@ async def make_game_embeds(channel, games):
     description="See the currently free games on Epic Games",
     guild=discord.Object(id=guild_id)
 )
-async def free_games_rn(ctx):
+async def free_games_rn(ctx: discord.Interaction):
     await ctx.response.send_message(embed=await make_link_embed())
     free_games = await get_free_games()
-    await make_game_embeds(ctx.channel, free_games)
+    await send_games_embed(ctx.channel, free_games)
 
 
-async def scheduled_post_free_games():
+async def scheduled_post_free_games() -> None:
     global previous_free_games
     free_games = await get_free_games()
     game_titles = [game["title"] for game in free_games]
@@ -79,10 +86,10 @@ async def scheduled_post_free_games():
         channel = client.get_channel(testing_channel_id)      # Test channel
 
     await channel.send(embed=await make_link_embed())
-    await make_game_embeds(channel, free_games)
+    await send_games_embed(channel, free_games)
 
 
-async def schedule_post_free_games():
+async def schedule_post_free_games() -> None:
     trigger = CronTrigger(hour=18, minute=0, second=0, timezone='Europe/Oslo')
     scheduler.add_job(scheduled_post_free_games, trigger)
     scheduler.start()

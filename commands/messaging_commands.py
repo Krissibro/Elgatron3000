@@ -8,7 +8,7 @@ from utilities.shared import tree
 from utilities.settings import guild_id
 
 
-async def execute_command(ctx, command_name, internal_function, user: discord.User, message: str, amount: int, interval: int, channel: discord.TextChannel):
+async def execute_command(ctx, command_name, internal_function, user: discord.User, message: str, amount: int, interval: int, channel: discord.TextChannel) -> None:
     """
     Executes a specified command with validation, tracking, and response handling.
 
@@ -55,7 +55,7 @@ async def annoy(ctx, message: str, amount: int, interval: str, user: discord.Use
     await execute_command(ctx, "annoy", annoy_internal, user, message, amount, interval, ctx.channel)
 
 
-async def annoy_internal(ctx, command_info: MessagingInfo):
+async def annoy_internal(ctx, command_info: MessagingInfo) -> None:
     while command_info.remaining > 0:
         command_info.remaining -= 1
         message = await ctx.channel.send(f"{command_info.get_mention()} {command_info.message}")
@@ -86,7 +86,7 @@ class ReactButton(discord.ui.View):
         self.stop()
 
 
-async def get_attention_internal(ctx, command_info: MessagingInfo):
+async def get_attention_internal(ctx, command_info: MessagingInfo) -> None:
     while command_info.remaining > 0:
         command_info.remaining -= 1
         view = ReactButton(timeout=command_info.interval * 2)
@@ -114,7 +114,7 @@ async def dm_spam(ctx, user: discord.User, message: str, amount: int, interval: 
     await execute_command(ctx, "dm_spam", dm_spam_internal, user, message, amount, interval, ctx.channel)
 
 
-async def dm_spam_internal(ctx, command_info: MessagingInfo):
+async def dm_spam_internal(ctx, command_info: MessagingInfo) -> None:
     try:
         while command_info.remaining > 0:
             command_info.remaining -= 1

@@ -15,7 +15,7 @@ class MessageSelectDropdown(discord.ui.Select):
         options = Command.make_dropdown_options()
         super().__init__(placeholder="Which command would you like to edit?", min_values=1, max_values=1, options=options)
 
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         selected_command_id = int(self.values[0])
 
         if selected_command_id in Command.get_ids():
@@ -41,7 +41,7 @@ class ManageCommandsButtons(discord.ui.View):
         super().__init__()
         self.command = command
 
-    async def make_command_embed(self, interaction: discord.Interaction):
+    async def make_command_embed(self, interaction: discord.Interaction) -> None:
         if not Command.is_empty():
             view = ManageCommandsButtons(self.command)
             embed = self.command.get_embed()
@@ -50,7 +50,7 @@ class ManageCommandsButtons(discord.ui.View):
             embed = discord.Embed(title="No commands running", color=discord.Color.red())
         await interaction.edit_original_response(embed=embed, view=view)
 
-    async def return_to_dropdown(self, interaction: discord.Interaction):
+    async def return_to_dropdown(self, interaction: discord.Interaction) -> None:
         if not Command.is_empty():
             view = ManageCommandsDropDown()
             embed = Command.make_overview_embed()
@@ -60,18 +60,18 @@ class ManageCommandsButtons(discord.ui.View):
         await interaction.response.edit_message(view=view, embed=embed)
 
     @discord.ui.button(emoji="📄", style=discord.ButtonStyle.blurple)
-    async def return_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def return_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
         await self.return_to_dropdown(interaction)
 
     @discord.ui.button(emoji="💀", style=discord.ButtonStyle.red)
-    async def kill_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def kill_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
         if await self.silliness_check(interaction):
             self.command.kill()
             await self.return_to_dropdown(interaction)
             await self.command.info.delete_messages()
 
     @discord.ui.button(emoji="🪶", style=discord.ButtonStyle.green)
-    async def edit_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def edit_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
         if await self.silliness_check(interaction):
             modal = EditMessagingCommandWindow(self.command.info)
             await interaction.response.send_modal(modal)
@@ -80,7 +80,11 @@ class ManageCommandsButtons(discord.ui.View):
             await self.make_command_embed(interaction)
 
     # Check if the command still exists
-    async def silliness_check(self, interaction: discord.Interaction):
+    async def silliness_check(self, interaction: discord.Interaction) -> bool:
+        """
+        :param interaction: interaction tied to command management message.
+        :return: True if command exists in the command list. else False
+        """
         if not Command.check_if_command_exists(self.command.id):
             await self.return_to_dropdown(interaction)
             return False
@@ -88,7 +92,7 @@ class ManageCommandsButtons(discord.ui.View):
 
 
 class EditMessagingCommandWindow(discord.ui.Modal):
-    def __init__(self, command_info: MessagingInfo):
+    def __init__(self, command_info: MessagingInfo) -> None:
         super().__init__(title="Edit")
         self.command_info = command_info
 
@@ -113,7 +117,7 @@ class EditMessagingCommandWindow(discord.ui.Modal):
 
         self.finished_event = asyncio.Event()
 
-    async def on_submit(self, interaction: discord.Interaction):
+    async def on_submit(self, interaction: discord.Interaction) -> None:
         if (
             not await validate_numeric(interaction, self.amount_input.value, "Amount must be numeric") or
             not await validate_amount(interaction, int(self.amount_input.value)) or
@@ -138,7 +142,7 @@ class EditMessagingCommandWindow(discord.ui.Modal):
     description="See and manage running commands",
     guild=discord.Object(id=guild_id)
 )
-async def manage_commands(ctx):
+async def manage_commands(ctx: discord.Interaction):
     if Command.is_empty():
         await ctx.response.send_message(embed=discord.Embed(title="No commands running", color=discord.Color.red()), ephemeral=True)
         return
@@ -152,7 +156,7 @@ async def manage_commands(ctx):
     description="Clean the current chat for bot messages",
     guild=discord.Object(id=guild_id)
 )
-async def cleanup(ctx, messages_amount: int):
+async def cleanup(ctx: discord.Interaction, messages_amount: int):
     if messages_amount <= 0:
         await ctx.response.send_message(embed=discord.Embed(title="Cannot delete less than 1 message"), ephemeral=True)
         return

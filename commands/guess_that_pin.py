@@ -12,7 +12,7 @@ class PinManager:
     def __init__(self):
         self.pins = []
 
-    async def initialize(self):
+    async def initialize(self) -> None:
         """Fetches all pinned messages and stores them in ./data."""
         # Load if there are pins already stored, else store all the pins
         try:
@@ -37,25 +37,25 @@ class PinManager:
             self.save_pins()
         print(f"Initialized with {len(self.pins)} pins")
 
-    def load_random_pin(self):
+    def load_random_pin(self) -> Pin:
         """Loads a random pin from the stored chunks."""
         return random.choice(self.pins)
 
-    def add_pin(self, pin):
+    def add_pin(self, pinned_message: discord.Message) -> None:
         """Adds a pin to the storage."""
-        pin = Pin(pin.author.display_name, pin.content, [attachment.url for attachment in pin.attachments],
-                  pin.channel.id, pin.id)
-        self.pins.append(pin)
+        pinned_message = Pin(pinned_message.author.display_name, pinned_message.content, [attachment.url for attachment in pinned_message.attachments],
+                             pinned_message.channel.id, pinned_message.id)
+        self.pins.append(pinned_message)
         self.save_pins()
 
-    def remove_pin(self, pin):
+    def remove_pin(self, pinned_message: discord.Message) -> None:
         """Removes a pin from the storage."""
-        pin = Pin(pin.author.display_name, pin.content, [attachment.url for attachment in pin.attachments],
-                  pin.channel.id, pin.id)
-        self.pins.remove(pin)
+        pinned_message = Pin(pinned_message.author.display_name, pinned_message.content, [attachment.url for attachment in pinned_message.attachments],
+                             pinned_message.channel.id, pinned_message.id)
+        self.pins.remove(pinned_message)
         self.save_pins()
 
-    def save_pins(self):
+    def save_pins(self) -> None:
         """Saves all the pins to the disk."""
         print(f"Saving {len(self.pins)} pins")
         with open("./data/pins.pkl", "wb") as file:
@@ -90,7 +90,7 @@ class PinView(discord.ui.View):
                         value=f"https://discord.com/channels/{guild_id}/{self.pin.channel}/{self.pin.id}")
         return embed
 
-    async def send_attachments(self):
+    async def send_attachments(self) -> None:
         """Sends the attachments of the pin to the channel if there are any."""
         if self.pin.attachments:
             await self.message_ctx.channel.send("\n".join(attachment for attachment in self.pin.attachments))
@@ -112,7 +112,7 @@ class PinView(discord.ui.View):
     description="Guess the pin!",
     guild=discord.Object(id=guild_id)
 )
-async def guess_that_pin(ctx):
+async def guess_that_pin(ctx: discord.Interaction):
     if not pin_manager.pins:
         await ctx.response.send_message("No pinned messages found.")
         return
