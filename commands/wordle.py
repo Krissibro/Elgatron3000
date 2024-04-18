@@ -11,7 +11,7 @@ from utilities.settings import testing, wordle_channel_id, guild_id
 valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())
 word_bank = list(np.genfromtxt('./data/word-bank.csv', delimiter=',', dtype=str))
 
-whitelisted_words = {"ELGA3", "SKIBIDI", "GYATT", "BRIAN"}
+whitelisted_words = {"ELGA3", "SKIBIDI", "GYATT", "BRIAN", "GOOBER", "CHRIS"}
 word_bank.extend(whitelisted_words)
 
 
