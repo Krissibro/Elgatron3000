@@ -5,7 +5,7 @@ import numpy as np
 from apscheduler.triggers.cron import CronTrigger
 
 from utilities.shared import tree, client, scheduler
-from utilities.settings import testing, game_channel_id, guild_id
+from utilities.settings import testing, wordle_channel_id, guild_id
 
 
 valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())
@@ -28,7 +28,7 @@ class Wordle:
 
     async def pick_new_word(self) -> None:
         if not self.correct_guess and not self.daily_word == "":
-            await client.get_channel(game_channel_id).send(embed=discord.Embed(
+            await client.get_channel(wordle_channel_id).send(embed=discord.Embed(
                 title=f"The previous word was {self.daily_word.upper()}"))
 
         random_word = str(random.sample(word_bank, 1)[0])
@@ -43,16 +43,16 @@ class Wordle:
                                   'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
         self.correct_guess = False
 
-        if not testing:
+        # if not testing:
             # channel = client.get_channel(testing_channel_id)      # Test channel
-            channel = client.get_channel(game_channel_id)       # Gaming channel
+        channel = client.get_channel(wordle_channel_id)       # Gaming channel
 
-            embed = discord.Embed(title="New Daily Wordle dropped! :fire: :fire: ")
+        embed = discord.Embed(title="New Daily Wordle dropped! :fire: :fire: ")
 
-            embed.description = ("[Connections](https://www.nytimes.com/games/connections)\n" +
-                                 "[Real Wordle](https://www.nytimes.com/games/wordle/index.html)\n" +
-                                 "[Pokedoku](https://pokedoku.com/)")
-            await channel.send(embed=embed)
+        embed.description = ("[Connections](https://www.nytimes.com/games/connections)\n" +
+                             "[Real Wordle](https://www.nytimes.com/games/wordle/index.html)\n" +
+                             "[Pokedoku](https://pokedoku.com/)")
+        await channel.send(embed=embed)
 
     async def guess_word(self, ctx, guessed_word: str) -> None:
         guessed_word = guessed_word.strip().upper()
