@@ -125,7 +125,6 @@ class Wordle:
     async def make_embed(self) -> discord.Embed:
         if self.correct_guess:
             embed = discord.Embed(title=f"Congratulations! \nThe word was {self.daily_word}!")
-                                  # description=f"")
             embed.add_field(name=f"Guess streak:   {self.correct_guess_streak}",
                             value=f"\u200B")
         else:
