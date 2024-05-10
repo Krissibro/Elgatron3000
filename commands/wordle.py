@@ -5,7 +5,7 @@ import numpy as np
 from apscheduler.triggers.cron import CronTrigger
 
 from utilities.shared import tree, client, scheduler
-from utilities.settings import testing, wordle_channel_id, guild_id
+from utilities.settings import testing, wordle_channel_id, guild_id, testing_channel_id
 
 
 valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())
@@ -18,6 +18,7 @@ word_bank.extend(whitelisted_words)
 class Wordle:
     daily_word = ""
     correct_guess = False
+    correct_guess_streak = 0
     guessed_words = set()
     users_that_guessed = set()
     known_letters = set()
@@ -28,8 +29,13 @@ class Wordle:
 
     async def pick_new_word(self) -> None:
         if not self.correct_guess and not self.daily_word == "":
-            await client.get_channel(wordle_channel_id).send(embed=discord.Embed(
-                title=f"The previous word was {self.daily_word.upper()}"))
+            channel = testing_channel_id if testing else wordle_channel_id
+
+            await client.get_channel(channel).send(embed=discord.Embed(
+                title=f"No one guessed the word {self.daily_word.upper()}!  :sob:",
+                description=f"Guess streak of  **{self.correct_guess_streak}**  has been reset"))
+
+            self.correct_guess_streak = 0
 
         random_word = str(random.sample(word_bank, 1)[0])
         self.daily_word = random_word.upper()
@@ -79,6 +85,8 @@ class Wordle:
         self.guessed_words.add(guessed_word)
         self.users_that_guessed.add(ctx.user.id)
         self.correct_guess = guessed_word == self.daily_word
+        if self.correct_guess:
+            self.correct_guess_streak += 1
 
         # Initialize result with all red squares
         guess_result = [":red_square:"] * len(guessed_word)
@@ -117,6 +125,9 @@ class Wordle:
     async def make_embed(self) -> discord.Embed:
         if self.correct_guess:
             embed = discord.Embed(title=f"Congratulations! \nThe word was {self.daily_word}!")
+                                  # description=f"")
+            embed.add_field(name=f"Guess streak:   {self.correct_guess_streak}",
+                            value=f"\u200B")
         else:
             embed = discord.Embed(title="Daily Wordle")
 
