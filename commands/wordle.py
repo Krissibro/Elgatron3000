@@ -11,7 +11,8 @@ from utilities.settings import testing, wordle_channel_id, guild_id, testing_cha
 valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())
 word_bank = list(np.genfromtxt('./data/word-bank.csv', delimiter=',', dtype=str))
 
-whitelisted_words = {"ELGA3", "SKIBIDI", "GYATT", "BRIAN", "GOOBER", "CHRIS"}
+# Apparently I am a potato according to Brian :pensive:
+whitelisted_words = {"ELGA3", "SKIBIDI", "GYATT", "BRIAN", "GOOBER", "CHRIS", "BEEEG", "SHREK", "GRONK", "POTATO"}
 word_bank.extend(whitelisted_words)
 
 
