@@ -6,6 +6,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 from utilities.settings import testing, wordle_channel_id, guild_id, testing_channel_id
 from utilities.settings import client, scheduler, tree
+from utilities.state_helper import save_state, load_state
 
 
 valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())
@@ -17,9 +18,10 @@ word_bank.extend(whitelisted_words)
 
 
 class Wordle:
+    state = load_state()
     daily_word = ""
     correct_guess = False
-    correct_guess_streak = 0
+    correct_guess_streak = state["wordle_streak"]
     guessed_words = set()
     users_that_guessed = set()
     known_letters = set()
@@ -37,6 +39,7 @@ class Wordle:
                 description=f"Guess streak of  **{self.correct_guess_streak}**  has been reset"))
 
             self.correct_guess_streak = 0
+            self.update_streak_state()
 
         random_word = str(random.sample(word_bank, 1)[0])
         self.daily_word = random_word.upper()
@@ -88,6 +91,7 @@ class Wordle:
         self.correct_guess = guessed_word == self.daily_word
         if self.correct_guess:
             self.correct_guess_streak += 1
+            self.update_streak_state()
 
         # Initialize result with all red squares
         guess_result = [":red_square:"] * len(guessed_word)
@@ -150,6 +154,11 @@ class Wordle:
         known_letters = f"Known letters:\n{' '.join(sorted_known_letters)}"
         rest = f"Available letters:\n{' '.join(sorted_available_letters)}"
         return f"{known_letters}\n{rest}"
+
+    def update_streak_state(self) -> None:
+        state = load_state()
+        state["wordle_streak"] = self.correct_guess_streak
+        save_state(state)
 
 
 wordle_game = Wordle()

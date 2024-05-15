@@ -36,7 +36,7 @@ async def collect_data(ctx: discord.Interaction):
 )
 async def reset_wordle(ctx):
     await wordle_game.pick_new_word()
-    await ctx.response.send_message(embed=discord.Embed(title="Wordle has been reset!"), ephemeral=True, delete_after=1)
+    await ctx.response.send_message(embed=discord.Embed(title="Wordle has been reset!"), ephemeral=True, delete_after=10)
 
 
 @tree.command(
@@ -45,5 +45,5 @@ async def reset_wordle(ctx):
     guild=discord.Object(id=guild_id)
 )
 async def test_epic_games_scheduler(ctx):
-    await ctx.response.send_message(embed=discord.Embed(title="Testing!"), ephemeral=True, delete_after=1)
+    await ctx.response.send_message(embed=discord.Embed(title="Testing!"), ephemeral=True, delete_after=10)
     await scheduled_post_free_games()
