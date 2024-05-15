@@ -4,8 +4,7 @@ import asyncio
 from command_objects.Command import Command
 from command_objects.MessagingInfo import MessagingInfo
 from utilities.helper_functions import parse_time, validate_interval, validate_amount
-from utilities.shared import tree
-from utilities.settings import guild_id
+from utilities.settings import guild_id, tree
 
 
 async def execute_command(ctx, command_name, internal_function, user: discord.User, message: str, amount: int, interval: int, channel: discord.TextChannel) -> None:

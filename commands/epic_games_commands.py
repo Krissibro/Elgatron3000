@@ -4,8 +4,7 @@ from epicstore_api import EpicGamesStoreAPI
 from apscheduler.triggers.cron import CronTrigger
 
 from utilities.settings import testing, game_channel_id, testing_channel_id
-from utilities.shared import client, scheduler, tree
-from utilities.settings import guild_id
+from utilities.settings import guild_id, client, scheduler, tree
 from typing import List, Dict
 
 

@@ -4,8 +4,8 @@ import numpy as np
 
 from apscheduler.triggers.cron import CronTrigger
 
-from utilities.shared import tree, client, scheduler
 from utilities.settings import testing, wordle_channel_id, guild_id, testing_channel_id
+from utilities.settings import client, scheduler, tree
 
 
 valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())

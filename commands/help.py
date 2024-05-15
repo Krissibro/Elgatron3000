@@ -1,7 +1,6 @@
 import discord
 
-from utilities.shared import tree
-from utilities.settings import guild_id
+from utilities.settings import guild_id, tree
 
 
 @tree.command(

@@ -1,8 +1,7 @@
 import discord
 import csv
 
-from utilities.shared import tree
-from utilities.settings import guild_id
+from utilities.settings import guild_id, tree
 from commands.wordle import wordle_game
 from commands.epic_games_commands import scheduled_post_free_games
 

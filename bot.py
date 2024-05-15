@@ -13,8 +13,7 @@ from commands.help import help_command
 from commands.guess_that_pin import guess_that_pin, initialize_guess_that_pin
 from commands.emulator_commands import pokemon, emu
 
-from utilities.shared import client, tree
-from utilities.settings import guild_id, testing
+from utilities.settings import guild_id, testing, client, tree
 
 if testing:
     from the_lab.test_commands import *

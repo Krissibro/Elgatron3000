@@ -1,5 +1,6 @@
-from utilities.shared import *
-from utilities.settings import guild_id
+
+import discord
+from utilities.settings import guild_id, tree, client
 import random
 import pickle
 from collections import namedtuple
