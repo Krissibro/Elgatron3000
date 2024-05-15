@@ -38,6 +38,5 @@ async def load_wordle_game_state():
         from commands.wordle import Wordle
         wordle = Wordle()
         await wordle.pick_new_word()
-        wordle.correct_guess_streak = 6
         return wordle
 
