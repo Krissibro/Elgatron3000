@@ -23,9 +23,9 @@ if testing:
 async def on_ready():
     await tree.sync(guild=discord.Object(id=guild_id))
 
+    await initialize_wordle()
+    await initialize_guess_that_pin()
     client.loop.create_task(schedule_post_free_games())
-    client.loop.create_task(initialize_wordle())
-    client.loop.create_task(initialize_guess_that_pin())
 
     print("Ready!")
 

@@ -73,7 +73,6 @@ async def free_games_rn(ctx: discord.Interaction):
 
 def get_free_games_state() -> List[dict]:
     state = load_state()
-    print(state["free_games"])
     return state["free_games"]
 
 
@@ -110,4 +109,5 @@ async def schedule_post_free_games() -> None:
     trigger = CronTrigger(hour=18, minute=0, second=0, timezone='Europe/Oslo')
     scheduler.add_job(scheduled_post_free_games, trigger)
     scheduler.start()
+    scheduler.print_jobs()
 
