@@ -48,8 +48,12 @@ async def send_games_embed(channel: discord.TextChannel, games: List[dict]) -> N
     :return:
     """
     for game in games:
-        page_slug = game["catalogNs"]["mappings"][0]["pageSlug"]
-        url = f"\n[**Link**](https://store.epicgames.com/en-US/p/{page_slug})" if page_slug else ""
+        try:
+            # page_slug = game["catalogNs"]["mappings"][0]["pageSlug"]
+            page_slug = game["productSlug"]
+            url = f"\n[**Link**](https://store.epicgames.com/en-US/p/{page_slug})" if page_slug else ""
+        except IndexError:
+            url = ""
 
         embed = discord.Embed(title=f"{game['title']}",
                               description=f"{game['description']}" + url)
