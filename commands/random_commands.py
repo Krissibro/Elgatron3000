@@ -47,4 +47,12 @@ async def weave(ctx: discord.Interaction):
 async def trout(ctx: discord.Interaction):
     await ctx.response.send_message("https://cdn.discordapp.com/attachments/839100318893211669/1211047338509082664/trout.mp4?ex=65ecc6b9&is=65da51b9&hm=53454f3fb04b5ac3c02974211f370897b90e3a1925f4d3e5c0ab5aee9dcd6077&")
 
+@tree.command(
+    name="sus",
+    description="amogos sos amogos sossi sossi baki amogos sos amogos",
+    guild=discord.Object(id=guild_id)
+)
+async def sussy_baki(ctx: discord.Interaction):
+    await ctx.response.send_message("https://cdn.discordapp.com/attachments/839100318893211669/1245765875462836388/Sossi-baki.mp4?ex=6659f161&is=66589fe1&hm=5af0e663626613c8ef2ab2bb7c0876447eeeedc6194d7aa24f7c80c8dbb95d40&")
+
 
