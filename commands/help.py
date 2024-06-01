@@ -43,6 +43,7 @@ async def help_command(ctx: discord.Interaction):
 
     embed.add_field(name="Funny gifs and videos",
                     value='''/trout
+                        /sus
                         /weave
                         /this_dude
                         /thanos_snapped
