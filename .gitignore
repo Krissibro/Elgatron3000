@@ -14,3 +14,4 @@ venv/
 # speciffic files:
 
 utilities/config.json
+data/bot_state.json

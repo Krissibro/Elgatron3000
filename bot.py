@@ -14,18 +14,19 @@ from commands.guess_that_pin import guess_that_pin, initialize_guess_that_pin
 from commands.emulator_commands import pokemon, emu
 from the_lab.petting import petting
 
-from utilities.shared import client, tree
-from utilities.settings import guild_id
+from utilities.settings import guild_id, testing, client, tree
 
+if testing:
+    from the_lab.test_commands import *
 
 
 @client.event
 async def on_ready():
     await tree.sync(guild=discord.Object(id=guild_id))
 
+    await initialize_wordle()
+    await initialize_guess_that_pin()
     client.loop.create_task(schedule_post_free_games())
-    client.loop.create_task(initialize_wordle())
-    client.loop.create_task(initialize_guess_that_pin())
 
     print("Ready!")
 

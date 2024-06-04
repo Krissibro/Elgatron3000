@@ -6,8 +6,7 @@ from ast import literal_eval
 from command_objects.Command import Command
 from commands.messaging_commands import MessagingInfo
 from utilities.helper_functions import parse_time, format_seconds, validate_numeric, validate_interval, validate_amount
-from utilities.settings import guild_id
-from utilities.shared import client, tree
+from utilities.settings import guild_id, client, tree
 
 
 class MessageSelectDropdown(discord.ui.Select):

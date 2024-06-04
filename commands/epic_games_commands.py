@@ -4,12 +4,11 @@ from epicstore_api import EpicGamesStoreAPI
 from apscheduler.triggers.cron import CronTrigger
 
 from utilities.settings import testing, game_channel_id, testing_channel_id
-from utilities.shared import client, scheduler, tree
-from utilities.settings import guild_id
+from utilities.settings import guild_id, client, scheduler, tree
+from utilities.state_helper import save_state, load_state
 from typing import List, Dict
 
 
-previous_free_games = []
 
 
 async def make_link_embed():
@@ -49,8 +48,12 @@ async def send_games_embed(channel: discord.TextChannel, games: List[dict]) -> N
     :return:
     """
     for game in games:
-        page_slug = game["catalogNs"]["mappings"][0]["pageSlug"]
-        url = f"\n[**Link**](https://store.epicgames.com/en-US/p/{page_slug})" if page_slug else ""
+        try:
+            # page_slug = game["catalogNs"]["mappings"][0]["pageSlug"]
+            page_slug = game["productSlug"]
+            url = f"\n[**Link**](https://store.epicgames.com/en-US/p/{page_slug})" if page_slug else ""
+        except IndexError:
+            url = ""
 
         embed = discord.Embed(title=f"{game['title']}",
                               description=f"{game['description']}" + url)
@@ -72,25 +75,43 @@ async def free_games_rn(ctx: discord.Interaction):
     await send_games_embed(ctx.channel, free_games)
 
 
+def get_free_games_state() -> List[dict]:
+    state = load_state()
+    return state["free_games"]
+
+
+def update_free_games_state(free_games: List[dict]) -> None:
+    state = load_state()
+    state["free_games"] = free_games
+    save_state(state)
+
+
+previous_free_game_titles = get_free_games_state()
+
+
 async def scheduled_post_free_games() -> None:
-    global previous_free_games
+    global previous_free_game_titles
     free_games = await get_free_games()
-    game_titles = [game["title"] for game in free_games]
+    current_free_game_titles = [game["title"] for game in free_games]
 
-    if game_titles == previous_free_games or not free_games:
-        return
-    previous_free_games = game_titles
-    if not testing:
-        channel = client.get_channel(game_channel_id)       # Gaming channel
-    else:
-        channel = client.get_channel(testing_channel_id)      # Test channel
+    if current_free_game_titles != previous_free_game_titles and free_games:
+        # Update the state
+        previous_free_game_titles = current_free_game_titles
+        update_free_games_state(current_free_game_titles)
 
-    await channel.send(embed=await make_link_embed())
-    await send_games_embed(channel, free_games)
+        if not testing:
+            channel = client.get_channel(game_channel_id)
+        else:
+            channel = client.get_channel(testing_channel_id)
+
+        # Send the free games embed
+        await channel.send(embed=await make_link_embed())
+        await send_games_embed(channel, free_games)
 
 
 async def schedule_post_free_games() -> None:
     trigger = CronTrigger(hour=18, minute=0, second=0, timezone='Europe/Oslo')
     scheduler.add_job(scheduled_post_free_games, trigger)
     scheduler.start()
+    scheduler.print_jobs()
 

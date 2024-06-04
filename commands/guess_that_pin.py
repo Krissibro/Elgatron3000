@@ -1,8 +1,10 @@
-from utilities.shared import *
-from utilities.settings import guild_id
+
+import discord
+from utilities.settings import guild_id, tree, client
 import random
 import pickle
 from collections import namedtuple
+import asyncio
 
 # Pickle will not store the message object itself, so it had to be dumbed down to a namedtuple
 Pin = namedtuple("Pin", ["author", "content", "attachments", "channel", "id"])
@@ -74,6 +76,7 @@ class PinView(discord.ui.View):
         super().__init__(timeout=timeout)
         self.pin: Pin = pin
         self.message_ctx = message_ctx
+        self.task = asyncio.create_task(self.auto_reveal())
 
     async def make_first_embed(self) -> discord.Embed:
         """Creates the embed containing the title and the selected pin.
@@ -95,16 +98,29 @@ class PinView(discord.ui.View):
         if self.pin.attachments:
             await self.message_ctx.channel.send("\n".join(attachment for attachment in self.pin.attachments))
 
-    @discord.ui.button(label="Reveal the sinner!", style=discord.ButtonStyle.success)
-    async def reveal_button(self, button: discord.ui.Button, interaction: discord.Interaction) -> None:
-        """Reveals the author of the pinned message and removes the view from the message."""
-        sinner_ember = await self.make_sinner_embed()
-        await self.message_ctx.edit_original_response(embed=sinner_ember, view=None)
-        self.stop()
+    async def reveal_author(self):
+        """Method to reveal the author and edit the original message."""
+        sinner_embed = await self.make_sinner_embed()
+        await self.message_ctx.edit_original_response(embed=sinner_embed, view=None)
+        self.stop()  # Ensure that we stop the view
 
-    async def on_timeout(self) -> None:
-        sinner_ember = await self.make_sinner_embed()
-        await self.message_ctx.edit_original_response(embed=sinner_ember, view=None)
+    @discord.ui.button(label="Reveal the sinner!", style=discord.ButtonStyle.success)
+    async def reveal_button(self, button: discord.ui.Button, interaction: discord.Interaction):
+        await self.reveal_author()
+
+    async def on_timeout(self):
+        # We might want to double check here in case it times out exactly at the same time
+        if not self.is_finished():
+            await self.reveal_author()
+
+    async def auto_reveal(self):
+        # Wait until just before the timeout
+        await asyncio.sleep(self.timeout - 10)  # Reveal 10 seconds before timeout
+        if not self.is_finished():
+            await self.reveal_author()
+
+    def __del__(self):
+        self.task.cancel()  # Clean up the task when the view is garbage collected
 
 
 @tree.command(

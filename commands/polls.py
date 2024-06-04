@@ -1,8 +1,7 @@
 import discord
 
 from utilities.helper_functions import char_to_emoji
-from utilities.shared import tree
-from utilities.settings import guild_id
+from utilities.settings import guild_id, tree
 
 
 @tree.command(
