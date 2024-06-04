@@ -12,6 +12,7 @@ from commands.random_commands import this_dude, weave, pet_elga3, thanos_snapped
 from commands.help import help_command
 from commands.guess_that_pin import guess_that_pin, initialize_guess_that_pin
 from commands.emulator_commands import pokemon, emu
+from the_lab.petting import petting
 
 from utilities.shared import client, tree
 from utilities.settings import guild_id
