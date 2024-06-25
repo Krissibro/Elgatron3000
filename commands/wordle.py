@@ -66,8 +66,7 @@ class Wordle:
         self.users_that_guessed.clear()
         self.display_list.clear()
         self.known_letters.clear()
-        self.available_letters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
-                                  'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
+        self.available_letters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
         self.correct_guess = False
 
         if not testing:

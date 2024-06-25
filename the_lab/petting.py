@@ -2,8 +2,7 @@ import discord
 from io import BytesIO
 from PIL import Image, ImageSequence
 
-from utilities.shared import tree
-from utilities.settings import guild_id
+from utilities.settings import guild_id, tree
 
 
 @tree.command(
@@ -21,19 +20,29 @@ async def petting(ctx, user: discord.User):
     images = []
     with open("data/template.gif", "rb") as f:
         template_gif = Image.open(f)
-        for frame in ImageSequence.Iterator(template_gif):
-            frame = frame.convert("RGBA")  # Ensure frame is in RGBA mode
 
-            # Create a copy of the avatar image for each frame
-            frame_avatar = avatar_image.copy()
+        # get sizes
+        canvas_width, canvas_height = template_gif.size
+        avatar_width, avatar_height = int(canvas_width * 0.8), int(canvas_height * 0.8)
 
-            # TODO makes sure the avatar and frames are alligned correctly
+        # Resize avatar image
+        avatar_image = avatar_image.resize((avatar_width, avatar_height))
 
-            # TODO squish and pull the avatar
+        # find where to place the avatar on the image
+        avatar_x = canvas_width - avatar_width
+        avatar_y = canvas_height - avatar_height
 
-            # Paste the frame on top of the avatar image
-            frame_avatar.paste(frame, (0, 0), frame)
-            images.append(frame_avatar)
+        for hand_frame in ImageSequence.Iterator(template_gif):
+            hand_frame = hand_frame.convert("RGBA")
+            frame = Image.new("RGBA", (canvas_width, canvas_height), (0, 0, 0, 0))
+
+            # TODO stretch and squeeze the user avatar
+
+            # Paste avatar, then hand on top
+            frame.paste(avatar_image, (avatar_x, avatar_y), avatar_image)
+            frame.paste(hand_frame, (0, 0), hand_frame)
+
+            images.append(frame)
 
     # save the gif
     img_byte_arr = BytesIO()
@@ -43,10 +52,10 @@ async def petting(ctx, user: discord.User):
         save_all=True,
         append_images=images[1:],
         duration=30,
+        disposal=2,  # 2 = Restore to background color.
         loop=0
     )
     img_byte_arr.seek(0)
 
-    # Send the GIF
     file = discord.File(fp=img_byte_arr, filename="petting.gif")
     await ctx.response.send_message(file=file)
