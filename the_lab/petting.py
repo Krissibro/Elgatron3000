@@ -25,21 +25,31 @@ async def petting(ctx, user: discord.User):
         canvas_width, canvas_height = template_gif.size
         avatar_width, avatar_height = int(canvas_width * 0.8), int(canvas_height * 0.8)
 
-        # Resize avatar image
-        avatar_image = avatar_image.resize((avatar_width, avatar_height))
+        frames = template_gif.n_frames
+        max_stretch = 0.25
 
-        # find where to place the avatar on the image
-        avatar_x = canvas_width - avatar_width
-        avatar_y = canvas_height - avatar_height
+        stretch = [abs((i - frames//2)/(frames//2)) * max_stretch for i in range(frames)]
+        pull = stretch[5:] + stretch[:5]
 
-        for hand_frame in ImageSequence.Iterator(template_gif):
+        print(stretch)
+        print(pull)
+
+        for i, hand_frame in enumerate(ImageSequence.Iterator(template_gif)):
             hand_frame = hand_frame.convert("RGBA")
             frame = Image.new("RGBA", (canvas_width, canvas_height), (0, 0, 0, 0))
 
             # TODO stretch and squeeze the user avatar
 
+            new_avatar_width = int(avatar_width * (1 - pull[i]))
+            new_avatar_height = int(avatar_height * (1 - stretch[i]))
+
+            avatar_x = canvas_width - new_avatar_width
+            avatar_y = canvas_height - new_avatar_height
+
             # Paste avatar, then hand on top
-            frame.paste(avatar_image, (avatar_x, avatar_y), avatar_image)
+            temp_avatar = avatar_image.resize((new_avatar_height, new_avatar_width))
+
+            frame.paste(temp_avatar, (avatar_x, avatar_y), temp_avatar)
             frame.paste(hand_frame, (0, 0), hand_frame)
 
             images.append(frame)
