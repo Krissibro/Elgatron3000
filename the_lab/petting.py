@@ -23,7 +23,7 @@ async def petting(ctx, user: discord.User):
 
         # get sizes
         canvas_width, canvas_height = template_gif.size
-        avatar_width, avatar_height = int(canvas_width * 0.8), int(canvas_height * 0.8)
+        avatar_width, avatar_height = int(canvas_width * 0.85), int(canvas_height * 0.85)
 
         frames = template_gif.n_frames
         max_stretch = 0.25
@@ -43,8 +43,8 @@ async def petting(ctx, user: discord.User):
             new_avatar_width = int(avatar_width * (1 - pull[i]))
             new_avatar_height = int(avatar_height * (1 - stretch[i]))
 
-            avatar_x = canvas_width - new_avatar_width
-            avatar_y = canvas_height - new_avatar_height
+            avatar_y = canvas_width - new_avatar_width
+            avatar_x = canvas_height - new_avatar_height
 
             # Paste avatar, then hand on top
             temp_avatar = avatar_image.resize((new_avatar_height, new_avatar_width))
