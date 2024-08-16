@@ -16,15 +16,16 @@ async def start_poll(ctx: discord.Interaction, title: str, option1: str, option2
     # Make list with valid options
     options = [option1, option2, option3, option4, option5, option6, option7, option8, option9, option10]
     options = [option for option in options if option]  # remove option if it's not defined
+    emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
 
     # Make the embed
     embed = discord.Embed(title=title, description=description)
-    content = "\n".join([f"{char_to_emoji(i+1)} {j}" for i, j in enumerate(options)])
+    content = "\n".join([f"{i} {j}" for i, j in zip(emojis, options)])
     embed.add_field(name=content, value="", inline=False)
 
     # Send message and add reactions and thread
     await ctx.response.send_message(embed=embed)
     msg = await ctx.original_response()
     for i in range(len(options)):
-        await msg.add_reaction(char_to_emoji(i + 1))
+        await msg.add_reaction(emojis[i])
     await msg.create_thread(name=title)
