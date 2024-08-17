@@ -5,9 +5,9 @@ from command_objects.Emulator import Emulator
 from typing import Optional
 
 # for debug
-# emu = Emulator("./data/Pokemon - Red Version (USA, Europe) (SGB Enhanced).gb")
+# emu = Emulator("./data/pokemon_red.gb")
 # for bot
-emu = Emulator("./data/Pokemon - Red Version (USA, Europe) (SGB Enhanced).gb", window="null")
+emu = Emulator("./data/pokemon_red.gb", window="null")
 
 
 @tree.command(

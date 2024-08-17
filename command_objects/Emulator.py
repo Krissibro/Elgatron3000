@@ -51,7 +51,7 @@ class Emulator(PyBoy):
 
 
 if __name__ == "__main__":
-    pyboy = Emulator("../data/Pokemon - Red Version (USA, Europe) (SGB Enhanced).gb")
+    pyboy = Emulator("../data/pokemon_red.gb")
 
     for i in range(10000):
         pyboy.tick()
