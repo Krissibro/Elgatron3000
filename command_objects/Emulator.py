@@ -47,8 +47,10 @@ class Emulator(PyBoy):
 
     def tick(self, count: int = 3, render: bool = True):
         super().tick(count=count, render=render)
+
+        # copy, upscale and save image
         image = self.screen.image.copy()
-        image = image.resize((image.width*2, image.height*2), resample=0)
+        image = image.resize((image.width*2, image.height*2), resample=0) # resample 0 = nearest neighbour resampling
         self.images.append(image)
 
 
