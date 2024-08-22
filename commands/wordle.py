@@ -13,7 +13,7 @@ valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=s
 word_bank = list(np.genfromtxt('./data/word-bank.csv', delimiter=',', dtype=str))
 
 # Apparently I am a potato according to Brian :pensive:
-whitelisted_words = {"ELGA3", "SKIBIDI", "GYATT", "BRIAN", "GOOBER", "CHRIS", "BEEEG", "SHREK", "GRONK", "POTATO"}
+whitelisted_words = set(np.genfromtxt('./data/whitelisted-words.csv', delimiter=',', dtype=str))
 word_bank.extend(whitelisted_words)
 
 
@@ -105,7 +105,7 @@ class Wordle:
                 return
 
         self.guessed_words.add(guessed_word)
-        self.users_that_guessed.add(ctx.user.name)
+        self.users_that_guessed.add(ctx.user.id)
         self.correct_guess = guessed_word == self.daily_word
         if self.correct_guess:
             self.correct_guess_streak += 1
