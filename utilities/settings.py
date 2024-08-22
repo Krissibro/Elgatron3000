@@ -1,5 +1,6 @@
 import json
 import discord
+from discord.ext.commands import Bot
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
@@ -8,8 +9,8 @@ intents = discord.Intents.default()
 intents.members = True
 intents.messages = True
 intents.message_content = True
-client = discord.Client(intents=intents)
-tree = discord.app_commands.CommandTree(client)
+bot = Bot(intents=intents, command_prefix="/")
+tree = bot.tree
 scheduler = AsyncIOScheduler(timezone='Europe/Oslo')
 
 with open("utilities/config.json", "r") as f:

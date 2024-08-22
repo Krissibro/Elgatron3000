@@ -4,7 +4,7 @@ from epicstore_api import EpicGamesStoreAPI
 from apscheduler.triggers.cron import CronTrigger
 
 from utilities.settings import testing, game_channel_id, testing_channel_id
-from utilities.settings import guild_id, client, scheduler, tree
+from utilities.settings import guild_id, bot, scheduler, tree
 from utilities.state_helper import save_state, load_state
 from typing import List, Dict
 
@@ -100,9 +100,9 @@ async def scheduled_post_free_games() -> None:
         update_free_games_state(current_free_game_titles)
 
         if not testing:
-            channel = client.get_channel(game_channel_id)
+            channel = bot.get_channel(game_channel_id)
         else:
-            channel = client.get_channel(testing_channel_id)
+            channel = bot.get_channel(testing_channel_id)
 
         # Send the free games embed
         await channel.send(embed=await make_link_embed())

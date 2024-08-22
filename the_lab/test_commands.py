@@ -2,7 +2,7 @@ import discord
 import csv
 
 from utilities.settings import guild_id, tree
-from commands.wordle import wordle_game
+# from commands.wordle import wordle_game
 from commands.epic_games_commands import scheduled_post_free_games
 
 
@@ -27,16 +27,6 @@ async def collect_data(ctx: discord.Interaction):
         print("finished!")
         writer = csv.writer(csvfile)
         writer.writerows(messages)
-
-
-@tree.command(
-    name="reset_wordle",
-    description="Reset the daily wordle",
-    guild=discord.Object(id=guild_id)
-)
-async def reset_wordle(ctx):
-    await wordle_game.pick_new_word()
-    await ctx.response.send_message(embed=discord.Embed(title="Wordle has been reset!"), ephemeral=True, delete_after=10)
 
 
 @tree.command(

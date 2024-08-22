@@ -1,2 +1,0 @@
-class WordleStats:
-    pass

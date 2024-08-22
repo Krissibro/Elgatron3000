@@ -1,13 +1,15 @@
+import json
+import os
 import discord
+from discord import app_commands
+from discord.ext import commands
 import random
 import numpy as np
 
 from apscheduler.triggers.cron import CronTrigger
 
 from utilities.settings import testing, wordle_channel_id, guild_id, testing_channel_id
-from utilities.settings import client, scheduler, tree
-from utilities.state_helper import save_wordle_game_state, load_wordle_game_state
-
+from utilities.settings import bot, scheduler
 
 valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())
 word_bank = list(np.genfromtxt('./data/word-bank.csv', delimiter=',', dtype=str))
@@ -17,7 +19,8 @@ whitelisted_words = set(np.genfromtxt('./data/whitelisted-words.csv', delimiter=
 word_bank.extend(whitelisted_words)
 
 
-class Wordle:
+@app_commands.guild_only()
+class Wordle(commands.GroupCog, group_name="wordle"):
     daily_word = ""
     correct_guess = False
     correct_guess_streak = 0
@@ -27,33 +30,42 @@ class Wordle:
     available_letters = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
     display_list = []
 
-    # Singleton pattern, only one instance of Wordle should exist
-    _instance = None
+    state_file_path = "data/wordle_state.json"
 
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(Wordle, cls).__new__(cls)
-            # Initialize any attributes of your instance here
-            cls._instance.daily_word = ""
-            cls._instance.correct_guess = False
-            cls._instance.correct_guess_streak = 0
-            cls._instance.guessed_words = set()
-            cls._instance.users_that_guessed = set()
-            cls._instance.known_letters = set()
-            cls._instance.available_letters = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
-            cls._instance.display_list = []
-        return cls._instance
+    def __init__(self):
+
+        self.daily_word = ""
+        self.correct_guess = False
+        self.correct_guess_streak = 0
+        self.guessed_words = set()
+        self.users_that_guessed = set()
+        self.known_letters = set()
+        self.available_letters = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+        self.display_list = []
+
+    # wordle_group: app_commands.Group = app_commands.Group(
+    #     name="wordle",
+    #     description="Play the daily wordle game!",
+    #     guild_ids=[guild_id]
+    # )
+    # class WordleGroup(app_commands.Group):
+    #     def __init__(self):
+    #         super().__init__(
+    #             name="wordle",
+    #             description="Play the daily wordle game!",
+    #             guild_ids=[guild_id]
+    #         )
 
     async def pick_new_word(self) -> None:
         if not self.correct_guess and not self.daily_word == "":
             channel = testing_channel_id if testing else wordle_channel_id
 
             if self.correct_guess_streak > 0:
-                await client.get_channel(channel).send(embed=discord.Embed(
+                await bot.get_channel(channel).send(embed=discord.Embed(
                     title=f"No one guessed the word {self.daily_word.upper()}!  :sob:",
                     description=f"Guess streak of  **{self.correct_guess_streak}**  has been reset"))
             else:
-                await client.get_channel(channel).send(embed=discord.Embed(
+                await bot.get_channel(channel).send(embed=discord.Embed(
                     title=f"No one guessed the word {self.daily_word.upper()}!  :sob:"))
 
             self.correct_guess_streak = 0
@@ -66,12 +78,12 @@ class Wordle:
         self.users_that_guessed.clear()
         self.display_list.clear()
         self.known_letters.clear()
-        self.available_letters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
+        self.available_letters = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
         self.correct_guess = False
 
         if not testing:
             # channel = client.get_channel(testing_channel_id)      # Test channel
-            channel = client.get_channel(wordle_channel_id)       # Gaming channel
+            channel = bot.get_channel(wordle_channel_id)  # Gaming channel
 
             embed = discord.Embed(title="New Daily Wordle dropped! :fire: :fire: ")
 
@@ -80,10 +92,14 @@ class Wordle:
                                  "[Pokedoku](https://pokedoku.com/)")
             await channel.send(embed=embed)
 
-        save_wordle_game_state(self)
+        self.save_state()
 
-    async def guess_word(self, ctx, guessed_word: str) -> None:
-        guessed_word = guessed_word.strip().upper()
+    @app_commands.command(
+        name="guess",
+        description="Attempt to guess the daily wordle!",
+    )
+    async def guess_word(self, ctx, word: str) -> None:
+        guessed_word = word.strip().upper()
 
         if self.correct_guess:
             await ctx.response.send_message(embed=discord.Embed(title="The daily wordle has already been guessed"))
@@ -144,7 +160,14 @@ class Wordle:
 
         await ctx.response.send_message(embed=await self.make_embed())
 
-        save_wordle_game_state(self)
+        self.save_state()
+
+    @app_commands.command(
+        name="current",
+        description="See the current progress of the daily wordle!",
+    )
+    async def current_game(self, ctx: discord.Interaction):
+        await ctx.response.send_message(embed=await self.make_embed())
 
     async def make_embed(self) -> discord.Embed:
         if self.correct_guess:
@@ -174,35 +197,66 @@ class Wordle:
         rest = f"Available letters:\n{' '.join(sorted_available_letters)}"
         return f"{known_letters}\n{rest}"
 
+    def get_dict_of_data(self):
+        return {
+            "daily_word": self.daily_word,
+            "correct_guess": self.correct_guess,
+            "correct_guess_streak": self.correct_guess_streak,
+            "guessed_words": list(self.guessed_words),
+            "users_that_guessed": list(self.users_that_guessed),
+            "known_letters": list(self.known_letters),
+            "available_letters": list(self.available_letters),
+            "display_list": self.display_list
+        }
 
-wordle_game = Wordle()
+    def retrieve_data_from_dict(self, data):
+        self.daily_word = data.get("daily_word", "")
+        self.correct_guess = data.get("correct_guess", False)
+        self.correct_guess_streak = data.get("correct_guess_streak", 0)
+        self.guessed_words = set(data.get("guessed_words", []))
+        self.users_that_guessed = set(data.get("users_that_guessed", []))
+        self.known_letters = set(data.get("known_letters", []))
+        self.available_letters = set(data.get("available_letters", list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')))
+        self.display_list = data.get("display_list", [])
+
+    def save_state(self):
+        """Save the current state to a JSON file."""
+        with open(self.state_file_path, 'w') as file:
+            json.dump(self.get_dict_of_data(), file)
+
+    async def load_state(self):
+        """Load the state from a JSON file if it exists, otherwise set a new word."""
+        if os.path.exists(self.state_file_path):
+            with open(self.state_file_path, 'r') as file:
+                wordle_dict = json.load(file)
+                self.retrieve_data_from_dict(wordle_dict)
+        else:
+            await self.pick_new_word()
+
+    if testing:
+        @app_commands.command(
+            name="reset",
+            description="Reset the daily wordle",
+        )
+        async def reset_wordle(self, ctx):
+            await self.pick_new_word()
+            await ctx.response.send_message(embed=discord.Embed(title="Wordle has been reset!"), ephemeral=True, delete_after=10)
 
 
-async def initialize_wordle() -> None:
-    # If the bot is restarted, the daily wordle will be reset
-    global wordle_game
-    wordle_game = await load_wordle_game_state()
+class WordleStats:
+    # correct_guess_streak = 0
+    # number_guesses_per_game_counter = {}
+    pass
+
+
+async def setup(setup_bot):
+    wordle_game = Wordle()
+    await wordle_game.load_state()
 
     trigger = CronTrigger(hour=8, minute=0, second=0, timezone='Europe/Oslo')
     scheduler.add_job(wordle_game.pick_new_word, trigger)
 
-
-@tree.command(
-    name="wordle",
-    description="See the current progress of the daily wordle!",
-    guild=discord.Object(id=guild_id)
-)
-async def wordle(ctx):
-    await ctx.response.send_message(embed=await wordle_game.make_embed())
-
-
-@tree.command(
-    name="guess_wordle",
-    description="Attempt to guess the daily wordle!",
-    guild=discord.Object(id=guild_id)
-)
-async def guess_wordle(ctx, guessed_word: str):
-    await wordle_game.guess_word(ctx, guessed_word)
+    await bot.add_cog(wordle_game, guild=bot.get_guild(guild_id))
 
 
 

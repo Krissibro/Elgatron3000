@@ -1,6 +1,8 @@
 import json
+import os
 import pickle
 
+from commands.wordle import Wordle
 
 state_path = "./data/bot_state.json"
 wordle_state_path = "./data/wordle_state.pkl"
@@ -24,19 +26,20 @@ def save_state(state):
         json.dump(state, file, indent=4)
 
 
-def save_wordle_game_state(wordle_game):
-    with open(wordle_state_path, 'wb') as file:
-        pickle.dump(wordle_game, file)
-
-
-async def load_wordle_game_state():
-    try:
-        with open(wordle_state_path, 'rb') as file:
-            return pickle.load(file)
-    except FileNotFoundError:
-        # Return a new Wordle game instance if no save file exists
-        from commands.wordle import Wordle
-        wordle = Wordle()
-        await wordle.pick_new_word()
-        return wordle
+# def save_wordle_game_state(wordle_game):
+#     with open('wordle_state.json', 'w') as file:
+#         json.dump(wordle_game.get_dict_of_data(), file)
+#
+#
+# async def load_wordle_game_state():
+#     wordle = Wordle()
+#
+#     if os.path.exists('wordle_state.json'):
+#         with open('wordle_state.json', 'r') as file:
+#             data = json.load(file)
+#             wordle.retrieve_data_from_dict(data)
+#     else:
+#         await wordle.pick_new_word()
+#
+#     return wordle
 

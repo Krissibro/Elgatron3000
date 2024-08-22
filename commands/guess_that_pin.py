@@ -1,6 +1,6 @@
 
 import discord
-from utilities.settings import guild_id, tree, client
+from utilities.settings import guild_id, tree, bot
 import random
 import pickle
 from collections import namedtuple
@@ -21,7 +21,7 @@ class PinManager:
             self.pins = pickle.load(open("./data/pins.pkl", "rb"))
         except (OSError, IOError) as e:
             self.pins = []
-            guild = client.get_guild(guild_id)
+            guild = bot.get_guild(guild_id)
 
             # Fetch pins from all channels
             for i, channel in enumerate(guild.text_channels):
@@ -142,7 +142,7 @@ async def guess_that_pin(ctx: discord.Interaction):
     await view.send_attachments()
 
 
-@client.event
+@bot.event
 async def on_message_edit(before, after):
     """Detects if a message has been edited.
     If a message is pinned, it is saved to the storage.

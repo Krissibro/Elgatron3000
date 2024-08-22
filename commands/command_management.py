@@ -6,7 +6,7 @@ from ast import literal_eval
 from command_objects.Command import Command
 from commands.messaging_commands import MessagingInfo
 from utilities.helper_functions import parse_time, format_seconds, validate_numeric, validate_interval, validate_amount
-from utilities.settings import guild_id, client, tree
+from utilities.settings import guild_id, bot, tree
 
 
 class MessageSelectDropdown(discord.ui.Select):
@@ -160,7 +160,7 @@ async def cleanup(ctx: discord.Interaction, messages_amount: int):
         await ctx.response.send_message(embed=discord.Embed(title="Cannot delete less than 1 message"), ephemeral=True)
         return
     await ctx.response.defer()
-    await ctx.channel.purge(limit=messages_amount, check=lambda m: m.author == client.user)
+    await ctx.channel.purge(limit=messages_amount, check=lambda m: m.author == bot.user)
     await ctx.response.send_message(embed=discord.Embed(title=f"Deleted {messages_amount} messages"),
                                     ephemeral=True,
                                     delete_after=10)
