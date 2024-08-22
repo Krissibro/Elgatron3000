@@ -43,19 +43,6 @@ class Wordle(commands.GroupCog, group_name="wordle"):
         self.available_letters = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
         self.display_list = []
 
-    # wordle_group: app_commands.Group = app_commands.Group(
-    #     name="wordle",
-    #     description="Play the daily wordle game!",
-    #     guild_ids=[guild_id]
-    # )
-    # class WordleGroup(app_commands.Group):
-    #     def __init__(self):
-    #         super().__init__(
-    #             name="wordle",
-    #             description="Play the daily wordle game!",
-    #             guild_ids=[guild_id]
-    #         )
-
     async def pick_new_word(self) -> None:
         if not self.correct_guess and not self.daily_word == "":
             channel = testing_channel_id if testing else wordle_channel_id
