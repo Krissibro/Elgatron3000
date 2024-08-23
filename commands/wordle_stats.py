@@ -31,7 +31,7 @@ class WordleStats:
         self.number_of_guesses += guesses
 
         now = datetime.now()
-        eight_am_today = datetime.combine(now.date(), time(19, 13))
+        eight_am_today = datetime.combine(now.date(), time(8, 0))
         time_difference = now - eight_am_today
         total_seconds = int(time_difference.total_seconds())
         self.fastest_win = min(self.fastest_win, total_seconds) if self.fastest_win > 0 else total_seconds
