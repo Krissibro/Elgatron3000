@@ -220,7 +220,7 @@ class Wordle(commands.GroupCog, group_name="wordle"):
         description="See the wordle statistics!",
     )
     async def show_stats(self, ctx):
-        await ctx.response.send_message(embed=self.wordle_stats.create_embed())
+        await ctx.response.send_message(embed=self.wordle_stats.create_embed(), ephemeral=True)
 
     if testing:
         @commands.is_owner()
