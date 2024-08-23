@@ -5,7 +5,7 @@ from discord import app_commands
 from discord.ext import commands
 import random
 import numpy as np
-from datetime import datetime, time
+from datetime import datetime
 
 from commands.wordle_stats import WordleStats
 
@@ -189,7 +189,8 @@ class Wordle(commands.GroupCog, group_name="wordle"):
             "users_that_guessed": list(self.users_that_guessed),
             "known_letters": list(self.known_letters),
             "available_letters": list(self.available_letters),
-            "display_list": self.display_list
+            "display_list": self.display_list,
+            "new_word_time": self.new_word_time.isoformat()
         }
 
     def retrieve_data_from_dict(self, data):
@@ -200,6 +201,8 @@ class Wordle(commands.GroupCog, group_name="wordle"):
         self.known_letters = set(data.get("known_letters", []))
         self.available_letters = set(data.get("available_letters", list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')))
         self.display_list = data.get("display_list", [])
+        new_word_time_str = data.get("new_word_time")
+        self.new_word_time = datetime.fromisoformat(new_word_time_str) if new_word_time_str else datetime.now()
 
     def save_state(self):
         """Save the current state to a JSON file."""
