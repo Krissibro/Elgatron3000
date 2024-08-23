@@ -5,6 +5,7 @@ from discord import app_commands
 from discord.ext import commands
 import random
 import numpy as np
+from datetime import datetime, time
 
 from commands.wordle_stats import WordleStats
 
@@ -32,6 +33,7 @@ class Wordle(commands.GroupCog, group_name="wordle"):
     known_letters = set()
     available_letters = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
     display_list = []
+    new_word_time = datetime.now()
 
     wordle_stats = WordleStats()
 
@@ -59,6 +61,7 @@ class Wordle(commands.GroupCog, group_name="wordle"):
         self.known_letters.clear()
         self.available_letters = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
         self.correct_guess = False
+        self.new_word_time = datetime.now()
 
         if not testing:
             # channel = client.get_channel(testing_channel_id)      # Test channel
@@ -137,7 +140,7 @@ class Wordle(commands.GroupCog, group_name="wordle"):
         self.display_list.append([ctx.user.name, seperator.join(guessed_word), ' '.join(guess_result)])
 
         if self.correct_guess:
-            self.wordle_stats.handle_win(len(self.display_list))
+            self.wordle_stats.handle_win(len(self.display_list), self.new_word_time)
 
         self.save_state()
 

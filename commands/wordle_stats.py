@@ -3,7 +3,7 @@ import time
 import discord
 import os
 import json
-from datetime import datetime, time, timedelta
+from datetime import datetime, time
 
 
 class WordleStats:
@@ -24,15 +24,14 @@ class WordleStats:
         self.games_played += 1
         self.save_stats()
 
-    def handle_win(self, guesses):
+    def handle_win(self, guesses, reset_time):
         self.wins += 1
         self.correct_guess_streak += 1
         self.longest_guess_streak = max(self.longest_guess_streak, self.correct_guess_streak)
         self.number_of_guesses += guesses
 
         now = datetime.now()
-        eight_am_today = datetime.combine(now.date(), time(8, 0))
-        time_difference = now - eight_am_today
+        time_difference = now - reset_time
         total_seconds = int(time_difference.total_seconds())
         self.fastest_win = min(self.fastest_win, total_seconds) if self.fastest_win > 0 else total_seconds
 
