@@ -16,3 +16,4 @@ venv/
 utilities/config.json
 data/bot_state.json
 data/wordle_state.json
+data/wordle_stats.json
