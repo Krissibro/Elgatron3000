@@ -234,8 +234,10 @@ async def setup(setup_bot):
     wordle_game = Wordle()
     await wordle_game.load_state()
 
-    trigger = CronTrigger(hour=8, minute=0, second=0, timezone='Europe/Oslo')
-    scheduler.add_job(wordle_game.pick_new_word, trigger)
+    job_id = "wordle_pick_new_word"
+    if not scheduler.get_job(job_id):
+        trigger = CronTrigger(hour=8, minute=0, second=0, timezone='Europe/Oslo')
+        scheduler.add_job(wordle_game.pick_new_word, trigger, id=job_id)
 
     await bot.add_cog(wordle_game, guild=bot.get_guild(guild_id))
 

@@ -111,7 +111,9 @@ async def scheduled_post_free_games() -> None:
 
 async def schedule_post_free_games() -> None:
     trigger = CronTrigger(hour=18, minute=0, second=0, timezone='Europe/Oslo')
-    scheduler.add_job(scheduled_post_free_games, trigger)
-    scheduler.start()
-    scheduler.print_jobs()
+    job_id = "post_free_games"
+    if not scheduler.get_job(job_id):
+        scheduler.add_job(scheduled_post_free_games, trigger, id=job_id)
+        scheduler.start()
+        scheduler.print_jobs()
 
