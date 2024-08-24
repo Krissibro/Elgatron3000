@@ -39,7 +39,4 @@ async def on_ready():
 
 
 load_dotenv("token.env")
-try:
-    bot.run(os.getenv("TOKEN"))
-finally:
-    emu.stop()
+bot.run(os.getenv("TOKEN"))

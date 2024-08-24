@@ -16,6 +16,9 @@ class EmulatorCommands(commands.Cog):
         # make view work after bot reset
         self.bot.add_view(self.controller)
 
+    def __del__(self):
+        self.emu.stop()
+
     @app_commands.command(
         name="pokemon",
         description="Sends controller to play Pokemon!"
