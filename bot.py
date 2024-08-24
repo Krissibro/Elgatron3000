@@ -5,11 +5,8 @@ from dotenv import load_dotenv
 # Commands from other files
 from commands.command_management import manage_commands, cleanup
 from commands.messaging_commands import annoy, get_attention, dm_spam
-from commands.polls import start_poll
 from commands.epic_games_commands import schedule_post_free_games, free_games_rn
 from commands.wordle import *
-from commands.random_commands import this_dude, weave, pet_elga3, thanos_snapped, trout
-from commands.help import help_command
 from commands.guess_that_pin import guess_that_pin, initialize_guess_that_pin
 from commands.emulator_commands import pokemon, emu, EmulatorController
 from commands.sync import *
@@ -30,6 +27,9 @@ async def on_ready():
     # make emulator buttons work
     bot.add_view(EmulatorController())
     await bot.load_extension("commands.wordle")
+    await bot.load_extension("commands.random_commands")
+    await bot.load_extension("commands.polls")
+    await bot.load_extension("commands.help")
 
     # TODO: Remove these from on_ready
     # initiate scheduled items
