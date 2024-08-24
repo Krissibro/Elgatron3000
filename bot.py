@@ -8,7 +8,6 @@ from commands.messaging_commands import annoy, get_attention, dm_spam
 from commands.epic_games_commands import schedule_post_free_games, free_games_rn
 from commands.wordle import *
 from commands.guess_that_pin import guess_that_pin, initialize_guess_that_pin
-from commands.emulator_commands import pokemon, emu, EmulatorController
 from commands.sync import *
 from the_lab.petting import petting
 
@@ -25,11 +24,11 @@ async def on_ready():
     # await tree.sync(guild=discord.Object(id=guild_id))
 
     # make emulator buttons work
-    bot.add_view(EmulatorController())
     await bot.load_extension("commands.wordle")
     await bot.load_extension("commands.random_commands")
     await bot.load_extension("commands.polls")
     await bot.load_extension("commands.help")
+    await bot.load_extension("commands.emulator_commands")
 
     # TODO: Remove these from on_ready
     # initiate scheduled items
