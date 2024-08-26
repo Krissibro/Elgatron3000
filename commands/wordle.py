@@ -21,6 +21,7 @@ whitelisted_words = set(np.genfromtxt('./data/whitelisted-words.csv', delimiter=
 word_bank.extend(whitelisted_words)
 
 
+# TODO maybe split this class into 2, a wordle class and a Cog class.
 @app_commands.guild_only()
 class Wordle(commands.GroupCog, group_name="wordle"):
     def __init__(self, bot):
