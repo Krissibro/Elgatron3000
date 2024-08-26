@@ -1,4 +1,6 @@
 import discord
+from discord import app_commands
+from discord.ext import commands
 
 from epicstore_api import EpicGamesStoreAPI
 from apscheduler.triggers.cron import CronTrigger
@@ -6,7 +8,7 @@ from apscheduler.triggers.cron import CronTrigger
 from utilities.settings import testing, game_channel_id, testing_channel_id
 from utilities.settings import guild_id, bot, scheduler, tree
 from utilities.state_helper import save_state, load_state
-from typing import List, Dict
+from typing import List
 
 
 
@@ -64,17 +66,6 @@ async def send_games_embed(channel: discord.TextChannel, games: List[dict]) -> N
         await channel.send(embed=embed)
 
 
-@tree.command(
-    name="free_games_rn",
-    description="See the currently free games on Epic Games",
-    guild=discord.Object(id=guild_id)
-)
-async def free_games_rn(ctx: discord.Interaction):
-    await ctx.response.send_message(embed=await make_link_embed())
-    free_games = await get_free_games()
-    await send_games_embed(ctx.channel, free_games)
-
-
 def get_free_games_state() -> List[dict]:
     state = load_state()
     return state["free_games"]
@@ -117,3 +108,20 @@ async def schedule_post_free_games() -> None:
         scheduler.start()
         scheduler.print_jobs()
 
+class EpicGames(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+        # TODO schedule games in here
+
+    @app_commands.command(
+        name="free_games_rn",
+        description="See the currently free games on Epic Games"
+    )
+    async def free_games_rn(self, ctx: discord.Interaction):
+        await ctx.response.send_message(embed=await make_link_embed())
+        free_games = await get_free_games()
+        await send_games_embed(ctx.channel, free_games)
+
+
+async def setup(bot):
+    await bot.add_cog(EpicGames(bot), guild=bot.get_guild(guild_id))

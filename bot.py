@@ -3,9 +3,8 @@ import discord
 from dotenv import load_dotenv
 
 # Commands from other files
-from commands.epic_games_commands import schedule_post_free_games, free_games_rn
+from commands.epic_games_commands import schedule_post_free_games
 from commands.wordle import *
-from commands.guess_that_pin import guess_that_pin, initialize_guess_that_pin
 from commands.sync import *
 
 from utilities.settings import guild_id, testing, bot, tree
@@ -30,10 +29,11 @@ async def on_ready():
     await bot.load_extension("commands.emulator_commands")
     await bot.load_extension("commands.command_management")
     await bot.load_extension("commands.messaging_commands")
+    await bot.load_extension("commands.epic_games_commands")
+    await bot.load_extension("commands.guess_that_pin")
 
     # TODO: Remove these from on_ready
     # initiate scheduled items
-    await initialize_guess_that_pin()
     bot.loop.create_task(schedule_post_free_games())
 
     print("Ready!")

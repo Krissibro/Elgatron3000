@@ -1,10 +1,14 @@
-
 import discord
-from utilities.settings import guild_id, tree, bot
 import random
 import pickle
-from collections import namedtuple
 import asyncio
+
+from discord import app_commands
+from discord.ext import commands
+
+from utilities.settings import guild_id, tree, bot
+
+from collections import namedtuple
 
 # Pickle will not store the message object itself, so it had to be dumbed down to a namedtuple
 Pin = namedtuple("Pin", ["author", "content", "attachments", "channel", "id"])
@@ -14,7 +18,6 @@ class PinManager:
     def __init__(self):
         self.pins = []
 
-    async def initialize(self) -> None:
         """Fetches all pinned messages and stores them in ./data."""
         # Load if there are pins already stored, else store all the pins
         try:
@@ -29,7 +32,7 @@ class PinManager:
                 print(f"|{(i * '#'):<{len(guild.text_channels)}}| {len(self.pins):<{4}} | {channel.name}", end="\n")
 
                 try:
-                    channel_pins = await channel.pins()
+                    channel_pins = channel.pins()
                     self.pins.extend(
                         [Pin(pin.author.display_name, pin.content, [attachment.url for attachment in pin.attachments],
                              pin.channel.id, pin.id) for pin in channel_pins])
@@ -62,13 +65,6 @@ class PinManager:
         print(f"Saving {len(self.pins)} pins")
         with open("./data/pins.pkl", "wb") as file:
             pickle.dump(self.pins, file)
-
-
-pin_manager = PinManager()
-
-
-async def initialize_guess_that_pin():
-    await pin_manager.initialize()
 
 
 class PinView(discord.ui.View):
@@ -123,38 +119,42 @@ class PinView(discord.ui.View):
         self.task.cancel()  # Clean up the task when the view is garbage collected
 
 
-@tree.command(
-    name="guess_the_pin",
-    description="Guess the pin!",
-    guild=discord.Object(id=guild_id)
-)
-async def guess_that_pin(ctx: discord.Interaction):
-    if not pin_manager.pins:
-        await ctx.response.send_message("No pinned messages found.")
-        return
+class GuessThatPin(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+        self.pin_manager = PinManager()
 
-    pin = pin_manager.load_random_pin()
+    @commands.Cog.listener('on_message_edit')
+    async def on_message_edit(self, before, after):
+        """Detects if a message has been edited.
+        If a message is pinned, it is saved to the storage.
+        If a message is unpinned, it is removed from storage"""
+        print(f'message was edited from {before} to {after}')
 
-    view = PinView(ctx, pin)
-    embed = await view.make_first_embed()
+        # If pinned
+        if not before.pinned and after.pinned:
+            self.pin_manager.add_pin(after)
 
-    await ctx.response.send_message(embed=embed, view=view)
-    await view.send_attachments()
+        # If unpinned
+        if before.pinned and not after.pinned:
+            self.pin_manager.remove_pin(after)
 
+    @app_commands.command(
+        name="guess_the_pin",
+        description="Guess the pin!",
+    )
+    async def guess_that_pin(self, ctx: discord.Interaction):
+        if not self.pin_manager.pins:
+            await ctx.response.send_message("No pinned messages found.")
+            return
 
-@bot.event
-async def on_message_edit(before, after):
-    """Detects if a message has been edited.
-    If a message is pinned, it is saved to the storage.
-    If a message is unpinned, it is removed from storage"""
+        pin = self.pin_manager.load_random_pin()
 
-    # If pinned
-    if not before.pinned and after.pinned:
-        pin_manager.add_pin(after)
+        view = PinView(ctx, pin)
+        embed = await view.make_first_embed()
 
-    # If unpinned
-    if before.pinned and not after.pinned:
-        pin_manager.remove_pin(after)
+        await ctx.response.send_message(embed=embed, view=view)
+        await view.send_attachments()
 
 # Todo: handle if a pinned message is deleted or ehhhhhh?
 
@@ -168,3 +168,7 @@ async def on_message_edit(before, after):
 #         return
 #     if payload.data["pinned"]:
 #         print("Get pinned")
+
+
+async def setup(bot):
+    await bot.add_cog(GuessThatPin(bot), guild=bot.get_guild(guild_id))
