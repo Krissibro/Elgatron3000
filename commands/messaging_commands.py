@@ -1,10 +1,13 @@
 import discord
 import asyncio
 
+from discord import app_commands
+from discord.ext import commands
+
 from command_objects.Command import Command
 from command_objects.MessagingInfo import MessagingInfo
 from utilities.helper_functions import parse_time, validate_interval, validate_amount
-from utilities.settings import guild_id, tree
+from utilities.settings import guild_id
 
 
 async def execute_command(ctx, command_name, internal_function, user: discord.User, message: str, amount: int, interval: int, channel: discord.TextChannel) -> None:
@@ -44,36 +47,6 @@ async def execute_command(ctx, command_name, internal_function, user: discord.Us
     command.end()
 
 
-@tree.command(
-    name="annoy",
-    description="Spam a message at someone!",
-    guild=discord.Object(id=guild_id)
-)
-async def annoy(ctx, message: str, amount: int, interval: str, user: discord.User = None):
-    interval = parse_time(interval)
-    await execute_command(ctx, "annoy", annoy_internal, user, message, amount, interval, ctx.channel)
-
-
-async def annoy_internal(ctx, command_info: MessagingInfo) -> None:
-    while command_info.remaining > 0:
-        command_info.remaining -= 1
-        message = await ctx.channel.send(f"{command_info.get_mention()} {command_info.message}")
-        command_info.add_message(message)
-        await asyncio.sleep(command_info.interval)
-
-    await command_info.delete_messages()
-
-
-@tree.command(
-    name="get_attention",
-    description="Ping someone once every 10 seconds 100 times or until they react",
-    guild=discord.Object(id=guild_id)
-)
-async def get_attention(ctx, user: discord.User, message: str = "WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP", amount: int = 100, interval: str = "10s"):
-    interval = parse_time(interval)
-    await execute_command(ctx, "get_attention", get_attention_internal, user, message, amount, interval, ctx.channel)
-
-
 class ReactButton(discord.ui.View):
     seen: bool = False
 
@@ -103,16 +76,6 @@ async def get_attention_internal(ctx, command_info: MessagingInfo) -> None:
     await command_info.delete_messages()
 
 
-@tree.command(
-    name="dm_spam",
-    description="Annoy someone as many times as you would like with a given interval!",
-    guild=discord.Object(id=guild_id)
-)
-async def dm_spam(ctx, user: discord.User, message: str, amount: int, interval: str):
-    interval = parse_time(interval)
-    await execute_command(ctx, "dm_spam", dm_spam_internal, user, message, amount, interval, ctx.channel)
-
-
 async def dm_spam_internal(ctx, command_info: MessagingInfo) -> None:
     try:
         while command_info.remaining > 0:
@@ -123,3 +86,48 @@ async def dm_spam_internal(ctx, command_info: MessagingInfo) -> None:
     except discord.Forbidden:
         await ctx.followup.send(embed=discord.Embed(title="I don't have permission to send messages to that user!"),
                                 ephemeral=True)
+
+
+async def annoy_internal(ctx, command_info: MessagingInfo) -> None:
+    while command_info.remaining > 0:
+        command_info.remaining -= 1
+        message = await ctx.channel.send(f"{command_info.get_mention()} {command_info.message}")
+        command_info.add_message(message)
+        await asyncio.sleep(command_info.interval)
+
+    await command_info.delete_messages()
+
+
+class MessagingCommands(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
+    @app_commands.command(
+        name="dm_spam",
+        description="Annoy someone as many times as you would like with a given interval!",
+    )
+    async def dm_spam(self, ctx, user: discord.User, message: str, amount: int, interval: str):
+        interval = parse_time(interval)
+        await execute_command(ctx, "dm_spam", dm_spam_internal, user, message, amount, interval, ctx.channel)
+
+    @app_commands.command(
+        name="get_attention",
+        description="Ping someone once every 10 seconds 100 times or until they react"
+    )
+    async def get_attention(self, ctx, user: discord.User, message: str = "WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP",
+                            amount: int = 100, interval: str = "10s"):
+        interval = parse_time(interval)
+        await execute_command(ctx, "get_attention", get_attention_internal, user, message, amount, interval,
+                              ctx.channel)
+
+    @app_commands.command(
+        name="annoy",
+        description="Spam a message at someone!",
+    )
+    async def annoy(self, ctx, message: str, amount: int, interval: str, user: discord.User = None):
+        interval = parse_time(interval)
+        await execute_command(ctx, "annoy", annoy_internal, user, message, amount, interval, ctx.channel)
+
+
+async def setup(bot):
+    await bot.add_cog(MessagingCommands(bot), guild=bot.get_guild(guild_id))

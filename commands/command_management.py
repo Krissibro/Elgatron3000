@@ -3,10 +3,13 @@ import asyncio
 
 from ast import literal_eval
 
+from discord import app_commands
+from discord.ext import commands
+
 from command_objects.Command import Command
 from commands.messaging_commands import MessagingInfo
 from utilities.helper_functions import parse_time, format_seconds, validate_numeric, validate_interval, validate_amount
-from utilities.settings import guild_id, bot, tree
+from utilities.settings import guild_id
 
 
 class MessageSelectDropdown(discord.ui.Select):
@@ -103,7 +106,7 @@ class EditMessagingCommandWindow(discord.ui.Modal):
         self.amount_input = discord.ui.TextInput(
             label="Amount:",
             style=discord.TextStyle.short,
-            default=str(command_info.amount)
+            default=str(command_info.remaining)
         )
         self.interval_input = discord.ui.TextInput(
             label="Interval:",
@@ -136,33 +139,38 @@ class EditMessagingCommandWindow(discord.ui.Modal):
         self.finished_event.set()  # Signal that the modal is closed
 
 
-@tree.command(
-    name="manage_commands",
-    description="See and manage running commands",
-    guild=discord.Object(id=guild_id)
-)
-async def manage_commands(ctx: discord.Interaction):
-    if Command.is_empty():
-        await ctx.response.send_message(embed=discord.Embed(title="No commands running", color=discord.Color.red()), ephemeral=True)
-        return
-    view = ManageCommandsDropDown()
-    first_embed = Command.make_overview_embed()
-    await ctx.response.send_message(embed=first_embed, view=view, ephemeral=True)
+class CommandManagement(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
+    @app_commands.command(
+        name="manage_commands",
+        description="See and manage running commands"
+    )
+    async def manage_commands(self, ctx: discord.Interaction):
+        if Command.is_empty():
+            await ctx.response.send_message(embed=discord.Embed(title="No commands running", color=discord.Color.red()),
+                                            ephemeral=True)
+            return
+        view = ManageCommandsDropDown()
+        first_embed = Command.make_overview_embed()
+        await ctx.response.send_message(embed=first_embed, view=view, ephemeral=True)
+
+    @app_commands.command(
+        name="cleanup",
+        description="Clean the current chat for bot messages"
+    )
+    async def cleanup(self, ctx: discord.Interaction, messages_amount: int):
+        if messages_amount <= 0:
+            await ctx.response.send_message(embed=discord.Embed(title="Cannot delete less than 1 message"),
+                                            ephemeral=True)
+            return
+        await ctx.response.defer()
+        await ctx.channel.purge(limit=messages_amount, check=lambda m: m.author == self.bot.user)
+        await ctx.response.send_message(embed=discord.Embed(title=f"Deleted {messages_amount} messages"),
+                                        ephemeral=True,
+                                        delete_after=10)
 
 
-@tree.command(
-    name="cleanup",
-    description="Clean the current chat for bot messages",
-    guild=discord.Object(id=guild_id)
-)
-async def cleanup(ctx: discord.Interaction, messages_amount: int):
-    if messages_amount <= 0:
-        await ctx.response.send_message(embed=discord.Embed(title="Cannot delete less than 1 message"), ephemeral=True)
-        return
-    await ctx.response.defer()
-    await ctx.channel.purge(limit=messages_amount, check=lambda m: m.author == bot.user)
-    await ctx.response.send_message(embed=discord.Embed(title=f"Deleted {messages_amount} messages"),
-                                    ephemeral=True,
-                                    delete_after=10)
-
-
+async def setup(bot):
+    await bot.add_cog(CommandManagement(bot), guild=bot.get_guild(guild_id))
