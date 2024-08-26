@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-from utilities.settings import guild_id, tree
+from utilities.settings import guild_id
 
 
 class GIFCommands(commands.GroupCog, group_name="gif"):

@@ -7,7 +7,7 @@ import random
 import numpy as np
 from datetime import datetime
 
-from commands.wordle_stats import WordleStats
+from command_objects.wordle_stats import WordleStats
 
 from apscheduler.triggers.cron import CronTrigger
 
