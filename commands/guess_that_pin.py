@@ -6,12 +6,18 @@ import asyncio
 from discord import app_commands
 from discord.ext import commands
 
-from utilities.settings import guild_id, tree, bot
+from utilities.settings import guild_id, bot
 
 from collections import namedtuple
 
 # Pickle will not store the message object itself, so it had to be dumbed down to a namedtuple
 Pin = namedtuple("Pin", ["author", "content", "attachments", "channel", "id"])
+
+
+def make_pin(message: discord.Message) -> Pin:
+    return Pin(message.author.display_name, message.content,
+               [attachment.url for attachment in message.attachments],
+               message.channel.id, message.id)
 
 
 class PinManager:
@@ -33,9 +39,7 @@ class PinManager:
 
                 try:
                     channel_pins = channel.pins()
-                    self.pins.extend(
-                        [Pin(pin.author.display_name, pin.content, [attachment.url for attachment in pin.attachments],
-                             pin.channel.id, pin.id) for pin in channel_pins])
+                    self.pins.extend([make_pin(pin) for pin in channel_pins])
                 except Exception as e:
                     print(f"Failed to fetch pins from {channel.name}: {e}")
 
@@ -48,15 +52,13 @@ class PinManager:
 
     def add_pin(self, pinned_message: discord.Message) -> None:
         """Adds a pin to the storage."""
-        pinned_message = Pin(pinned_message.author.display_name, pinned_message.content, [attachment.url for attachment in pinned_message.attachments],
-                             pinned_message.channel.id, pinned_message.id)
+        pinned_message = make_pin(pinned_message)
         self.pins.append(pinned_message)
         self.save_pins()
 
     def remove_pin(self, pinned_message: discord.Message) -> None:
         """Removes a pin from the storage."""
-        pinned_message = Pin(pinned_message.author.display_name, pinned_message.content, [attachment.url for attachment in pinned_message.attachments],
-                             pinned_message.channel.id, pinned_message.id)
+        pinned_message = make_pin(pinned_message)
         self.pins.remove(pinned_message)
         self.save_pins()
 
