@@ -222,7 +222,7 @@ class Wordle(commands.GroupCog, group_name="wordle"):
             await self.pick_new_word()
 
     @app_commands.command(
-        name="statss",
+        name="stats",
         description="See the wordle statistics!",
     )
     async def show_stats(self, ctx):
