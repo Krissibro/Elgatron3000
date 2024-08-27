@@ -5,12 +5,10 @@ from discord.ext import commands
 from epicstore_api import EpicGamesStoreAPI
 from apscheduler.triggers.cron import CronTrigger
 
-from utilities.settings import testing, game_channel_id, testing_channel_id
-from utilities.settings import guild_id, bot, scheduler, tree
+from utilities.settings import testing, game_channel_id, testing_channel_id, bot
+from utilities.settings import guild_id, scheduler
 from utilities.state_helper import save_state, load_state
 from typing import List
-
-
 
 
 async def make_link_embed():
@@ -107,6 +105,7 @@ async def schedule_post_free_games() -> None:
         scheduler.add_job(scheduled_post_free_games, trigger, id=job_id)
         scheduler.start()
         scheduler.print_jobs()
+
 
 class EpicGames(commands.Cog):
     def __init__(self, bot):

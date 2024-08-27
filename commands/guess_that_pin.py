@@ -6,7 +6,7 @@ import asyncio
 from discord import app_commands
 from discord.ext import commands
 
-from utilities.settings import guild_id, bot
+from utilities.settings import guild_id
 
 from collections import namedtuple
 
@@ -21,7 +21,7 @@ def make_pin(message: discord.Message) -> Pin:
 
 
 class PinManager:
-    def __init__(self):
+    def __init__(self, bot):
         self.pins = []
 
         """Fetches all pinned messages and stores them in ./data."""
@@ -107,7 +107,7 @@ class PinView(discord.ui.View):
         await self.reveal_author()
 
     async def on_timeout(self):
-        # We might want to double check here in case it times out exactly at the same time
+        # We might want to double-check here in case it times out exactly at the same time
         if not self.is_finished():
             await self.reveal_author()
 
@@ -124,7 +124,7 @@ class PinView(discord.ui.View):
 class GuessThatPin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.pin_manager = PinManager()
+        self.pin_manager = PinManager(bot)
 
     @commands.Cog.listener('on_message_edit')
     async def on_message_edit(self, before, after):
@@ -158,7 +158,7 @@ class GuessThatPin(commands.Cog):
         await ctx.response.send_message(embed=embed, view=view)
         await view.send_attachments()
 
-# Todo: handle if a pinned message is deleted or ehhhhhh?
+# Todo: handle if a pinned message is deleted or ehh?
 
 # Alternative method, but without the previous state of the message
 # @client.event

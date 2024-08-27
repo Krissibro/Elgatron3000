@@ -61,6 +61,7 @@ class ManageCommandsButtons(discord.ui.View):
             embed = discord.Embed(title="No commands running", color=discord.Color.red())
         await interaction.response.edit_message(view=view, embed=embed)
 
+    @staticmethod
     @discord.ui.button(emoji="📄", style=discord.ButtonStyle.blurple)
     async def return_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
         await self.return_to_dropdown(interaction)

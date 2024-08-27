@@ -20,7 +20,8 @@ class Emulator(PyBoy):
 
         if button:
             self.button_press(button)
-            for _ in range(8 // self.skipped_frames): # we dont want to hold the button for too long, nor too short, this is a guess
+            # we don't want to hold the button for too long, nor too short, this is a guess
+            for _ in range(8 // self.skipped_frames):
                 self.tick(self.skipped_frames)
             self.button_release(button)
 
