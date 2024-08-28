@@ -119,9 +119,6 @@ class Wordle:
         for index, letter in enumerate(guessed_word):
             if index >= len(self.daily_word):
                 break
-            print(letter)
-            print(self.daily_word[index])
-            print("=========")
             if letter == self.daily_word[index]:
                 print("check")
                 guess_result[index] = ":green_square:"
