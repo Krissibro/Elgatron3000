@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 
 # Commands from other files
 from commands.epic_games_commands import schedule_post_free_games
-from commands.sync import *
 
 from utilities.settings import testing, bot
 
@@ -12,22 +11,17 @@ from utilities.settings import testing, bot
 # TODO: Add more COGS!!!!!
 @bot.event
 async def on_ready():
-    await bot.load_extension("commands.wordle")
-    await bot.load_extension("commands.random_commands")
-    await bot.load_extension("commands.polls")
-    await bot.load_extension("commands.help")
-    await bot.load_extension("commands.emulator_commands")
-    await bot.load_extension("commands.command_management")
-    await bot.load_extension("commands.messaging_commands")
-    await bot.load_extension("commands.epic_games_commands")
-    await bot.load_extension("commands.guess_that_pin")
+
+    for file in os.listdir("commands"):
+        if file.endswith(".py"):
+            await bot.load_extension(f"commands.{file[:-3]}")
 
     if testing:
-        await bot.load_extension("the_lab.test_commands")
-        await bot.load_extension("the_lab.petting")
+        for file in os.listdir("the_lab"):
+            if file.endswith(".py"):
+                await bot.load_extension(f"the_lab.{file[:-3]}")
 
-    # TODO: Remove these from on_ready
-    # initiate scheduled items
+    # TODO: move this to /epic_games_commands
     bot.loop.create_task(schedule_post_free_games())
 
     print("Ready!")

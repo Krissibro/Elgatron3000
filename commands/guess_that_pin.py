@@ -131,7 +131,6 @@ class GuessThatPin(commands.Cog):
         """Detects if a message has been edited.
         If a message is pinned, it is saved to the storage.
         If a message is unpinned, it is removed from storage"""
-        print(f'message was edited from {before} to {after}')
 
         # If pinned
         if not before.pinned and after.pinned:
