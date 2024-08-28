@@ -47,28 +47,19 @@ class WordleStats:
         self.correct_guess_streak = 0
         self.save_stats()
 
-    def create_embed(self):
-        embed = discord.Embed(title="Wordle Stats")
-
-        embed.add_field(name="Games played", value=self.games_played, inline=True)
-
+    async def make_embed(self):
         percentage_wins = (
             f"{(self.wins / self.games_played * 100):.2f}"
             if self.games_played > 0 else "0.00"
         )
-        embed.add_field(
-            name="Wins",
-            value=f"{self.wins} \u00A0\u00A0\u00A0 ({percentage_wins}%)",
-            inline=True
-        )
-
-        embed.add_field(name="\t Number of guesses", value=self.number_of_guesses, inline=True)
-
         average_guesses = (self.number_of_guesses / self.wins) if self.games_played > 0 and self.wins > 0 else 0
+
+        embed = discord.Embed(title="Wordle Stats")
+        embed.add_field(name="Games played", value=self.games_played, inline=True)
+        embed.add_field(name="Wins", value=f"{self.wins} \u00A0\u00A0\u00A0 ({percentage_wins}%)", inline=True)
+        embed.add_field(name="\t Number of guesses", value=self.number_of_guesses, inline=True)
         embed.add_field(name="Average guesses", value=f"{average_guesses:.2f}", inline=True)
-
         embed.add_field(name="Current streak", value=self.correct_guess_streak, inline=True)
-
         embed.add_field(name="Longest streak", value=self.longest_guess_streak, inline=True)
 
         if self.fastest_win > 0:

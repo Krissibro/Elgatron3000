@@ -2,7 +2,7 @@ import json
 import os
 import pickle
 
-from commands.wordle import Wordle
+from commands.wordle_commands import Wordle
 
 state_path = "./data/bot_state.json"
 wordle_state_path = "./data/wordle_state.pkl"
