@@ -4,7 +4,7 @@ from PIL import Image, ImageSequence
 from discord import app_commands
 from discord.ext import commands
 
-from utilities.settings import guild_id, tree
+from utilities.settings import guild_id
 
 
 class Petting(commands.Cog):
@@ -39,7 +39,7 @@ class Petting(commands.Cog):
 
             for i, hand_frame in enumerate(ImageSequence.Iterator(template_gif)):
                 # prepare the new frame
-                hand_frame = hand_frame.convert("RGBA")
+                hand_frame: Image = hand_frame.convert("RGBA")
                 frame = Image.new("RGBA", (canvas_width, canvas_height), (0, 0, 0, 0))
 
                 # find the new dimensions and location and modify the avatar
