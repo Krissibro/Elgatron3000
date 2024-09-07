@@ -27,14 +27,17 @@ class Help(commands.Cog):
         embed.add_field(name="/free_games_rn",
                         value="See free games from Epic Games and Playstation", inline=False)
 
-        embed.add_field(name="/start_poll",
-                        value="Start a poll", inline=False)
+        embed.add_field(name="/poll start",
+                        value="Start a poll with up to 10 options!", inline=False)
 
-        embed.add_field(name="/wordle",
+        embed.add_field(name="/wordle current",
                         value="Show the current wordle game", inline=False)
 
-        embed.add_field(name="/guess_wordle",
+        embed.add_field(name="/wordle guess",
                         value="Guess the wordle word", inline=False)
+
+        embed.add_field(name="/wordle stats",
+                        value="Shows the server's stats for all played wordle games", inline=False)
 
         embed.add_field(name="/pokemon",
                         value="Sends pokemon controller and gif",
@@ -47,12 +50,12 @@ class Help(commands.Cog):
                         value="Manage the running commands, see info and edit/kill running commands", inline=False)
 
         embed.add_field(name="Funny gifs and videos",
-                        value='''/trout
-                            /sus
-                            /weave
-                            /this_dude
-                            /thanos_snapped
-                            /pet_elga3''',
+                        value='''/gif trout
+                            /gif sus
+                            /gif weave
+                            /gif this_dude
+                            /gif thanos_snapped
+                            /gif pet_elga3''',
                         inline=False)
 
         embed.set_footer(text='''interval is in the format <XdXhXmXs> 
