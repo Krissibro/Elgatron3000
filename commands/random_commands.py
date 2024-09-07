@@ -51,6 +51,13 @@ class GIFCommands(commands.GroupCog, group_name="gif"):
     async def sussy_baki(self, ctx: discord.Interaction):
         await ctx.response.send_message("https://cdn.discordapp.com/attachments/839100318893211669/1245765875462836388/Sossi-baki.mp4?ex=6659f161&is=66589fe1&hm=5af0e663626613c8ef2ab2bb7c0876447eeeedc6194d7aa24f7c80c8dbb95d40&")
 
+    @app_commands.command(
+        name="minecraft",
+        description="I be placing blocks n shit, cuz im in fucking minecraft",
+    )
+    async def minecraft(self, ctx: discord.Interaction):
+        await ctx.response.send_message("https://cdn.discordapp.com/attachments/839100318893211669/1281936983135879262/minecraft.mp4?ex=66dd885a&is=66dc36da&hm=01e0ecc04e358363d36ee5c79fc6fe717b2b815844c31a6a6438d57a2b9b188e&")
+
 
 async def setup(bot):
     await bot.add_cog(GIFCommands(bot), guild=bot.get_guild(guild_id))
