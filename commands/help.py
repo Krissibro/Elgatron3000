@@ -55,7 +55,8 @@ class Help(commands.Cog):
                             /gif weave
                             /gif this_dude
                             /gif thanos_snapped
-                            /gif pet_elga3''',
+                            /gif pet_elga3
+                            /gif minecraft''',
                         inline=False)
 
         embed.set_footer(text='''interval is in the format <XdXhXmXs> 
