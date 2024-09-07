@@ -119,14 +119,12 @@ class Wordle:
         # Initialize result with all red squares
         guess_result = [":red_square:"] * len(guessed_word)
         yellow_checker = list(self.daily_word)
-        print(yellow_checker)
 
         # Check for correct letters
         for index, letter in enumerate(guessed_word):
             if index >= len(self.daily_word):
                 break
             if letter == self.daily_word[index]:
-                print("check")
                 guess_result[index] = ":green_square:"
                 # if a letter is found, we don't want it to be found again
                 yellow_checker.remove(letter)
@@ -145,7 +143,6 @@ class Wordle:
         for letter in guessed_word:
             if letter in self.available_letters:
                 self.available_letters.remove(letter)
-        print(guess_result)
 
         return ' '.join(guess_result)
 
