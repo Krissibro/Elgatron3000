@@ -51,7 +51,7 @@ class Emulator(PyBoy):
 
         # copy, upscale and save image
         image = self.screen.image.copy()
-        image = image.resize((image.width*2, image.height*2), resample=0) # resample 0 = nearest neighbour resampling
+        # image = image.resize((image.width*2, image.height*2), resample=0) # resample 0 = nearest neighbour resampling
         self.images.append(image)
 
 
