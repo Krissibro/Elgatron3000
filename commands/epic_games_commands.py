@@ -98,19 +98,10 @@ async def scheduled_post_free_games() -> None:
         await send_games_embed(channel, free_games)
 
 
-async def schedule_post_free_games() -> None:
-    trigger = CronTrigger(hour=18, minute=0, second=0, timezone='Europe/Oslo')
-    job_id = "post_free_games"
-    if not scheduler.get_job(job_id):
-        scheduler.add_job(scheduled_post_free_games, trigger, id=job_id)
-        scheduler.start()
-        scheduler.print_jobs()
-
-
+# TODO: Clean up everything in this file and move it into a cog
 class EpicGames(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        # TODO schedule games in here
 
     @app_commands.command(
         name="free_games_rn",
@@ -123,4 +114,10 @@ class EpicGames(commands.Cog):
 
 
 async def setup(bot):
+    trigger = CronTrigger(hour=18, minute=0, second=0, timezone='Europe/Oslo')
+    job_id = "post_free_games"
+    if not scheduler.get_job(job_id):
+        scheduler.add_job(scheduled_post_free_games, trigger, id=job_id)
+
+
     await bot.add_cog(EpicGames(bot), guild=bot.get_guild(guild_id))

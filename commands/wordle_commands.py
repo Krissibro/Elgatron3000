@@ -48,16 +48,16 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
 
 
 async def setup(bot):
-    wordle_game = WordleCommands(bot)
+    wordle_cog = WordleCommands(bot)
 
-    await wordle_game.wordle.load_state()
+    await wordle_cog.wordle.load_state()
 
     job_id = "wordle_pick_new_word"
     if not scheduler.get_job(job_id):
         trigger = CronTrigger(hour=8, minute=0, second=0, timezone='Europe/Oslo')
-        scheduler.add_job(wordle_game.wordle.pick_new_word, trigger, id=job_id)
+        scheduler.add_job(wordle_cog.wordle.pick_new_word, trigger, id=job_id)
 
-    await bot.add_cog(wordle_game, guild=bot.get_guild(guild_id))
+    await bot.add_cog(wordle_cog, guild=bot.get_guild(guild_id))
 
 
 

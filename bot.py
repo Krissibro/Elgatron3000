@@ -1,10 +1,7 @@
 import os
 from dotenv import load_dotenv
 
-# Commands from other files
-from commands.epic_games_commands import schedule_post_free_games
-
-from utilities.settings import testing, bot, guild_id
+from utilities.settings import testing, bot, guild_id, scheduler
 
 
 # TODO: MAY RUN MORE THAN ONCE! :skull:
@@ -23,8 +20,8 @@ async def on_ready():
     if not testing:
         await bot.tree.sync(guild=bot.get_guild(guild_id))
 
-    # TODO: move this to /epic_games_commands
-    bot.loop.create_task(schedule_post_free_games())
+    scheduler.start()
+    scheduler.print_jobs()
 
     print("Ready!")
 
