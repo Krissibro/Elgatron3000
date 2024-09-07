@@ -36,15 +36,20 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
     async def show_stats(self, ctx: discord.Interaction):
         await ctx.response.send_message(embed=await self.wordle.make_stats_embed(), ephemeral=True)
 
-    if testing:
-        @commands.is_owner()
-        @app_commands.command(
-            name="reset",
-            description="Reset the daily wordle",
-        )
-        async def reset_wordle(self, ctx: discord.Interaction):
-            await self.wordle.pick_new_word()
-            await ctx.response.send_message(embed=discord.Embed(title="Wordle has been reset!"), ephemeral=True, delete_after=10)
+    @commands.is_owner()
+    @app_commands.command(
+        name="reset",
+        description="Reset the daily wordle",
+    )
+    async def reset_wordle(self, ctx: discord.Interaction):
+        if not await self.bot.is_owner(ctx.user):
+            await ctx.edit_original_response(
+                content="You do not have permission to use this command."
+            )
+            return
+
+        await self.wordle.pick_new_word()
+        await ctx.response.send_message(embed=discord.Embed(title="Wordle has been reset!"), ephemeral=True, delete_after=10)
 
 
 async def setup(bot):

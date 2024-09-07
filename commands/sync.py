@@ -9,7 +9,7 @@ class CommandSync(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    # Slash command for syncing commands, visible only to the bot owner
+    @commands.is_owner()
     @app_commands.command(
         name="sync",
         description="Syncs commands"
@@ -46,11 +46,3 @@ class CommandSync(commands.Cog):
 # Set up the cog
 async def setup(bot):
     await bot.add_cog(CommandSync(bot), guild=bot.get_guild(guild_id))
-
-    # Fetch the bot owner's ID and apply permission-based restrictions
-    app_command = bot.tree.get_command("sync")
-    if app_command:
-        app_command.default_permissions = False  # Hide for everyone by default
-        owner = (await bot.application_info()).owner  # Fetch owner info
-        bot.tree.context_command_permissions.add_user(app_command.id, owner.id)  # Allow only owner to use
-
