@@ -77,19 +77,9 @@ class Wordle:
     async def guess_word(self, ctx: discord.Interaction, word: str) -> discord.Embed:
         guessed_word = word.strip().upper()
 
-        if self.correct_guess:
-            return discord.Embed(title="The daily wordle has already been guessed")
-
-        if not testing:
-            if ctx.user.id in self.users_that_guessed:
-                return discord.Embed(title=f"{ctx.user.display_name} have already guessed")
-            if guessed_word not in whitelisted_words:
-                if not len(guessed_word) == 5:
-                    return discord.Embed(title="The word must be 5 letters long")
-                if guessed_word.lower() not in valid_words:
-                    return discord.Embed(title=f"{guessed_word} is not a valid word")
-            if guessed_word in self.guessed_words:
-                return discord.Embed(title=f"{guessed_word} has already been guessed")
+        invalid_guess_embed = self.check_valid_guess(guessed_word, ctx)
+        if invalid_guess_embed:
+            return invalid_guess_embed
 
         self.guessed_words.add(guessed_word)
         self.users_that_guessed.add(ctx.user.id)
@@ -108,6 +98,22 @@ class Wordle:
 
         embed = await self.make_embed()
         return embed
+
+    def check_valid_guess(self, guessed_word, ctx):
+        if self.correct_guess:
+            return discord.Embed(title="The daily wordle has already been guessed")
+
+        if testing:
+            if ctx.user.id in self.users_that_guessed:
+                return discord.Embed(title=f"{ctx.user.display_name} have already guessed")
+            if guessed_word not in whitelisted_words:
+                if not len(guessed_word) == 5:
+                    return discord.Embed(title="The word must be 5 letters long")
+                if guessed_word.lower() not in valid_words:
+                    return discord.Embed(title=f"{guessed_word} is not a valid word")
+            if guessed_word in self.guessed_words:
+                return discord.Embed(title=f"{guessed_word} has already been guessed")
+
 
     def wordle_logic(self, guessed_word: str) -> str:
         # Initialize result with all red squares
