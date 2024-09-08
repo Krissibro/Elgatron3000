@@ -66,10 +66,8 @@ class Wordle:
                              "[Real Wordle](https://www.nytimes.com/games/wordle/index.html)\n" +
                              "[Pokedoku](https://pokedoku.com/)")
 
-        if not testing:  # send embed if not testing
-            # channel = client.get_channel(testing_channel_id)      # Test channel
-            channel = self.bot.get_channel(wordle_channel_id)  # Gaming channel
-            await channel.send(embed=embed)
+        if testing:  # send embed if not testing
+            await self.channel.send(embed=embed)
 
         self.wordle_stats.increment_games_played()
         self.save_state()
