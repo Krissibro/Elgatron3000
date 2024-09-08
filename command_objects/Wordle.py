@@ -66,7 +66,7 @@ class Wordle:
                              "[Real Wordle](https://www.nytimes.com/games/wordle/index.html)\n" +
                              "[Pokedoku](https://pokedoku.com/)")
 
-        if testing:  # send embed if not testing
+        if not testing:  # send embed if not testing
             await self.channel.send(embed=embed)
 
         self.wordle_stats.increment_games_played()
