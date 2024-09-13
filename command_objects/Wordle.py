@@ -67,9 +67,7 @@ class Wordle:
                              "[Pokedoku](https://pokedoku.com/)")
 
         if not testing:  # send embed if not testing
-            # channel = client.get_channel(testing_channel_id)      # Test channel
-            channel = self.bot.get_channel(wordle_channel_id)  # Gaming channel
-            await channel.send(embed=embed)
+            await self.channel.send(embed=embed)
 
         self.wordle_stats.increment_games_played()
         self.save_state()
@@ -103,7 +101,7 @@ class Wordle:
         if self.correct_guess:
             return discord.Embed(title="The daily wordle has already been guessed")
 
-        if testing:
+        if not testing:
             if ctx.user.id in self.users_that_guessed:
                 return discord.Embed(title=f"{ctx.user.display_name} have already guessed")
             if guessed_word not in whitelisted_words:
