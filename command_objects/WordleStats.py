@@ -67,14 +67,21 @@ class WordleStats:
             fastest_seconds = self.fastest_win % 60
             embed.add_field(name="Fastest win", value=f"{fastest_minutes} min {fastest_seconds} sec", inline=True)
 
+        # if wins are less than or equal than 0, there is no reason to show the rest, it also breaks the math
+        if self.wins <= 0:
+            return embed
+
         embed.add_field(name="\u200b", value="", inline=False)
+
+        highest_guess_count = max(self.number_guesses_per_game_counter.values())
+        highest_guess_percentage = (highest_guess_count / self.wins) * 100
 
         for guess_amount, guess_count in self.number_guesses_per_game_counter.items():
             if guess_count == 0:
                 continue
-            percentage = (guess_count / self.wins) * 100 if self.wins > 0 else 0
+            percentage = (guess_count / self.wins) * 100
             # Scale percentage to fit in max 15 squares per line, 15 is max that can fit on mobile
-            square_count = int((percentage / 6.67) + 0.5)
+            square_count = int(percentage / highest_guess_percentage * 15 + 0.5)
 
             embed.add_field(
                 name=f"{guess_amount} guesses:      {guess_count}   ({percentage:.2f}%)",
