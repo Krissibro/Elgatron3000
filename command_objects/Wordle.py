@@ -83,9 +83,6 @@ class Wordle:
         self.users_that_guessed.add(ctx.user.id)
         self.correct_guess = guessed_word == self.daily_word
 
-        if self.correct_guess:
-            self.wordle_stats.handle_win(len(self.display_list), self.new_word_time)
-
         # Four whitespaces
         seperator = "\u00A0\u00A0\u00A0\u00A0"
         guess_result = self.wordle_logic(guessed_word)
@@ -93,6 +90,9 @@ class Wordle:
 
         self.display_list.append([ctx.user.name, formatted_word, guess_result])
         self.save_state()
+
+        if self.correct_guess:
+            self.wordle_stats.handle_win(len(self.display_list), self.new_word_time)
 
         embed = await self.make_embed()
         return embed
