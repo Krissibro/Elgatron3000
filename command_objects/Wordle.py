@@ -5,6 +5,7 @@ import numpy as np
 import discord
 
 from datetime import datetime
+from typing import Optional
 
 from command_objects.WordleStats import WordleStats
 from utilities.settings import testing_channel_id, testing, wordle_channel_id
@@ -97,7 +98,13 @@ class Wordle:
         embed = await self.make_embed()
         return embed
 
-    def check_valid_guess(self, guessed_word, ctx):
+    def check_valid_guess(self, guessed_word, ctx) -> Optional[discord.Embed]:
+        """
+        checks whether the guess is valid
+        :param guessed_word: The word that is being checked
+        :param ctx: discord context
+        :return: None if the guess is valid, else an embed containing the reason the guess is invalid
+        """
         if self.correct_guess:
             return discord.Embed(title="The daily wordle has already been guessed")
 
@@ -114,6 +121,12 @@ class Wordle:
 
 
     def wordle_logic(self, guessed_word: str) -> str:
+        """
+        Function to handle wordle logic
+        :param guessed_word: The word that is being checked
+        :return: String of red, yellow and red squares depending on the guessed word
+        :
+        """
         # Initialize result with all red squares
         guess_result = [":red_square:"] * len(guessed_word)
         yellow_checker = list(self.daily_word)
@@ -165,8 +178,10 @@ class Wordle:
 
         return embed
 
+
     async def make_stats_embed(self) -> discord.Embed:
         return await self.wordle_stats.make_embed()
+
 
     def format_available_letters(self) -> str:
         sorted_available_letters = sorted(list(self.available_letters))
@@ -175,7 +190,8 @@ class Wordle:
         rest = f"Available letters:\n{' '.join(sorted_available_letters)}"
         return f"{known_letters}\n{rest}"
 
-    def get_dict_of_data(self):
+
+    def get_dict_of_data(self) -> dict:
         return {
             "daily_word": self.daily_word,
             "correct_guess": self.correct_guess,
@@ -187,7 +203,7 @@ class Wordle:
             "new_word_time": self.new_word_time.isoformat()
         }
 
-    def retrieve_data_from_dict(self, data):
+    def retrieve_data_from_dict(self, data) -> None:
         self.daily_word = data.get("daily_word", "")
         self.correct_guess = data.get("correct_guess", False)
         self.guessed_words = set(data.get("guessed_words", []))
@@ -198,12 +214,12 @@ class Wordle:
         new_word_time_str = data.get("new_word_time")
         self.new_word_time = datetime.fromisoformat(new_word_time_str) if new_word_time_str else datetime.now()
 
-    def save_state(self):
+    def save_state(self) -> None:
         """Save the current state to a JSON file."""
         with open(self.state_file_path, 'w') as file:
             json.dump(self.get_dict_of_data(), file)
 
-    async def load_state(self):
+    async def load_state(self) -> None:
         """Load the state from a JSON file if it exists, otherwise set a new word."""
         if os.path.exists(self.state_file_path):
             with open(self.state_file_path, 'r') as file:
