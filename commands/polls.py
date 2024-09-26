@@ -32,7 +32,7 @@ class PollCommands(commands.GroupCog, group_name = "poll"):
         for i in range(len(options)):
             await msg.add_reaction(emojis[i])
             await asyncio.sleep(0.05)
-        await msg.create_thread(name=title)
+        await msg.create_thread(name=title[:100])
 
 
 async def setup(bot):
