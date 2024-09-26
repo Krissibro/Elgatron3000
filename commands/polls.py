@@ -1,3 +1,5 @@
+import asyncio
+
 import discord
 from discord.ext import commands
 from discord import app_commands
@@ -21,7 +23,7 @@ class PollCommands(commands.GroupCog, group_name = "poll"):
 
         # Make the embed
         embed = discord.Embed(title=title, description=description)
-        content = "\n".join([f"{i} {j}" for i, j in zip(emojis, options)])
+        content = "\n\n".join([f"{i} {j}" for i, j in zip(emojis, options)])
         embed.add_field(name=content, value="", inline=False)
 
         # Send message and add reactions and thread
@@ -29,6 +31,7 @@ class PollCommands(commands.GroupCog, group_name = "poll"):
         msg = await ctx.original_response()
         for i in range(len(options)):
             await msg.add_reaction(emojis[i])
+            await asyncio.sleep(0.05)
         await msg.create_thread(name=title)
 
 
