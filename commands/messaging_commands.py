@@ -1,3 +1,5 @@
+from typing import Union
+
 import discord
 import asyncio
 
@@ -124,7 +126,7 @@ class MessagingCommands(commands.Cog):
         name="annoy",
         description="Spam a message at someone!",
     )
-    async def annoy(self, ctx, message: str, amount: int, interval: str, user: discord.User | discord.Role = None):
+    async def annoy(self, ctx, message: str, amount: int, interval: str, user: Union[discord.User, discord.Role]  = None):
         interval = parse_time(interval)
         await execute_command(ctx, "annoy", annoy_internal, user, message, amount, interval, ctx.channel)
 
