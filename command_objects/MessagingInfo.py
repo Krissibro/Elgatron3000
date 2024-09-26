@@ -37,7 +37,7 @@ class MessagingInfo(CommandInfo):
     def make_select_option(self, index):
         return discord.SelectOption(label=f"{index}:",
                                     value=str(index),
-                                    description=f"{self.message}")
+                                    description=f"{self.message}"[:100])
 
     def get_mention(self):
         return "" if self.user is None else self.user.mention
