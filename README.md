@@ -1,15 +1,19 @@
 # Elgatron3000 Discord Bot 🤖
 
-Elgatron3000 is a very cool and epic Discord bot designed to provide a mix of reminders, peer pressure and some fun features for our server.
+Elgatron3000 is an epic Discord bot designed to provide some fun and useful features to our server :)
 
 ## Features 🌟
 
-- **Attention Grabber**: Ping someone at intervals until they go mad.
-- **Management of Running Commands**: End commands early if someone are too annoyed.
-- **Reaction Polls**: Automatically make polls with a threads to discuss.
-- **Epic Games Integration**: Get information about the currently free games on Epic Games Store.
-- **Wordle but Epic**: Play wordle with your friends, only one guess each. Resets daily.
-- **Game Boy Emulator**: play any Game Boy game or Game Boy Colour game you would like!
+- **Wordle but Epic**: Play wordle with your friends, only one guess each! Resets daily at 08:00, now with game stats!
+- **Game Boy Emulator**: Play any Game Boy/Game Boy Colour game you would like in discord!
+- **Guess The Pin**: A fun game where the bot picks a random pin, and you have to guess who wrote it!
+- **Epic Games Integration**: The latest free games from the Epic Games Store are sent every day at 18:00 if something new drops!
+- **Attention Grabber**: Ping someone in intervals until they go mad.
+- **Management of Running Commands**: End commands early if someone gets too mad.
+- **Reaction Polls**: Automatically make polls with threads to discuss stuff.
+- **Built-in Gifs and videos**: A bunch of epic gifs and videos to react with.
+
+
 
 ## Installation 🛠️
 
@@ -28,6 +32,7 @@ Create a `token.env` file in the root directory and add your Discord bot token:
 3. **Set Up Config**: 
 Create a `config.json` file in the `utilities` directory. \
 Add your guild ID (server ID) and whether this instance of the bot is for testing or production.
+Experimental features will only be available in testing mode.
 
     ```
     {
@@ -36,7 +41,6 @@ Add your guild ID (server ID) and whether this instance of the bot is for testin
         "wordle_channel_id" : CHANNEL_ID_GOES_HERE,
         "testing_channel_id" : CHANNEL_ID_GOES_HERE,
         "testing" : BOOL_GOES_HERE
-        
     }
     ```
 
