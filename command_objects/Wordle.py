@@ -110,14 +110,14 @@ class Wordle:
 
         if not testing:
             if ctx.user.id in self.users_that_guessed:
-                return discord.Embed(title=f"{ctx.user.display_name} have already guessed")
+                return discord.Embed(title=f"{ctx.user.display_name} has already guessed")
             if guessed_word not in whitelisted_words:
                 if not len(guessed_word) == 5:
                     return discord.Embed(title="The word must be 5 letters long")
                 if guessed_word.lower() not in valid_words:
-                    return discord.Embed(title=f"{guessed_word} is not a valid word")
-            if guessed_word in self.guessed_words:
-                return discord.Embed(title=f"{guessed_word} has already been guessed")
+                    return discord.Embed(title=f'"{guessed_word}" is not a valid word')
+        if guessed_word in self.guessed_words:
+            return discord.Embed(title=f'"{guessed_word}" has already been guessed')
 
 
     def wordle_logic(self, guessed_word: str) -> str:
