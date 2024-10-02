@@ -39,6 +39,9 @@ class Help(commands.Cog):
         embed.add_field(name="/wordle stats",
                         value="Shows the server's stats for all played wordle games", inline=False)
 
+        embed.add_field(name="/guess_the_pin",
+                        value="Guess which one of your friends have sinned!", inline=False)
+
         embed.add_field(name="/pokemon",
                         value="Sends pokemon controller and gif",
                         inline=False)
