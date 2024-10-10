@@ -34,7 +34,7 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         description="See the wordle statistics!",
     )
     async def show_stats(self, ctx: discord.Interaction):
-        await ctx.response.send_message(embed=await self.wordle.make_stats_embed(), ephemeral=True)
+        await ctx.response.send_message(embed=await self.wordle.make_stats_embed())
 
     @commands.is_owner()
     @app_commands.command(
