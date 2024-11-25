@@ -58,6 +58,13 @@ class GIFCommands(commands.GroupCog, group_name="gif"):
     async def minecraft(self, ctx: discord.Interaction):
         await ctx.response.send_message("https://cdn.discordapp.com/attachments/839100318893211669/1281936983135879262/minecraft.mp4?ex=66dd885a&is=66dc36da&hm=01e0ecc04e358363d36ee5c79fc6fe717b2b815844c31a6a6438d57a2b9b188e&")
 
+    @app_commands.command(
+        name="help",
+        description="Gee you already know im obsessed with it *burp*, i cant get enough, back with another milk- ",
+    )
+    async def help(self, ctx: discord.Interaction):
+        await ctx.response.send_message("https://cdn.discordapp.com/attachments/839100318893211669/1310589750490562640/HEEEELP.mp4?ex=6745c552&is=674473d2&hm=86c7673380acaf4bea501ca6cd938ba70da9ed7aa783882fa4445ef98c02ba85&")
+
 
 async def setup(bot):
     await bot.add_cog(GIFCommands(bot), guild=bot.get_guild(guild_id))
