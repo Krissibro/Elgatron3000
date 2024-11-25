@@ -5,7 +5,7 @@ from discord import app_commands
 from utilities.settings import guild_id
 
 
-class GIFCommands(commands.GroupCog, group_name="gif"):
+class StimCommands(commands.GroupCog, group_name="stim"):
     def __init__(self, bot):
         self.bot = bot
 
@@ -67,4 +67,4 @@ class GIFCommands(commands.GroupCog, group_name="gif"):
 
 
 async def setup(bot):
-    await bot.add_cog(GIFCommands(bot), guild=bot.get_guild(guild_id))
+    await bot.add_cog(StimCommands(bot), guild=bot.get_guild(guild_id))

@@ -52,15 +52,15 @@ class Help(commands.Cog):
         embed.add_field(name="/manage_commands",
                         value="Manage the running commands, see info and edit/kill running commands", inline=False)
 
-        embed.add_field(name="Funny gifs and videos",
-                        value='''/gif trout
-                            /gif sus
-                            /gif weave
-                            /gif this_dude
-                            /gif thanos_snapped
-                            /gif pet_elga3
-                            /gif minecraft
-                            /gif help''',
+        embed.add_field(name="Goofy gifs and videos to stim to",
+                        value='''/stim trout
+                            /stim sus
+                            /stim weave
+                            /stim this_dude
+                            /stim thanos_snapped
+                            /stim pet_elga3
+                            /stim minecraft
+                            /stim help''',
                         inline=False)
 
         embed.set_footer(text='''interval is in the format <XdXhXmXs> 
