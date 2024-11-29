@@ -65,6 +65,20 @@ class StimCommands(commands.GroupCog, group_name="stim"):
     async def help(self, ctx: discord.Interaction):
         await ctx.response.send_message("https://cdn.discordapp.com/attachments/839100318893211669/1310589750490562640/HEEEELP.mp4?ex=6745c552&is=674473d2&hm=86c7673380acaf4bea501ca6cd938ba70da9ed7aa783882fa4445ef98c02ba85&")
 
+    @app_commands.command(
+        name="wassup_beijing",
+        description="Christian winnie the pooh cosplay",
+    )
+    async def wassup_beijing(self, ctx: discord.Interaction):
+        await ctx.response.send_message("https://cdn.discordapp.com/attachments/839100318893211669/1310925320014008340/wassup-beijing.mp4?ex=6746fdd8&is=6745ac58&hm=f3e680140b5238a1f6ec58b7c8ba95c7223e1fcc5246028dc7ba797be7d6f128&")
+
+    @app_commands.command(
+        name="gn_girl",
+        description="*Rambunctious falling sounds*",
+    )
+    async def gn_girl(self, ctx: discord.Interaction):
+        await ctx.response.send_message("https://cdn.discordapp.com/attachments/839100318893211669/1310925339765248020/gn-girl.mp4?ex=6746fddc&is=6745ac5c&hm=b4168328e4f76d27e2649dc530bf33b69fcdc60c72a29f54d847bab35ac8b907&")
+
 
 async def setup(bot):
     await bot.add_cog(StimCommands(bot), guild=bot.get_guild(guild_id))
