@@ -18,20 +18,32 @@ class TestCommands(commands.GroupCog, group_name="test"):
     )
     @discord.app_commands.checks.bot_has_permissions(read_message_history=True)
     async def collect_data(self, ctx: discord.Interaction):
-        await ctx.response.defer()
+        await ctx.response.defer(ephemeral=True)
         messages = []
         for i in ctx.guild.text_channels:
             print(i.name)
             if i.name in ["logs", "fishing-pond"]:
                 continue
             try:
-                messages.extend([[message.created_at.year, message.created_at.month, message.created_at.day, message.created_at.hour] async for message in i.history(limit=100000) if message.author == ctx.user and message.clean_content])
+                messages.extend([[
+                    message.channel,
+                    message.author,
+                    message.created_at,
+                    message.clean_content,
+                    [reaction.emoji for reaction in message.reactions],
+                    [".".join(attatchment.filename.split(".")[0:-1]) for attatchment in message.attachments],
+                    [attatchment.filename.split(".")[1] for attatchment in message.attachments],
+                    [attatchment.content_type for attatchment in message.attachments]
+                ] async for message in i.history(limit=10)])
             except:  # TODO specify what kind of error can occur here?
                 continue
-        with open('data/messages.csv', 'w', newline='') as csvfile:
+        with open('data/messages.csv', 'w', newline='', encoding='utf-8') as csvfile:
             print("finished!")
             writer = csv.writer(csvfile)
             writer.writerows(messages)
+
+        embed = discord.Embed(title=f"Collected {len(messages)} messages")
+        await ctx.edit_original_response(embed=embed)
 
     @app_commands.command(
         name="test_epic_games_scheduler",
