@@ -1,4 +1,5 @@
 import io
+import os.path
 
 from pyboy import PyBoy
 from PIL import Image
@@ -11,6 +12,12 @@ class Emulator(PyBoy):
         self.set_emulation_speed(5)
         self.images: List[Image] = []
         self.skipped_frames = 3
+        self.state_file = "./data/pokemon.state"
+
+        if os.path.isfile(self.state_file):
+            with open(self.state_file, "rb") as f:
+                if f:
+                    self.load_state(f)
 
     def sim_button_time(self, button: Optional[str], frames: int) -> None:
         """
@@ -27,6 +34,9 @@ class Emulator(PyBoy):
 
         for _ in range(frames // self.skipped_frames):
             self.tick(self.skipped_frames)
+
+        with open(self.state_file, "wb") as f:
+            self.save_state(f)
 
     def make_gif(self) -> io.BytesIO:
         """
