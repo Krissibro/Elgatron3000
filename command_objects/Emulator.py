@@ -14,6 +14,7 @@ class Emulator(PyBoy):
         self.skipped_frames = 3
         self.state_file = "./data/pokemon.state"
 
+        #load save state when bot is started
         if os.path.isfile(self.state_file):
             with open(self.state_file, "rb") as f:
                 if f:
@@ -35,6 +36,7 @@ class Emulator(PyBoy):
         for _ in range(frames // self.skipped_frames):
             self.tick(self.skipped_frames)
 
+        # save state at every time step, TODO there may be some better way to do this?
         with open(self.state_file, "wb") as f:
             self.save_state(f)
 
