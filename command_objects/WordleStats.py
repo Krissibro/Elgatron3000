@@ -1,9 +1,8 @@
-import time
-
 import discord
 import os
 import json
-from datetime import datetime, time
+
+from utilities.helper_functions import format_duration_in_milliseconds
 
 
 class WordleStats:
@@ -124,23 +123,3 @@ class WordleStats:
                 self.retrieve_data_from_dict(stats_dict)
         else:
             self.save_stats()
-
-
-def format_duration_in_milliseconds(duration_ms: int) -> str:
-    """
-    Format a duration given in total milliseconds into a string with hours, minutes, seconds, and milliseconds.
-    """
-    hours = duration_ms // 3_600_000
-    minutes = (duration_ms % 3_600_000) // 60_000
-    seconds = (duration_ms % 60_000) // 1_000
-    milliseconds = duration_ms % 1_000
-
-    parts = []
-    if hours > 0:
-        parts.append(f"{hours} hr")
-    if hours > 0 or minutes > 0:
-        parts.append(f"{minutes} min")
-
-    parts.append(f"{seconds}.{milliseconds} sec")
-
-    return " ".join(parts)

@@ -7,7 +7,8 @@ import discord
 from datetime import datetime
 from typing import Optional
 
-from command_objects.WordleStats import WordleStats, format_duration_in_milliseconds
+from command_objects.WordleStats import WordleStats
+from utilities.helper_functions import format_duration_in_milliseconds
 from utilities.settings import testing_channel_id, testing, wordle_channel_id
 
 valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())
