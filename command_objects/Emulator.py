@@ -50,24 +50,22 @@ class Emulator(PyBoy):
         """
         img_byte_arr = io.BytesIO()
 
-        self.images[0].save(img_byte_arr,
-                            duration=1000 // (60//self.skipped_frames),  # 1000 (full sec) divided by frames per sec (30)
-                            save_all=True,
-                            append_images=self.images[1:],
-                            format="GIF",
-                            )
+        self.images[0].save(
+            img_byte_arr,
+            duration=1000 // (60//self.skipped_frames),  # 1000 (full sec) divided by frames per sec (30)
+            save_all=True,
+            append_images=self.images[1:],
+            format="GIF",
+            optimize=False # This could reduce file size at the cost of more computation
+        )
 
-        self.images = []
+        self.images.clear()
         img_byte_arr.seek(0)
         return img_byte_arr
 
     def tick(self, count: int = 3, render: bool = True):
         super().tick(count=count, render=render)
-
-        # copy, upscale and save image
-        image = self.screen.image.copy()
-        # image = image.resize((image.width*2, image.height*2), resample=0) # resample 0 = nearest neighbour resampling
-        self.images.append(image)
+        self.images.append(self.screen.image.copy())
 
 
 if __name__ == "__main__":
