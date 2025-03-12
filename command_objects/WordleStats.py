@@ -58,7 +58,7 @@ class WordleStats:
         embed.add_field(name="Games played", value=self.games_played, inline=True)
         embed.add_field(name="Wins", value=f"{self.wins} \u00A0\u00A0\u00A0 ({percentage_wins}%)", inline=True)
         embed.add_field(name="\t Number of guesses", value=self.number_of_guesses, inline=True)
-        embed.add_field(name="Average guesses", value=f"{average_guesses:.2f}", inline=True)
+        embed.add_field(name="Average guesses", value=f"{average_guesses:.3f}", inline=True)
         embed.add_field(name="Current streak", value=self.correct_guess_streak, inline=True)
         embed.add_field(name="Longest streak", value=self.longest_guess_streak, inline=True)
 
