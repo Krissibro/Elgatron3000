@@ -11,7 +11,7 @@ class Emulator(PyBoy):
         super().__init__(rom_path, sound_emulated=False, sound=False, **kwargs)
         self.set_emulation_speed(5)
         self.images: List[Image] = []
-        self.skipped_frames = 3
+        self.skipped_frames = 4
         self.state_file = "./data/pokemon.state"
 
         #load save state when bot is started
@@ -19,6 +19,7 @@ class Emulator(PyBoy):
             with open(self.state_file, "rb") as f:
                 if f:
                     self.load_state(f)
+        self.prev_map = self.memory[0xD35E]
 
     def sim_button_time(self, button: Optional[str], frames: int) -> None:
         """
@@ -36,9 +37,11 @@ class Emulator(PyBoy):
         for _ in range(frames // self.skipped_frames):
             self.tick(self.skipped_frames)
 
-        # save state at every time step, TODO there may be some better way to do this?
-        with open(self.state_file, "wb") as f:
-            self.save_state(f)
+        current_map = self.memory[0xD35E]
+        if self.prev_map != current_map:
+            self.prev_map = current_map
+            with open(self.state_file, "wb") as f:
+                self.save_state(f)
 
     def make_gif(self) -> io.BytesIO:
         """
@@ -47,24 +50,22 @@ class Emulator(PyBoy):
         """
         img_byte_arr = io.BytesIO()
 
-        self.images[0].save(img_byte_arr,
-                            duration=1000 // (60//self.skipped_frames),  # 1000 (full sec) divided by frames per sec (30)
-                            save_all=True,
-                            append_images=self.images[1:],
-                            format="GIF",
-                            )
+        self.images[0].save(
+            img_byte_arr,
+            duration=1000 // (60//self.skipped_frames),  # 1000 (full sec) divided by frames per sec (30)
+            save_all=True,
+            append_images=self.images[1:],
+            format="GIF",
+            optimize=False # This could reduce file size at the cost of more computation
+        )
 
-        self.images = []
+        self.images.clear()
         img_byte_arr.seek(0)
         return img_byte_arr
 
     def tick(self, count: int = 3, render: bool = True):
         super().tick(count=count, render=render)
-
-        # copy, upscale and save image
-        image = self.screen.image.copy()
-        # image = image.resize((image.width*2, image.height*2), resample=0) # resample 0 = nearest neighbour resampling
-        self.images.append(image)
+        self.images.append(self.screen.image.copy())
 
 
 if __name__ == "__main__":
