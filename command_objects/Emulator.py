@@ -37,6 +37,8 @@ class Emulator(PyBoy):
             self.tick(self.skipped_frames)
 
         # save state at every time step, TODO there may be some better way to do this?
+        # options: 1. save state every hour 2. save state based on some condition, such as a zone change etc
+
         with open(self.state_file, "wb") as f:
             self.save_state(f)
 
