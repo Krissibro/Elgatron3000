@@ -11,7 +11,7 @@ class Emulator(PyBoy):
         super().__init__(rom_path, sound_emulated=False, sound=False, **kwargs)
         self.set_emulation_speed(5)
         self.images: List[Image] = []
-        self.skipped_frames = 3
+        self.skipped_frames = 4
         self.state_file = "./data/pokemon.state"
 
         #load save state when bot is started
@@ -19,6 +19,7 @@ class Emulator(PyBoy):
             with open(self.state_file, "rb") as f:
                 if f:
                     self.load_state(f)
+        self.prev_map = self.memory[0xD35E]
 
     def sim_button_time(self, button: Optional[str], frames: int) -> None:
         """
@@ -36,11 +37,11 @@ class Emulator(PyBoy):
         for _ in range(frames // self.skipped_frames):
             self.tick(self.skipped_frames)
 
-        # save state at every time step, TODO there may be some better way to do this?
-        # options: 1. save state every hour 2. save state based on some condition, such as a zone change etc
-
-        with open(self.state_file, "wb") as f:
-            self.save_state(f)
+        current_map = self.memory[0xD35E]
+        if self.prev_map != current_map:
+            self.prev_map = current_map
+            with open(self.state_file, "wb") as f:
+                self.save_state(f)
 
     def make_gif(self) -> io.BytesIO:
         """

@@ -54,7 +54,7 @@ class EmulatorController(discord.ui.View):
 
     @discord.ui.button(emoji="🔼", style=discord.ButtonStyle.blurple, row=0, custom_id="Up_Button")
     async def up_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
-        await self.update(interaction, "up", 50)
+        await self.update(interaction, "up", 75)
 
     @discord.ui.button(emoji="🅱️", style=discord.ButtonStyle.red, row=0, custom_id="B_Button")
     async def B_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
@@ -62,15 +62,15 @@ class EmulatorController(discord.ui.View):
 
     @discord.ui.button(emoji="◀️", style=discord.ButtonStyle.blurple, row=1, custom_id="Left_Button")
     async def left_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
-        await self.update(interaction, "left", 50)
+        await self.update(interaction, "left", 75)
 
     @discord.ui.button(emoji="🔽", style=discord.ButtonStyle.blurple, row=1, custom_id="Down_Button")
     async def down_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
-        await self.update(interaction, "down", 50)
+        await self.update(interaction, "down", 75)
 
     @discord.ui.button(emoji="▶️", style=discord.ButtonStyle.blurple, row=1, custom_id="Right_Button")
     async def right_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
-        await self.update(interaction, "right", 50)
+        await self.update(interaction, "right", 75)
 
     @discord.ui.button(emoji="📃", style=discord.ButtonStyle.grey, row=2, custom_id="Select_Button")
     async def start_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
