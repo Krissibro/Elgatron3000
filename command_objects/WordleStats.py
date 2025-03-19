@@ -62,7 +62,7 @@ class WordleStats:
         embed.add_field(name="Longest streak", value=self.longest_guess_streak, inline=True)
 
         if self.fastest_win > 0:
-            embed.add_field(name="Fastest win", value=f"*{format_millisecond_duration(self.fastest_win)}*", inline=True)
+            embed.add_field(name="Fastest win", value=f"{format_millisecond_duration(self.fastest_win)}", inline=True)
 
         # if wins are less than or equal than 0, there is no reason to show the rest, it also breaks the math
         if self.wins <= 0:
