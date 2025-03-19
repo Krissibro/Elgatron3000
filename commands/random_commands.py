@@ -84,7 +84,7 @@ class StimCommands(commands.GroupCog, group_name="stim"):
         description="Epic dr pebba prank",
     )
     async def dr_peppa(self, ctx: discord.Interaction):
-        await ctx.response.send_message("https://cdn.discordapp.com/attachments/839100318893211669/1351885222257496105/dr-peppa.mp4?ex=67dc00b9&is=67daaf39&hm=d0f717d25c0e0c6677c5635347120fb0f601552313795db69aea7d1996241f8a&")
+        await ctx.response.send_message("https://cdn.discordapp.com/attachments/839100318893211669/1351897109263290479/dr-peppa.mp4?ex=67dc0bcb&is=67daba4b&hm=3c104e683e6274cd6dccb001ba942fc71dc446c127e3c107fff159b5b456b418&")
 
 
 async def setup(bot):
