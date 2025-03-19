@@ -90,29 +90,25 @@ def char_to_emoji(command_id) -> str:
     return temp
 
 
-def format_duration_in_milliseconds(duration_ms: int) -> str:
+def format_millisecond_duration(duration_ms: int) -> str:
     """
-    Format a duration given in total milliseconds into a string with hours, minutes, and seconds with milliseconds.
-    Example output: "6.12 sec"
+    Format a duration in total milliseconds as HH : MM : SS (zero-padded).
+    Examples:
+      1234 ms   -> 00 : 00 : 01
+      61234 ms  -> 00 : 01 : 01
+      3661234 ms -> 01 : 01 : 01
     """
     hours = duration_ms // 3_600_000
     minutes = (duration_ms % 3_600_000) // 60_000
     seconds = (duration_ms % 60_000) // 1_000
     milliseconds = duration_ms % 1_000
 
-    # Combine seconds and milliseconds into a float
-    seconds_with_ms = seconds + (milliseconds / 1000)
+    # Combine seconds and milliseconds into one float
+    # Decided to use only seconds for now, but I will leave this here
+    seconds_with_ms = seconds + (milliseconds / 1000.0)
 
-    parts = []
-    if hours > 0:
-        parts.append(f"{hours} hr")
-    if hours > 0 or minutes > 0:
-        parts.append(f"{minutes} min")
-
-    # Format seconds with 2 decimal places
-    parts.append(f"{seconds_with_ms:.2f} sec")
-
-    return " ".join(parts)
+    # Zero-pad hours/minutes (2 digits) and seconds_with_ms (width 5, 2 decimals)
+    return f"{hours:02} : {minutes:02} : {seconds:02}"
 
 
 if __name__ == "__main__":

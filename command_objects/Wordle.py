@@ -8,7 +8,7 @@ from datetime import datetime
 from typing import Optional
 
 from command_objects.WordleStats import WordleStats
-from utilities.helper_functions import format_duration_in_milliseconds
+from utilities.helper_functions import format_millisecond_duration
 from utilities.settings import testing_channel_id, testing, wordle_channel_id
 
 valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())
@@ -168,12 +168,12 @@ class Wordle:
         if self.correct_guess:
             embed = discord.Embed(title=f"Congratulations! \nThe word was {self.daily_word}!")
             embed.add_field(name=f"Guess streak:   ",
-                            value=f"{self.wordle_stats.correct_guess_streak}")
+                            value=f"{self.wordle_stats.correct_guess_streak} days")
             if self.correct_guess_time:
                 time_difference = self.correct_guess_time - self.new_word_time
                 total_milliseconds = int(time_difference.total_seconds() * 1000)
-                formatted_time = format_duration_in_milliseconds(total_milliseconds)
-                embed.add_field(name=f"Time elapsed:   ",
+                formatted_time = format_millisecond_duration(total_milliseconds)
+                embed.add_field(name=f"Time spent:   ",
                                 value=f"{formatted_time}", inline=False)
 
             embed.add_field(name="", value="", inline=False)
