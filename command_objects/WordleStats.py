@@ -77,8 +77,8 @@ class WordleStats:
             if guess_count == 0:
                 continue
             percentage = (guess_count / self.wins) * 100
-            # Scale percentage to fit in max 15 squares per line, 15 is max that can fit on mobile
-            square_count = int(percentage / highest_guess_percentage * 15 + 0.5)
+            # Scale percentage to fit in max 14 squares per line, 14 is max that can fit on mobile
+            square_count = int(percentage / highest_guess_percentage * 14 + 0.5)
 
             embed.add_field(
                 name=f"{guess_amount} guesses:      {guess_count}   ({percentage:.2f}%)",
