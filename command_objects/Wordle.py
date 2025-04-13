@@ -200,8 +200,8 @@ class Wordle:
 
     async def send_reminder(self) -> None:
         if not self.correct_guess:
-            embed = discord.Embed(title="Something malicious is brewing!",
-                                  description="Me when the wordle is not guessed yet :sob:")
+            embed = discord.Embed(title="Me when the and I and me when is and it",
+                                  description="Uhhh:sob: :sob:")
             await self.channel.send(embed=embed)
 
 
