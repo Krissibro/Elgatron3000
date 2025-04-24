@@ -1,9 +1,8 @@
-import time
-
 import discord
 import os
 import json
-from datetime import datetime, time
+
+from utilities.helper_functions import format_millisecond_duration
 
 
 class WordleStats:
@@ -14,6 +13,7 @@ class WordleStats:
     correct_guess_streak = 0
     longest_guess_streak = 0
     number_of_guesses = 0
+    # In milliseconds
     fastest_win = 0
     number_guesses_per_game_counter = {}
 
@@ -24,16 +24,15 @@ class WordleStats:
         self.games_played += 1
         self.save_stats()
 
-    def handle_win(self, guesses, reset_time):
+    def handle_win(self, guesses, reset_time, correct_guess_time):
         self.wins += 1
         self.correct_guess_streak += 1
         self.longest_guess_streak = max(self.longest_guess_streak, self.correct_guess_streak)
         self.number_of_guesses += guesses
 
-        now = datetime.now()
-        time_difference = now - reset_time
-        total_seconds = int(time_difference.total_seconds())
-        self.fastest_win = min(self.fastest_win, total_seconds) if self.fastest_win > 0 else total_seconds
+        time_difference = correct_guess_time - reset_time
+        total_milliseconds = int(time_difference.total_seconds() * 1000)
+        self.fastest_win = min(self.fastest_win, total_milliseconds) if self.fastest_win > 0 else total_milliseconds
 
         self.number_guesses_per_game_counter[str(guesses)] = self.number_guesses_per_game_counter.get(str(guesses), 0) + 1
         self.number_guesses_per_game_counter = {
@@ -63,9 +62,7 @@ class WordleStats:
         embed.add_field(name="Longest streak", value=self.longest_guess_streak, inline=True)
 
         if self.fastest_win > 0:
-            fastest_minutes = self.fastest_win // 60
-            fastest_seconds = self.fastest_win % 60
-            embed.add_field(name="Fastest win", value=f"{fastest_minutes} min {fastest_seconds} sec", inline=True)
+            embed.add_field(name="Fastest win", value=f"{format_millisecond_duration(self.fastest_win)}", inline=True)
 
         # if wins are less than or equal than 0, there is no reason to show the rest, it also breaks the math
         if self.wins <= 0:
@@ -126,4 +123,3 @@ class WordleStats:
                 self.retrieve_data_from_dict(stats_dict)
         else:
             self.save_stats()
-

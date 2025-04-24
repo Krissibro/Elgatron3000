@@ -8,6 +8,7 @@ from datetime import datetime
 from typing import Optional
 
 from command_objects.WordleStats import WordleStats
+from utilities.helper_functions import format_millisecond_duration
 from utilities.settings import testing_channel_id, testing, wordle_channel_id
 
 valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())
@@ -31,6 +32,7 @@ class Wordle:
         self.available_letters = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
         self.display_list = []
         self.new_word_time = datetime.now()
+        self.correct_guess_time = None
 
         channel = testing_channel_id if testing else wordle_channel_id
         self.channel = bot.get_channel(channel)
@@ -60,6 +62,7 @@ class Wordle:
         self.available_letters = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
         self.display_list.clear()
         self.new_word_time = datetime.now()
+        self.correct_guess_time = None
         print(self.daily_word)
 
         embed = discord.Embed(title="New Daily Wordle dropped! :fire: :fire: ")
@@ -90,10 +93,13 @@ class Wordle:
         formatted_word = seperator.join(guessed_word)
 
         self.display_list.append([ctx.user.name, formatted_word, guess_result])
-        self.save_state()
+
 
         if self.correct_guess:
-            self.wordle_stats.handle_win(len(self.display_list), self.new_word_time)
+            self.correct_guess_time = datetime.now()
+            self.wordle_stats.handle_win(len(self.display_list), self.new_word_time, self.correct_guess_time)
+
+        self.save_state()
 
         embed = await self.make_embed()
         return embed
@@ -157,11 +163,21 @@ class Wordle:
 
         return ' '.join(guess_result)
 
+
     async def make_embed(self) -> discord.Embed:
         if self.correct_guess:
             embed = discord.Embed(title=f"Congratulations! \nThe word was {self.daily_word}!")
-            embed.add_field(name=f"Guess streak:   {self.wordle_stats.correct_guess_streak}",
-                            value=f"\u200B")
+            embed.add_field(name=f"Guess streak:   ",
+                            value=f"{self.wordle_stats.correct_guess_streak} days")
+            if self.correct_guess_time:
+                time_difference = self.correct_guess_time - self.new_word_time
+                total_milliseconds = int(time_difference.total_seconds() * 1000)
+                formatted_time = format_millisecond_duration(total_milliseconds)
+                embed.add_field(name=f"Time spent:   ",
+                                value=f"{formatted_time}", inline=False)
+
+            embed.add_field(name="", value="", inline=False)
+
         else:
             embed = discord.Embed(title="Daily Wordle")
 
@@ -200,7 +216,8 @@ class Wordle:
             "known_letters": list(self.known_letters),
             "available_letters": list(self.available_letters),
             "display_list": self.display_list,
-            "new_word_time": self.new_word_time.isoformat()
+            "new_word_time": self.new_word_time.isoformat(),
+            "correct_guess_time": self.correct_guess_time.isoformat() if self.correct_guess_time else None,
         }
 
     def retrieve_data_from_dict(self, data) -> None:
@@ -212,7 +229,9 @@ class Wordle:
         self.available_letters = set(data.get("available_letters", list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')))
         self.display_list = data.get("display_list", [])
         new_word_time_str = data.get("new_word_time")
+        correct_guess_time_str = data.get("correct_guess_time")
         self.new_word_time = datetime.fromisoformat(new_word_time_str) if new_word_time_str else datetime.now()
+        self.correct_guess_time = datetime.fromisoformat(correct_guess_time_str) if correct_guess_time_str else None
 
     def save_state(self) -> None:
         """Save the current state to a JSON file."""

@@ -79,6 +79,13 @@ class StimCommands(commands.GroupCog, group_name="stim"):
     async def gn_girl(self, ctx: discord.Interaction):
         await ctx.response.send_message("https://cdn.discordapp.com/attachments/839100318893211669/1310925339765248020/gn-girl.mp4?ex=6746fddc&is=6745ac5c&hm=b4168328e4f76d27e2649dc530bf33b69fcdc60c72a29f54d847bab35ac8b907&")
 
+    @app_commands.command(
+        name="dr_peppa",
+        description="Epic dr pebba prank",
+    )
+    async def dr_peppa(self, ctx: discord.Interaction):
+        await ctx.response.send_message("https://cdn.discordapp.com/attachments/839100318893211669/1351897109263290479/dr-peppa.mp4?ex=67dc0bcb&is=67daba4b&hm=3c104e683e6274cd6dccb001ba942fc71dc446c127e3c107fff159b5b456b418&")
+
 
 async def setup(bot):
     await bot.add_cog(StimCommands(bot), guild=bot.get_guild(guild_id))
