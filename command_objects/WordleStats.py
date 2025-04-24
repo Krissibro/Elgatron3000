@@ -54,7 +54,7 @@ class WordleStats:
         )
         average_guesses = (self.number_of_guesses / self.wins) if self.games_played > 0 and self.wins > 0 else 0
 
-        embed = discord.Embed(title="Wordle Stats")
+        embed = discord.Embed(title="Wordle Stats", colour=discord.Colour.blue())
         embed.add_field(name="Games played", value=self.games_played, inline=True)
         embed.add_field(name="Wins", value=f"{self.wins} \u00A0\u00A0\u00A0 ({percentage_wins}%)", inline=True)
         embed.add_field(name="\t Number of guesses", value=self.number_of_guesses, inline=True)
@@ -85,7 +85,7 @@ class WordleStats:
 
             embed.add_field(
                 name=f"{guess_amount} guesses:      {guess_count}   ({percentage:.2f}%)",
-                value=square_count * ":green_square:" if square_count > 0 else ":black_large_square:",
+                value=square_count * ":blue_square:" if square_count > 0 else ":black_large_square:",
                 inline=False
             )
 
