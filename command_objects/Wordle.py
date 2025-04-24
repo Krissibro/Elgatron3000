@@ -198,6 +198,12 @@ class Wordle:
     async def make_stats_embed(self) -> discord.Embed:
         return await self.wordle_stats.make_embed()
 
+    async def send_reminder(self) -> None:
+        if not self.correct_guess:
+            embed = discord.Embed(title="Me when the and I and me when is and it",
+                                  description="Uhhh:sob: :sob:")
+            await self.channel.send(embed=embed)
+
 
     def format_available_letters(self) -> str:
         sorted_available_letters = sorted(list(self.available_letters))
