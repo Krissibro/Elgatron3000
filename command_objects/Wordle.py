@@ -44,11 +44,18 @@ class Wordle:
 
             if self.wordle_stats.correct_guess_streak > 0:
                 await self.channel.send(embed=discord.Embed(
-                    title=f"No one guessed the word {self.daily_word.upper()}!  :sob:",
-                    description=f"Guess streak of  **{self.wordle_stats.correct_guess_streak}**  has been reset"))
+                    title=f"No one guessed the word! {self.daily_word.upper()}!  :sob:",
+                    description=f"""The word was **[{self.daily_word.upper()}](https://www.merriam-webster.com/dictionary/{self.daily_word.upper()})**
+                    
+                    Guess streak of   **{self.wordle_stats.correct_guess_streak}**   has been reset""",
+                    color=discord.Color.red()
+                ))
             else:
                 await self.channel.send(embed=discord.Embed(
-                    title=f"No one guessed the word {self.daily_word.upper()}!  :sob:"))
+                    title=f"No one guessed the word! :sob:",
+                    description=f"The word was **[{self.daily_word.upper()}](https://www.merriam-webster.com/dictionary/{self.daily_word.upper()})**",
+                    color=discord.Color.red()
+                ))
 
             self.wordle_stats.reset_streak()
 
@@ -166,7 +173,7 @@ class Wordle:
 
     async def make_embed(self) -> discord.Embed:
         if self.correct_guess:
-            embed = discord.Embed(title=f"Congratulations!", color=discord.Color.green(), description=f"The word was [{self.daily_word}](https://www.merriam-webster.com/dictionary/{self.daily_word})!")
+            embed = discord.Embed(title=f"Congratulations!", color=discord.Color.green(), description=f"The word was **[{self.daily_word.upper()}](https://www.merriam-webster.com/dictionary/{self.daily_word})**!")
             embed.add_field(name=f"Guess streak:   ",
                             value=f"{self.wordle_stats.correct_guess_streak} days")
             if self.correct_guess_time:
