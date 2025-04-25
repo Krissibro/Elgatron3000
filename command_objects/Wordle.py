@@ -166,7 +166,7 @@ class Wordle:
 
     async def make_embed(self) -> discord.Embed:
         if self.correct_guess:
-            embed = discord.Embed(title=f"Congratulations! \nThe word was {self.daily_word}!")
+            embed = discord.Embed(title=f"Congratulations!", color=discord.Color.green(), description=f"The word was [{self.daily_word}](https://www.merriam-webster.com/dictionary/{self.daily_word})!")
             embed.add_field(name=f"Guess streak:   ",
                             value=f"{self.wordle_stats.correct_guess_streak} days")
             if self.correct_guess_time:
@@ -197,6 +197,12 @@ class Wordle:
 
     async def make_stats_embed(self) -> discord.Embed:
         return await self.wordle_stats.make_embed()
+
+    async def send_reminder(self) -> None:
+        if not self.correct_guess:
+            embed = discord.Embed(title="Me when the and I and me when is and it",
+                                  description="Uhhh:sob: :sob:")
+            await self.channel.send(embed=embed)
 
 
     def format_available_letters(self) -> str:

@@ -13,8 +13,9 @@ class PollCommands(commands.GroupCog, group_name = "poll"):
         description="start a poll",
     )
     async def start_poll(self, ctx: discord.Interaction, title: str, option1: str, option2: str, description: str = None,
-                         option3: str = None, option4: str = None, option5: str = None, option6: str = None,
-                         option7: str = None, option8: str = None, option9: str = None, option10: str = None):
+                         mentions: discord.Role = None, option3: str = None, option4: str = None, option5: str = None,
+                         option6: str = None, option7: str = None, option8: str = None, option9: str = None,
+                         option10: str = None):
 
         # Make list with valid options
         options = [option1, option2, option3, option4, option5, option6, option7, option8, option9, option10]
@@ -32,7 +33,8 @@ class PollCommands(commands.GroupCog, group_name = "poll"):
         for i in range(len(options)):
             await msg.add_reaction(emojis[i])
             await asyncio.sleep(0.05)
-        await msg.create_thread(name=title[:100])
+        thread = await msg.create_thread(name=title[:100])
+        await thread.send(content=mentions.mention + " GET YO ASS IN HERE")
 
 
 async def setup(bot):
