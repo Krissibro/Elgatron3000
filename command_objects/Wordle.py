@@ -45,9 +45,7 @@ class Wordle:
             if self.wordle_stats.correct_guess_streak > 0:
                 await self.channel.send(embed=discord.Embed(
                     title=f"No one guessed the word! {self.daily_word.upper()}!  :sob:",
-                    description=f"""The word was **[{self.daily_word.upper()}](https://www.merriam-webster.com/dictionary/{self.daily_word.upper()})**
-                    
-                    Guess streak of   **{self.wordle_stats.correct_guess_streak}**   has been reset""",
+                    description=f"The word was **[{self.daily_word.upper()}](https://www.merriam-webster.com/dictionary/{self.daily_word.upper()})** \nGuess streak of   **{self.wordle_stats.correct_guess_streak}**   has been reset",
                     color=discord.Color.red()
                 ))
             else:
