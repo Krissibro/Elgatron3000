@@ -6,10 +6,10 @@ import asyncio
 from discord import app_commands
 from discord.ext import commands
 
-from command_objects.Command import Command
+from command_objects.ActiveCommands import ActiveCommands
 from command_objects.MessagingInfo import MessagingInfo
 from utilities.helper_functions import parse_time, validate_interval, validate_amount
-from utilities.settings import guild_id
+from utilities.settings import guild_id, active_commands
 
 
 async def execute_command(ctx, internal_function: Callable, user: discord.User, message: str, amount: int, interval: int, channel: discord.TextChannel) -> None:
@@ -40,14 +40,14 @@ async def execute_command(ctx, internal_function: Callable, user: discord.User, 
     messaging_info = MessagingInfo(function_name, user, message, amount, interval, channel)
 
     async_task = asyncio.create_task(internal_function(ctx, messaging_info))
-    command = Command(messaging_info, async_task)
+    command_id = active_commands.add_command(messaging_info, async_task)
 
     # Run the given command
     await ctx.response.send_message(embed=messaging_info.make_embed(), ephemeral=True, delete_after=10)
     await async_task
 
     # Clean up after Command
-    command.end()
+    active_commands.kill(command_id)
 
 
 class ReactButton(discord.ui.View):
