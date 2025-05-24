@@ -1,6 +1,7 @@
 import discord
 
 from datetime import timedelta
+from typing import List
 
 from command_objects.CommandInfo import CommandInfo
 from utilities.helper_functions import char_to_emoji
@@ -15,6 +16,7 @@ class MessagingInfo(CommandInfo):
         self.remaining: int = amount
         self.interval: int = interval
         self.user: discord.User = user
+        self.messages: List[discord.Message] = []
 
     def make_embed(self):
         embed = discord.Embed(
@@ -38,6 +40,12 @@ class MessagingInfo(CommandInfo):
         return discord.SelectOption(label=f"{index}:",
                                     value=str(index),
                                     description=f"{self.message}"[:100])
+
+    def add_message(self, message):
+        self.messages.append(message)
+
+    async def delete_messages(self):
+        await self.channel.delete_messages(self.messages[1:])
 
     def get_mention(self):
         return "" if self.user is None else self.user.mention
