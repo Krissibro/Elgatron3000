@@ -48,4 +48,4 @@ class MessagingInfo(CommandInfo):
         await self.channel.delete_messages(self.messages[1:])
 
     def get_mention(self):
-        return "" if self.user is None else self.user.mention
+        return self.user.mention if self.user else ""

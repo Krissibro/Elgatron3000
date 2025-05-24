@@ -1,6 +1,7 @@
 import discord
 
 from typing import List
+from asyncio import Task
 
 from command_objects.CommandInfo import CommandInfo
 
@@ -11,7 +12,7 @@ class Command:
     def __init__(self, info: CommandInfo, task):
         self.id = self.assign_id()
         self.info = info
-        self.process = task
+        self.process: Task = task
         self.running_commands_dict[self.id] = self
 
     # Assigns the lowest ID
@@ -21,18 +22,10 @@ class Command:
             i += 1
         return i
 
-    @classmethod
-    def get_ids(cls) -> List[int]:
-        return list(cls.running_commands_dict.keys())
-
     def get_embed(self) -> discord.Embed:
         embed = self.info.make_embed()
         embed.add_field(name="ID:", value=f"{self.id}", inline=True)
         return embed
-
-    @classmethod
-    def get_embed_by_id(cls, command_id) -> discord.Embed:
-        return cls.running_commands_dict[command_id].get_embed()
 
     def end(self) -> None:
         del self.running_commands_dict[self.id]
@@ -40,6 +33,14 @@ class Command:
     def kill(self) -> None:
         self.process.cancel()
         del self.running_commands_dict[self.id]
+
+    @classmethod
+    def get_ids(cls) -> List[int]:
+        return list(cls.running_commands_dict.keys())
+
+    @classmethod
+    def get_embed_by_id(cls, command_id) -> discord.Embed:
+        return cls.running_commands_dict[command_id].get_embed()
 
     @classmethod
     def kill_all(cls) -> None:
@@ -58,7 +59,7 @@ class Command:
     @classmethod
     def make_overview_embed(cls):
         embed = discord.Embed(title="Showing all running processes:",
-                              color=discord.Color.red())
+                              color=discord.Color.blue())
 
         for index, command in cls.running_commands_dict.items():
             embed = command.info.make_overview(index, embed)
