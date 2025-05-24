@@ -7,7 +7,6 @@ class CommandInfo(ABC):
     @abstractmethod
     def __init__(self, channel: discord.TextChannel):
         self.channel = channel
-        self.messages = []
 
     @abstractmethod
     def make_embed(self) -> discord.Embed:
@@ -20,7 +19,7 @@ class CommandInfo(ABC):
         pass
 
     def add_message(self, message):
-        self.messages.append(message)
+        pass
 
     async def delete_messages(self):
-        await self.channel.delete_messages(self.messages[1:])
+        pass
