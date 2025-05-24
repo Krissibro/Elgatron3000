@@ -4,7 +4,7 @@ from discord.ext.commands import Bot
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from command_objects.ActiveCommands import ActiveCommands
+from commands.messaging.ActiveCommands import ActiveCommands
 
 # Shared Variables
 intents = discord.Intents.default()

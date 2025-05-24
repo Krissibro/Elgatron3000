@@ -3,7 +3,7 @@ import discord
 from typing import List, Dict
 from asyncio import Task
 
-from command_objects.CommandInfo import CommandInfo
+from commands.messaging.CommandInfo import CommandInfo
 
 
 class ActiveCommands:

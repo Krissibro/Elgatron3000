@@ -17,9 +17,8 @@ from utilities.helper_functions import (
     parse_time,
 )
 
-
 class MessagingInfo(CommandInfo):
-    def __init__(self, command_name: str, user: Union[discord.User, discord.Role, None], message: str, amount: int, interval: int, channel: discord.TextChannel):
+    def __init__(self, command_name: str, user: discord.User, message: str, amount: int, interval: int, channel: discord.TextChannel):
         super().__init__(command_name, channel)
         self.message: str = message
         self.amount: int = amount
