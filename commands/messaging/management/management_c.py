@@ -1,11 +1,11 @@
-import discord.ui
+import discord
 
 from discord import app_commands
 from discord.ext import commands
 
 from commands.messaging.management.management_view import ManageCommandsDropDown
-from commands.messaging.Command import Command
-from utilities.settings import guild_id
+from commands.messaging.ActiveCommands import ActiveCommands
+from utilities.settings import guild_id, active_commands
 
 class CommandManagement(commands.Cog):
     def __init__(self, bot):
@@ -16,12 +16,12 @@ class CommandManagement(commands.Cog):
         description="See and manage running commands"
     )
     async def manage_commands(self, ctx: discord.Interaction):
-        if Command.is_empty():
+        if active_commands.is_empty():
             await ctx.response.send_message(embed=discord.Embed(title="No commands running",
                     color=discord.Color.red()), ephemeral=True)
             return
         view = ManageCommandsDropDown()
-        first_embed = Command.make_overview_embed()
+        first_embed = active_commands.make_overview_embed()
         await ctx.response.send_message(embed=first_embed, view=view, ephemeral=True)
 
     @app_commands.command(

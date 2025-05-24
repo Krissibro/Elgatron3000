@@ -7,6 +7,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from commands.messaging.MessagingInfo import MessagingInfo
+
 from utilities.helper_functions import parse_time, validate_interval, validate_amount
 from utilities.settings import guild_id, active_commands
 
@@ -119,7 +120,7 @@ class MessagingCommands(commands.Cog):
     )
     async def get_attention(self, ctx, user: discord.User, message: str = "WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP",
                             amount: int = 100, interval: str = "10s"):
-        interval = parse_time(interval)
+        parsed_interval: int = parse_time(interval)
         await execute_command(ctx, get_attention_internal, user, message, amount, interval, ctx.channel)
 
     @app_commands.command(
@@ -127,7 +128,7 @@ class MessagingCommands(commands.Cog):
         description="Spam a message at someone!",
     )
     async def annoy(self, ctx, message: str, amount: int, interval: str, user: discord.User = None):
-        interval = parse_time(interval)
+        parsed_interval: int = parse_time(interval)
         await execute_command(ctx, annoy_internal, user, message, amount, interval, ctx.channel)
 
 
