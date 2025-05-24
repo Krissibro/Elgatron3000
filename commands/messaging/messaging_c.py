@@ -11,7 +11,7 @@ from utilities.helper_functions import parse_time, validate_interval, validate_a
 from utilities.settings import guild_id, active_commands
 
 
-async def execute_command(ctx, internal_function: Callable, user: Union[discord.User, discord.Role, None], message: str, amount: int, interval: int, channel: discord.TextChannel) -> None:
+async def execute_command(ctx, internal_function: Callable, user: discord.User, message: str, amount: int, interval: int, channel: discord.TextChannel) -> None:
     """
     Executes a specified command with validation, tracking, and response handling.
 
