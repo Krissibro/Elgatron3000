@@ -4,6 +4,8 @@ from discord.ext.commands import Bot
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
+from command_objects.ActiveCommands import ActiveCommands
+
 # Shared Variables
 intents = discord.Intents.default()
 intents.members = True
@@ -12,6 +14,7 @@ intents.message_content = True
 bot = Bot(intents=intents, command_prefix="/")
 tree = bot.tree
 scheduler = AsyncIOScheduler(timezone='Europe/Oslo')
+active_commands: ActiveCommands = ActiveCommands()
 
 with open("utilities/config.json", "r") as f:
     contents = json.load(f)
