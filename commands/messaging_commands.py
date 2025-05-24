@@ -12,13 +12,12 @@ from utilities.helper_functions import parse_time, validate_interval, validate_a
 from utilities.settings import guild_id
 
 
-async def execute_command(ctx, command_name, internal_function, user: discord.User, message: str, amount: int, interval: int, channel: discord.TextChannel) -> None:
+async def execute_command(ctx, internal_function: Callable, user: discord.User, message: str, amount: int, interval: int, channel: discord.TextChannel) -> None:
     """
     Executes a specified command with validation, tracking, and response handling.
 
     Args:
         ctx (Context): The context in which the command is being executed.
-        command_name (str): The name of the command to be executed.
         internal_function (Coroutine): The asynchronous function representing the command's logic.
         user (discord.User): The Discord user who is targeted or involved in the command.
         message (str): A message associated with the command.
@@ -37,7 +36,9 @@ async def execute_command(ctx, command_name, internal_function, user: discord.Us
         return
 
     # Create a Command object with the given information
-    messaging_info = MessagingInfo(command_name, user, message, amount, interval, channel)
+    function_name = " ".join(internal_function.__name__.split('_')[:-1])
+    messaging_info = MessagingInfo(function_name, user, message, amount, interval, channel)
+
     async_task = asyncio.create_task(internal_function(ctx, messaging_info))
     command = Command(messaging_info, async_task)
 
@@ -110,7 +111,7 @@ class MessagingCommands(commands.Cog):
     )
     async def dm_spam(self, ctx, user: discord.User, message: str, amount: int, interval: str):
         interval = parse_time(interval)
-        await execute_command(ctx, "dm_spam", dm_spam_internal, user, message, amount, interval, ctx.channel)
+        await execute_command(ctx, dm_spam_internal, user, message, amount, interval, ctx.channel)
 
     @app_commands.command(
         name="get_attention",
@@ -119,8 +120,7 @@ class MessagingCommands(commands.Cog):
     async def get_attention(self, ctx, user: discord.User, message: str = "WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP",
                             amount: int = 100, interval: str = "10s"):
         interval = parse_time(interval)
-        await execute_command(ctx, "get_attention", get_attention_internal, user, message, amount, interval,
-                              ctx.channel)
+        await execute_command(ctx, get_attention_internal, user, message, amount, interval, ctx.channel)
 
     @app_commands.command(
         name="annoy",
@@ -128,7 +128,7 @@ class MessagingCommands(commands.Cog):
     )
     async def annoy(self, ctx, message: str, amount: int, interval: str, user: Union[discord.User, discord.Role]  = None):
         interval = parse_time(interval)
-        await execute_command(ctx, "annoy", annoy_internal, user, message, amount, interval, ctx.channel)
+        await execute_command(ctx, annoy_internal, user, message, amount, interval, ctx.channel)
 
 
 async def setup(bot):
