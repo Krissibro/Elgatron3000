@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Callable
 
 import discord
 import asyncio
@@ -51,54 +51,55 @@ async def execute_command(ctx, internal_function: Callable, user: discord.User, 
 
 
 class ReactButton(discord.ui.View):
-    seen: bool = False
-
     @discord.ui.button(emoji="🤨", style=discord.ButtonStyle.success)
     async def wake_up_bitch(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.channel.send("New death grips album dropping tomorrow :pensive:")
-        await interaction.response.defer()
-        self.seen = True
+        await interaction.response.send_message("New death grips album dropping tomorrow :pensive:")
         self.stop()
 
 
-async def get_attention_internal(ctx, command_info: MessagingInfo) -> None:
-    while command_info.remaining > 0:
-        command_info.remaining -= 1
-        view = ReactButton(timeout=command_info.interval * 2)
+async def get_attention_internal(ctx, messaging_info: MessagingInfo) -> None:
+    while messaging_info.remaining > 0:
+        messaging_info.remaining -= 1
 
-        message = await ctx.channel.send(command_info.get_mention(),
-                                         embed=discord.Embed(title=f"{command_info.message}"),
-                                         view=view)
+        mention = messaging_info.get_mention()
+        button = ReactButton(timeout=messaging_info.interval * 2)
+        embed = discord.Embed(title=f"{messaging_info.message}")
 
-        command_info.add_message(message)
+        message = await ctx.channel.send(mention, embed=embed, view=button)
+        messaging_info.add_message(message) # message added to list so that it can be deleted in the future.
 
-        await asyncio.sleep(command_info.interval)
-        if view.seen:
+        await asyncio.sleep(messaging_info.interval)
+        if button.is_finished():
             break
 
-    await command_info.delete_messages()
+    await messaging_info.delete_messages()
 
 
-async def dm_spam_internal(ctx, command_info: MessagingInfo) -> None:
+async def dm_spam_internal(ctx, messaging_info: MessagingInfo) -> None:
     try:
-        while command_info.remaining > 0:
-            command_info.remaining -= 1
-            await command_info.user.send(command_info.message)
-            await asyncio.sleep(command_info.interval)
+        while messaging_info.remaining > 0:
+            messaging_info.remaining -= 1
+
+            await messaging_info.user.send(messaging_info.message)
+            await asyncio.sleep(messaging_info.interval)
 
     except discord.Forbidden:
-        await ctx.followup.send(embed=discord.Embed(title="I don't have permission to send messages to that user!"),
-                                ephemeral=True)
+        embed = discord.Embed(title="I don't have permission to send messages to that user.")
+        await ctx.followup.send(embed=embed, ephemeral=True)
+    except AttributeError:
+        embed = discord.Embed(title="Unable to message a bot user.")
+        await ctx.followup.send(embed=embed, ephemeral=True)
 
+async def annoy_internal(ctx, messaging_info: MessagingInfo) -> None:
+    while messaging_info.remaining > 0:
+        messaging_info.remaining -= 1
 
-async def annoy_internal(ctx, command_info: MessagingInfo) -> None:
-    while command_info.remaining > 0:
-        command_info.remaining -= 1
-        message = await ctx.channel.send(f"{command_info.get_mention()} {command_info.message}")
-        command_info.add_message(message)
-        await asyncio.sleep(command_info.interval)
+        message = await ctx.channel.send(f"{messaging_info.get_mention()} {messaging_info.message}")
+        messaging_info.add_message(message)
 
-    await command_info.delete_messages()
+        await asyncio.sleep(messaging_info.interval)
+
+    await messaging_info.delete_messages()
 
 
 class MessagingCommands(commands.Cog):
