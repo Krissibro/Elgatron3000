@@ -25,6 +25,7 @@ class EmulatorCommands(commands.Cog):
     )
     async def pokemon(self, ctx: discord.Interaction):
         await ctx.response.defer()
+        
         self.emu.sim_button_time(None, 1500)
         file = discord.File(fp=self.emu.make_gif(), filename="emulator.gif")
 
@@ -38,15 +39,13 @@ class EmulatorController(discord.ui.View):
         super().__init__(timeout=None)
         self.emu = emu
 
-    async def update_gif(self, interaction: discord.Interaction) -> None:
-        file = discord.File(fp=self.emu.make_gif(), filename="emulator.gif")
-
-        await interaction.response.edit_message(attachments=[file], view=self)
-
     async def update(self, interaction: discord.Interaction, button: Optional[str], frames: int) -> None:
+        # do the emulation
         self.emu.sim_button_time(button, frames)
 
-        await self.update_gif(interaction)
+        # get the gif and send it
+        file = discord.File(fp=self.emu.make_gif(), filename="emulator.gif")
+        await interaction.response.edit_message(attachments=[file], view=self)
 
     @discord.ui.button(emoji="🅰️", style=discord.ButtonStyle.red, row=0, custom_id="A_Button")
     async def A_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
@@ -54,7 +53,7 @@ class EmulatorController(discord.ui.View):
 
     @discord.ui.button(emoji="🔼", style=discord.ButtonStyle.blurple, row=0, custom_id="Up_Button")
     async def up_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
-        await self.update(interaction, "up", 75)
+        await self.update(interaction, "up", 80)
 
     @discord.ui.button(emoji="🅱️", style=discord.ButtonStyle.red, row=0, custom_id="B_Button")
     async def B_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
@@ -62,15 +61,15 @@ class EmulatorController(discord.ui.View):
 
     @discord.ui.button(emoji="◀️", style=discord.ButtonStyle.blurple, row=1, custom_id="Left_Button")
     async def left_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
-        await self.update(interaction, "left", 75)
+        await self.update(interaction, "left", 80)
 
     @discord.ui.button(emoji="🔽", style=discord.ButtonStyle.blurple, row=1, custom_id="Down_Button")
     async def down_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
-        await self.update(interaction, "down", 75)
+        await self.update(interaction, "down", 80)
 
     @discord.ui.button(emoji="▶️", style=discord.ButtonStyle.blurple, row=1, custom_id="Right_Button")
     async def right_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
-        await self.update(interaction, "right", 75)
+        await self.update(interaction, "right", 80)
 
     @discord.ui.button(emoji="📃", style=discord.ButtonStyle.grey, row=2, custom_id="Select_Button")
     async def start_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:

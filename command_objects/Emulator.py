@@ -15,34 +15,27 @@ class Emulator(PyBoy):
         self.skipped_frames = 4
         self.state_file = "./data/pokemon.state"
 
-        #load save state when bot is started
+        #load save state on init
         if os.path.isfile(self.state_file):
             with open(self.state_file, "rb") as f:
-                if f:
-                    self.load_state(f)
-        self.prev_map = self.memory[0xD35E]
+                self.load_state(f)
 
     def sim_button_time(self, button: Optional[str], frames: int) -> None:
         """
         :param button: Name of the button to press. can be 'up', 'down', 'left', 'right', 'a', 'b', 'start', 'select' or None.
         :param frames: the amount of frames to simulate.
         """
-
+        # press a button if defined
         if button:
-            self.button_press(button)
-            # we don't want to hold the button for too long, nor too short, this is a guess
-            for _ in range(8 // self.skipped_frames):
-                self.tick(self.skipped_frames)
-            self.button_release(button)
+            self.button(button, 8)
 
+        # run the select amount of frames
         for _ in range(frames // self.skipped_frames):
             self.tick(self.skipped_frames)
 
-        current_map = self.memory[0xD35E]
-        if self.prev_map != current_map:
-            self.prev_map = current_map
-            with open(self.state_file, "wb") as f:
-                self.save_state(f)
+        # save the state 
+        with open(self.state_file, "wb") as f:
+            self.save_state(f)
 
     def make_gif(self) -> io.BytesIO:
         """
@@ -53,15 +46,15 @@ class Emulator(PyBoy):
 
         self.images[0].save(
             img_byte_arr,
-            duration=1000 // (60//self.skipped_frames),  # 1000 (full sec) divided by frames per sec (30)
+            duration=1000 // (60//self.skipped_frames),  # 1000 (full sec) divided by frames per sec (60)
             save_all=True,
             append_images=self.images[1:],
             format="GIF",
             optimize=False # This could reduce file size at the cost of more computation
         )
-
-        self.images.clear()
         img_byte_arr.seek(0)
+        self.images.clear()
+        
         return img_byte_arr
 
     def tick(self, count: int = 3, render: bool = True):
