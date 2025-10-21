@@ -1,3 +1,5 @@
+import random
+
 import discord
 from discord.ext import commands
 from discord import app_commands
@@ -86,6 +88,26 @@ class StimCommands(commands.GroupCog, group_name="stim"):
     async def dr_peppa(self, ctx: discord.Interaction):
         await ctx.response.send_message("https://cdn.discordapp.com/attachments/839100318893211669/1351897109263290479/dr-peppa.mp4?ex=67dc0bcb&is=67daba4b&hm=3c104e683e6274cd6dccb001ba942fc71dc446c127e3c107fff159b5b456b418&")
 
+
+    @app_commands.command(
+        name="horse",
+        description="is this real?",
+    )
+    async def at_horse_is_this_real(self, ctx: discord.Interaction):
+        gifs = [
+            "https://media.discordapp.net/attachments/1217933367849386004/1377728074438803566/AWARE.gif?ex=683a04c1&is=6838b341&hm=0a57f01e1253027e8a9b8c0bafd03cafe842f2f5a006f0e6cbf46611cf87ae50&=&width=704&height=704",
+            "https://media.discordapp.net/attachments/1217933367849386004/1377728074849718272/horse-nod.gif?ex=683a04c1&is=6838b341&hm=88ae5035ea75b1c677bddda393f7610744e84eeb26005c4c86d4b0778c6458e5&=&width=264&height=469",
+            "https://media.discordapp.net/attachments/1217933367849386004/1377728075369939106/horse-tongue.gif?ex=683a04c2&is=6838b342&hm=f6762c232599eb056b879c10a6e79a5e661fc02e28625159b6c35cac42d03ffe&=&width=440&height=548",
+            "https://media.discordapp.net/attachments/1217933367849386004/1377728075843768481/joel.gif?ex=683a04c2&is=6838b342&hm=70236a47edeffc70a92e764c994e8f10029b4a6253dfbcdb8edc2951079a7852&=&width=528&height=528",
+            "https://media.discordapp.net/attachments/1217933367849386004/1377728076233965628/mogged.gif?ex=683a04c2&is=6838b342&hm=abfe80050a9565f830eb5f609cb4cbfa5d363cf4544ec33e52d6ff392c0ee1e8&=&width=660&height=438",
+            "https://media.discordapp.net/attachments/1217933367849386004/1377728076728762449/nop....gif?ex=683a04c2&is=6838b342&hm=6f87bf3e9a18d7c79c962a78bf126e8622a533b2a988160fc5a1d854af9b7c02&=&width=352&height=343",
+            "https://media.discordapp.net/attachments/1217933367849386004/1377728077177688185/RUN.gif?ex=683a04c2&is=6838b342&hm=6fa81c547c0076b4e1b89d9b95d24d852c66364c17f00753e35e324d28901957&=&width=548&height=405",
+            "https://media.discordapp.net/attachments/1217933367849386004/1377728077718884513/uhhhhh.gif?ex=683a04c2&is=6838b342&hm=a8feb2a95aa152981327b335197e9fd0bd65645bf6c1c0cc75015bcd5afb1b1e&=&width=310&height=548",
+            "https://media.discordapp.net/attachments/1217933367849386004/1377728078360608778/yapyapyap.gif?ex=683a04c2&is=6838b342&hm=a9c96acfe2fe48f2da22273f329e0d33e85ab26afafac50b805ded7310aa3c09&=&width=411&height=411",
+            "https://media.discordapp.net/attachments/1217933367849386004/1377728078788296774/yeeeeeesssss.gif?ex=683a04c2&is=6838b342&hm=1875126d84f1c2ea82c9a499e486ed3ba7faed0a8e6ed088298cdb448c92e8c6&=&width=310&height=548"
+        ]
+        selected_gif = random.choice(gifs)
+        await ctx.response.send_message(selected_gif)
 
 async def setup(bot):
     await bot.add_cog(StimCommands(bot), guild=bot.get_guild(guild_id))
