@@ -5,7 +5,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from utilities.settings import guild_id
-from commands.epic_games_commands import scheduled_post_free_games
+from commands.misc.free_games_c import scheduled_post_free_games
 
 
 class TestCommands(commands.GroupCog, group_name="test"):

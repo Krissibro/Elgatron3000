@@ -1,3 +1,4 @@
+from typing import List
 import discord
 import random
 import pickle
@@ -22,7 +23,7 @@ def make_pin(message: discord.Message) -> Pin:
 
 class PinManager:
     def __init__(self, bot):
-        self.pins = []
+        self.pins: List[Pin] = []
 
         """Fetches all pinned messages and stores them in ./data."""
         # Load if there are pins already stored, else store all the pins
@@ -50,15 +51,15 @@ class PinManager:
         """Loads a random pin from the stored chunks."""
         return random.choice(self.pins)
 
-    def add_pin(self, pinned_message: discord.Message) -> None:
+    def add_pin(self, message: discord.Message) -> None:
         """Adds a pin to the storage."""
-        pinned_message = make_pin(pinned_message)
+        pinned_message: Pin = make_pin(message)
         self.pins.append(pinned_message)
         self.save_pins()
 
-    def remove_pin(self, pinned_message: discord.Message) -> None:
+    def remove_pin(self, message: discord.Message) -> None:
         """Removes a pin from the storage."""
-        pinned_message = make_pin(pinned_message)
+        pinned_message: Pin = make_pin(message)
         self.pins.remove(pinned_message)
         self.save_pins()
 

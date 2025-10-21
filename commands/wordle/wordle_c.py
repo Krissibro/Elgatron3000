@@ -4,7 +4,7 @@ from discord.ext import commands
 
 from apscheduler.triggers.cron import CronTrigger
 
-from command_objects.Wordle import Wordle
+from commands.wordle.Wordle import Wordle
 from utilities.settings import testing, scheduler, guild_id
 
 

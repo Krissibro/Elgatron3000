@@ -104,7 +104,7 @@ class EpicGames(commands.Cog):
         self.bot = bot
 
     @app_commands.command(
-        name="free_games_rn",
+        name="free_games_rn",os.getenv("TOKEN")
         description="See the currently free games on Epic Games"
     )
     async def free_games_rn(self, ctx: discord.Interaction):

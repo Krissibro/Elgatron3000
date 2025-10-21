@@ -6,13 +6,12 @@ import asyncio
 from discord import app_commands
 from discord.ext import commands
 
-from command_objects.ActiveCommands import ActiveCommands
-from command_objects.MessagingInfo import MessagingInfo
+from commands.messaging.MessagingInfo import MessagingInfo
 from utilities.helper_functions import parse_time, validate_interval, validate_amount
 from utilities.settings import guild_id, active_commands
 
 
-async def execute_command(ctx, internal_function: Callable, user: discord.User, message: str, amount: int, interval: int, channel: discord.TextChannel) -> None:
+async def execute_command(ctx, internal_function: Callable, user: Union[discord.User, discord.Role, None], message: str, amount: int, interval: int, channel: discord.TextChannel) -> None:
     """
     Executes a specified command with validation, tracking, and response handling.
 
@@ -127,7 +126,7 @@ class MessagingCommands(commands.Cog):
         name="annoy",
         description="Spam a message at someone!",
     )
-    async def annoy(self, ctx, message: str, amount: int, interval: str, user: Union[discord.User, discord.Role]  = None):
+    async def annoy(self, ctx, message: str, amount: int, interval: str, user: discord.User = None):
         interval = parse_time(interval)
         await execute_command(ctx, annoy_internal, user, message, amount, interval, ctx.channel)
 

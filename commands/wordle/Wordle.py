@@ -7,7 +7,7 @@ import discord
 from datetime import datetime
 from typing import Optional
 
-from command_objects.WordleStats import WordleStats
+from commands.wordle.WordleStats import WordleStats
 from utilities.helper_functions import format_millisecond_duration
 from utilities.settings import testing_channel_id, testing, wordle_channel_id
 
