@@ -1,10 +1,12 @@
-import discord.ui
-
+import discord
 from discord import app_commands
 from discord.ext import commands
+from ast import literal_eval
+import asyncio
 
-from utilities.settings import guild_id, active_commands
-
+from commands.messaging.MessagingInfo import MessagingInfo
+from utilities.helper_functions import parse_time, format_seconds, validate_numeric, validate_interval, validate_amount
+from utilities.settings import active_commands
 
 class MessageSelectDropdown(discord.ui.Select):
     def __init__(self):
@@ -80,6 +82,51 @@ class ManageCommandsButtons(discord.ui.View):
         else:
             await self.return_to_dropdown(interaction)
 
+
+class EditMessagingCommandWindow(discord.ui.Modal):
+    def __init__(self, command_info: MessagingInfo) -> None:
+        super().__init__(title="Edit")
+        self.command_info = command_info
+
+        self.message_input = discord.ui.TextInput(
+            label="Message:",
+            style=discord.TextStyle.short,
+            default=command_info.message
+        )
+        self.amount_input = discord.ui.TextInput(
+            label="Amount:",
+            style=discord.TextStyle.short,
+            default=str(command_info.remaining)
+        )
+        self.interval_input = discord.ui.TextInput(
+            label="Interval:",
+            style=discord.TextStyle.short,
+            default=format_seconds(command_info.interval)
+        )
+        self.add_item(self.message_input)
+        self.add_item(self.amount_input)
+        self.add_item(self.interval_input)
+
+        self.finished_event = asyncio.Event()
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        if (
+            not await validate_numeric(interaction, self.amount_input.value, "Amount must be numeric") or
+            not await validate_amount(interaction, int(self.amount_input.value)) or
+            not await validate_interval(interaction, parse_time(self.interval_input.value))
+        ):
+            self.stop()
+            self.finished_event.set()
+            return
+        await interaction.response.defer()
+
+        self.command_info.message = self.message_input.value
+        self.command_info.amount = literal_eval(self.amount_input.value)
+        self.command_info.remaining = literal_eval(self.amount_input.value)
+        self.command_info.interval = parse_time(self.interval_input.value)
+
+        self.stop()
+        self.finished_event.set()  # Signal that the modal is closed
 
 class CommandManagement(commands.Cog):
     def __init__(self, bot):

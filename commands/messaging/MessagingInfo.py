@@ -4,21 +4,28 @@ from ast import literal_eval
 import discord
 
 from datetime import timedelta
-from typing import List
+from typing import List, Union
 
-from command_objects.CommandInfo import CommandInfo
-from utilities.helper_functions import char_to_emoji, format_seconds, validate_numeric, validate_amount, \
-    validate_interval, parse_time
+from commands.messaging.CommandInfo import CommandInfo
+# file uses format_seconds, validate_numeric, validate_amount, validate_interval, parse_time
+from utilities.helper_functions import (
+    char_to_emoji,
+    format_seconds,
+    validate_numeric,
+    validate_amount,
+    validate_interval,
+    parse_time,
+)
 
 
 class MessagingInfo(CommandInfo):
-    def __init__(self, command_name: str, user: discord.User, message: str, amount: int, interval: int, channel: discord.TextChannel):
+    def __init__(self, command_name: str, user: Union[discord.User, discord.Role, None], message: str, amount: int, interval: int, channel: discord.TextChannel):
         super().__init__(command_name, channel)
         self.message: str = message
         self.amount: int = amount
         self.remaining: int = amount
         self.interval: int = interval
-        self.user: discord.User = user
+        self.user: Union[discord.User, discord.Role, None] = user
         self.messages: List[discord.Message] = []
         self.process = None
 
