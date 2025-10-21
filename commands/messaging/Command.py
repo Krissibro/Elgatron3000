@@ -2,7 +2,7 @@ import discord
 
 from typing import List
 
-from command_objects.CommandInfo import CommandInfo
+from commands.messaging.CommandInfo import CommandInfo
 
 
 class Command:

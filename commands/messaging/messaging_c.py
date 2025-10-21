@@ -6,8 +6,8 @@ import asyncio
 from discord import app_commands
 from discord.ext import commands
 
-from command_objects.Command import Command
-from command_objects.MessagingInfo import MessagingInfo
+from commands.messaging.Command import Command
+from commands.messaging.MessagingInfo import MessagingInfo
 from utilities.helper_functions import parse_time, validate_interval, validate_amount
 from utilities.settings import guild_id
 
