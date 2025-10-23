@@ -7,7 +7,7 @@ import asyncio
 from discord import app_commands
 from discord.ext import commands
 
-from utilities.elgatron import Elgatron
+from bot import Elgatron
 
 from collections import namedtuple
 
