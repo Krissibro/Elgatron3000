@@ -56,12 +56,13 @@ class ManageCommandsButtons(discord.ui.View):
     @discord.ui.button(emoji="💀", style=discord.ButtonStyle.red)
     async def kill_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
         await interaction.response.defer()
-        await self.return_to_dropdown(interaction)
 
         if active_commands.check_if_command_exists(self.command_id):
             active_commands[self.command_id].kill()
             await active_commands[self.command_id].delete_messages()
             active_commands.kill(self.command_id)
+            
+        await self.return_to_dropdown(interaction)
 
 
     @discord.ui.button(emoji="🪶", style=discord.ButtonStyle.green)
