@@ -9,7 +9,8 @@ from discord.ext import commands
 from commands.messaging.MessagingInfo import MessagingInfo
 
 from utilities.helper_functions import parse_time
-from utilities.settings import Elgatron, active_commands
+from bot import Elgatron
+from utilities.settings import active_commands 
 
 
 async def execute_command(ctx, internal_function: Callable, target: Union[discord.User, discord.Role, None], message: str, amount: int, interval: int, channel: discord.TextChannel) -> None:

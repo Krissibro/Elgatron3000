@@ -5,8 +5,7 @@ from discord.ext import commands
 from apscheduler.triggers.cron import CronTrigger
 
 from commands.wordle.Wordle import Wordle
-from utilities.settings import scheduler
-from utilities.settings import Elgatron
+from bot import Elgatron
 
 
 # TODO maybe split this class into 2, a wordle class and a Cog class.
@@ -59,11 +58,11 @@ async def setup(bot: Elgatron):
     await wordle_cog.wordle.load_state()
 
     job_id = "wordle_pick_new_word"
-    if not scheduler.get_job(job_id):
+    if not bot.scheduler.get_job(job_id):
         new_word_trigger = CronTrigger(hour=8, minute=0, second=0, timezone='Europe/Oslo')
-        scheduler.add_job(wordle_cog.wordle.pick_new_word, new_word_trigger, id=job_id)
+        bot.scheduler.add_job(wordle_cog.wordle.pick_new_word, new_word_trigger, id=job_id)
         reminder_trigger = CronTrigger(hour=22, minute=0, second=0, timezone='Europe/Oslo')
-        scheduler.add_job(wordle_cog.wordle.send_reminder, reminder_trigger, id="wordle_reminder")
+        bot.scheduler.add_job(wordle_cog.wordle.send_reminder, reminder_trigger, id="wordle_reminder")
 
         await bot.add_cog(wordle_cog, guild=discord.Object(id=bot.guild_id))
 

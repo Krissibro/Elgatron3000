@@ -7,9 +7,8 @@ from epicstore_api import EpicGamesStoreAPI
 from apscheduler.triggers.cron import CronTrigger
 
 from utilities.settings import game_channel_id, testing_channel_id
-from utilities.settings import scheduler
 from utilities.state_helper import save_state, load_state
-from utilities.elgatron import Elgatron
+from bot import Elgatron
 from typing import List
 
 
@@ -118,8 +117,8 @@ class EpicGames(commands.Cog):
 async def setup(bot: Elgatron):
     trigger = CronTrigger(hour=18, minute=0, second=0, timezone='Europe/Oslo')
     job_id = "post_free_games"
-    if not scheduler.get_job(job_id):
-        scheduler.add_job(lambda: asyncio.create_task(scheduled_post_free_games(bot)), trigger=trigger, id=job_id)
+    if not bot.scheduler.get_job(job_id):
+        bot.scheduler.add_job(lambda: asyncio.create_task(scheduled_post_free_games(bot)), trigger=trigger, id=job_id)
 
 
     await bot.add_cog(EpicGames(bot), guild=discord.Object(id=bot.guild_id))

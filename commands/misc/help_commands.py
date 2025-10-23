@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-from utilities.elgatron import Elgatron
+from bot import Elgatron
 
 
 class Help(commands.Cog):
