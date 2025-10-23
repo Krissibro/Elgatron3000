@@ -7,7 +7,7 @@ from datetime import timedelta
 from typing import List, Union
 
 from commands.messaging.CommandInfo import CommandInfo
-# file uses format_seconds, validate_numeric, validate_amount, validate_interval, parse_time
+
 from utilities.helper_functions import (
     char_to_emoji,
     format_seconds,
@@ -65,9 +65,9 @@ class MessagingInfo(CommandInfo):
         return EditMessagingCommandWindow(self)
 
 class EditMessagingCommandWindow(discord.ui.Modal):
-    def __init__(self, messaging_info) -> None:
+    def __init__(self, messaging_info: MessagingInfo) -> None:
         super().__init__(title="Edit")
-        self.messaging_info = messaging_info
+        self.messaging_info: MessagingInfo = messaging_info
 
         self.message_input = discord.ui.TextInput(
             label="Message:",
