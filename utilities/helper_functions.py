@@ -4,27 +4,26 @@ import re
 from datetime import timedelta
 
 
-async def validate_interval(ctx, interval):
-    if interval <= 0:
-        await ctx.response.send_message(embed=discord.Embed(title="Input must be formatted as _d_h_m_s, i.e. 10m10s."),
-                                        ephemeral=True)
-        return False
-    return True
+def validate_interval(interval: str) -> int | discord.Embed:
+    time: int = parse_time(interval)
+    if time <= 0:
+        return discord.Embed(title="Input must be formatted as _d_h_m_s, i.e. 10m10s.")
+    return time
 
 
-async def validate_amount(ctx, amount: int):
-    if amount <= 0:
-        await ctx.response.send_message(embed=discord.Embed(title="Amount cannot be less than or equal to 0"),
-                                        ephemeral=True)
-        return False
-    return True
+def validate_natural_number(amount: str) -> int | discord.Embed:
+    integer: int | discord.Embed = validate_digit(amount)
+    if isinstance(integer, discord.Embed):
+        return integer
+    elif integer < 0:
+        return discord.Embed(title="Amount cannot be less than or equal to 0")
+    return integer
 
 
-async def validate_numeric(ctx, amount: str, error_msg: str):
-    if not amount.isnumeric():
-        await ctx.response.send_message(embed=discord.Embed(title=error_msg), ephemeral=True)
-        return False
-    return True
+def validate_digit(amount: str) -> int | discord.Embed:
+    if not amount.isdigit():
+        return discord.Embed(title=f"{amount} is not a valid number")
+    return int(amount)
 
 
 def parse_time(time_str: str) -> int:

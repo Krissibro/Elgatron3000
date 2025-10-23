@@ -1,18 +1,9 @@
 import json
-import discord
-from discord.ext.commands import Bot
-
+from utilities.elgatron import Elgatron
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from commands.messaging.ActiveCommands import ActiveCommands
 
-# Shared Variables
-intents = discord.Intents.default()
-intents.members = True
-intents.messages = True
-intents.message_content = True
-bot = Bot(intents=intents, command_prefix="/")
-tree = bot.tree
 scheduler = AsyncIOScheduler(timezone='Europe/Oslo')
 active_commands: ActiveCommands = ActiveCommands()
 
@@ -24,3 +15,5 @@ testing = contents["testing"]
 game_channel_id = contents["game_channel_id"]
 wordle_channel_id = contents["wordle_channel_id"]
 testing_channel_id = contents["testing_channel_id"]
+
+bot = Elgatron(guild_id, testing)

@@ -1,13 +1,15 @@
 import discord
+import asyncio
 from discord import app_commands
 from discord.ext import commands
 
 from epicstore_api import EpicGamesStoreAPI
 from apscheduler.triggers.cron import CronTrigger
 
-from utilities.settings import testing, game_channel_id, testing_channel_id, bot
-from utilities.settings import guild_id, scheduler
+from utilities.settings import game_channel_id, testing_channel_id
+from utilities.settings import scheduler
 from utilities.state_helper import save_state, load_state
+from utilities.elgatron import Elgatron
 from typing import List
 
 
@@ -78,7 +80,7 @@ def update_free_games_state(free_games: List[dict]) -> None:
 previous_free_game_titles = get_free_games_state()
 
 
-async def scheduled_post_free_games() -> None:
+async def scheduled_post_free_games(bot: Elgatron) -> None:
     global previous_free_game_titles
     free_games = await get_free_games()
     current_free_game_titles = [game["title"] for game in free_games]
@@ -88,7 +90,7 @@ async def scheduled_post_free_games() -> None:
         previous_free_game_titles = current_free_game_titles
         update_free_games_state(current_free_game_titles)
 
-        if not testing:
+        if not bot.testing:
             channel = bot.get_channel(game_channel_id)
         else:
             channel = bot.get_channel(testing_channel_id)
@@ -113,11 +115,11 @@ class EpicGames(commands.Cog):
         await send_games_embed(ctx.channel, free_games)
 
 
-async def setup(bot):
+async def setup(bot: Elgatron):
     trigger = CronTrigger(hour=18, minute=0, second=0, timezone='Europe/Oslo')
     job_id = "post_free_games"
     if not scheduler.get_job(job_id):
-        scheduler.add_job(scheduled_post_free_games, trigger, id=job_id)
+        scheduler.add_job(lambda: asyncio.create_task(scheduled_post_free_games(bot)), trigger=trigger, id=job_id)
 
 
-    await bot.add_cog(EpicGames(bot), guild=bot.get_guild(guild_id))
+    await bot.add_cog(EpicGames(bot), guild=bot.get_guild(bot.guild_id))

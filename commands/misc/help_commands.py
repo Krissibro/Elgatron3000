@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-from utilities.settings import guild_id
+from utilities.elgatron import Elgatron
 
 
 class Help(commands.Cog):
@@ -69,5 +69,5 @@ class Help(commands.Cog):
         await ctx.response.send_message(embed=embed, ephemeral=True)
 
 
-async def setup(bot):
-    await bot.add_cog(Help(bot), guild=bot.get_guild(guild_id))
+async def setup(bot: Elgatron):
+    await bot.add_cog(Help(bot), guild=bot.get_guild(bot.guild_id))

@@ -1,30 +1,16 @@
 import os
 from typing import Optional
 from dotenv import load_dotenv
-import glob
 
-from utilities.settings import testing, bot, guild_id, scheduler
+from utilities.settings import bot, scheduler
 
 
 # TODO: MAY RUN MORE THAN ONCE! :skull:
 @bot.event
 async def on_ready():
+    guild=bot.get_guild(bot.guild_id)
 
-    for path in glob.glob("./commands/**/*_c.py", recursive=True):
-        # files are in the format: "./x/y.py" 
-        # this turns it to: "x.y"
-        formatted_path = path[2:-3].replace("/", ".")
-        await bot.load_extension(formatted_path)
-        
-
-    if testing:
-        for path in glob.glob("./the_lab/**/*_c.py", recursive=True):
-            formatted_path = path[2:-3].replace("/", ".")
-            await bot.load_extension(formatted_path)
-
-    guild=bot.get_guild(guild_id)
-
-    if not testing:
+    if not bot.testing:
         await bot.tree.sync(guild=guild)
 
     scheduler.start()

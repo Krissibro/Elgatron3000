@@ -7,7 +7,7 @@ import asyncio
 from discord import app_commands
 from discord.ext import commands
 
-from utilities.settings import guild_id
+from utilities.elgatron import Elgatron
 
 from collections import namedtuple
 
@@ -22,7 +22,7 @@ def make_pin(message: discord.Message) -> Pin:
 
 
 class PinManager:
-    def __init__(self, bot):
+    def __init__(self, bot: Elgatron):
         self.pins: List[Pin] = []
 
         """Fetches all pinned messages and stores them in ./data."""
@@ -31,7 +31,7 @@ class PinManager:
             self.pins = pickle.load(open("./data/pins.pkl", "rb"))
         except (OSError, IOError) as e:
             self.pins = []
-            guild = bot.get_guild(guild_id)
+            guild = bot.get_guild(bot.guild_id)
 
             # Fetch pins from all channels
             for i, channel in enumerate(guild.text_channels):
@@ -172,5 +172,5 @@ class GuessThatPin(commands.Cog):
 #         print("Get pinned")
 
 
-async def setup(bot):
-    await bot.add_cog(GuessThatPin(bot), guild=bot.get_guild(guild_id))
+async def setup(bot: Elgatron):
+    await bot.add_cog(GuessThatPin(bot), guild=bot.get_guild(bot.guild_id))
