@@ -2,8 +2,8 @@ import io
 import os.path
 
 import PIL
+from PIL.Image import Image
 from pyboy import PyBoy
-from PIL import Image
 from typing import List, Optional
 
 
@@ -57,11 +57,13 @@ class Emulator(PyBoy):
         
         return img_byte_arr
 
-    def tick(self, count: int = 3, render: bool = True):
-        super().tick(count=count, render=render)
-        image: Image = self.screen.image.copy()
-        image = image.resize((image.width* 2, image.height*2))
-        self.images.append(image)
+    def tick(self, count: int = 3, render: bool = True, sound: bool = False) -> bool:
+        result = super().tick(count=count, render=render)
+        if self.screen.image is not None:
+            image = self.screen.image.copy()
+            image = image.resize((image.width* 2, image.height*2))
+            self.images.append(image)
+        return result
 
 
 if __name__ == "__main__":
