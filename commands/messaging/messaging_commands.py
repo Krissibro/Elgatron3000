@@ -12,7 +12,7 @@ from utilities.helper_functions import parse_time
 from utilities.settings import Elgatron, active_commands
 
 
-async def execute_command(ctx, internal_function: Callable, user: Optional[discord.User], message: str, amount: int, interval: int, channel: discord.TextChannel) -> None:
+async def execute_command(ctx, internal_function: Callable, target: Union[discord.User, discord.Role, None], message: str, amount: int, interval: int, channel: discord.TextChannel) -> None:
     """
     Executes a specified command with validation, tracking, and response handling.
 
@@ -33,7 +33,7 @@ async def execute_command(ctx, internal_function: Callable, user: Optional[disco
 
     # Create a Command object with the given information
     function_name = " ".join(internal_function.__name__.split('_')[:-1])
-    messaging_info = MessagingInfo(function_name, user, message, amount, interval, channel)
+    messaging_info = MessagingInfo(function_name, target, message, amount, interval, channel)
 
     async_task = asyncio.create_task(internal_function(ctx, messaging_info))
     command_id = active_commands.add_command(messaging_info, async_task)
@@ -115,10 +115,10 @@ class MessagingCommands(commands.Cog):
         name="get_attention",
         description="Ping someone once every 10 seconds 100 times or until they react"
     )
-    async def get_attention(self, ctx, user: discord.User, message: str = "WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP",
+    async def get_attention(self, ctx, target: Union[discord.User, discord.Role, None], message: str = "WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP",
                             amount: int = 100, interval: str = "10s"):
         parsed_interval: int = parse_time(interval)
-        await execute_command(ctx, get_attention_internal, user, message, amount, parsed_interval, ctx.channel)
+        await execute_command(ctx, get_attention_internal, target, message, amount, parsed_interval, ctx.channel)
 
     @app_commands.command(
         name="annoy",

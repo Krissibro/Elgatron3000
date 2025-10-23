@@ -18,13 +18,13 @@ from utilities.helper_functions import (
 )
 
 class MessagingInfo(CommandInfo):
-    def __init__(self, command_name: str, user: Optional[discord.User], message: str, amount: int, interval: int, channel: discord.TextChannel):
+    def __init__(self, command_name: str, target: Union[discord.User, discord.Role, None], message: str, amount: int, interval: int, channel: discord.TextChannel):
         super().__init__(command_name, channel)
         self.message: str = message
         self.amount: int = amount
         self.remaining: int = amount
         self.interval: int = interval
-        self.user: Optional[discord.User] = user
+        self.target: Union[discord.User, discord.Role, None] = target
         self.messages: List[discord.Message] = []
         self.process = None
 
@@ -33,7 +33,7 @@ class MessagingInfo(CommandInfo):
             title=f"Command: {self.command_name}",
             description=f"Message: {self.message}"
         )
-        if self.user is not None:
+        if self.target is not None:
             embed.add_field(name="User:", value=f"{self.get_mention()}", inline=False)
         embed.add_field(name="Amount:", value=f"{self.remaining}/{self.amount}", inline=True)
         embed.add_field(name="Interval:", value=f"{timedelta(seconds=self.interval)}", inline=True)
@@ -59,7 +59,7 @@ class MessagingInfo(CommandInfo):
         await self.channel.delete_messages(self.messages[1:])
 
     def get_mention(self):
-        return self.user.mention if self.user else ""
+        return self.target.mention if self.target else ""
 
     def get_edit_window(self):
         return EditMessagingCommandWindow(self)
