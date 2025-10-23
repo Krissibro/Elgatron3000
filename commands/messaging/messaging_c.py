@@ -111,8 +111,8 @@ class MessagingCommands(commands.Cog):
         description="Annoy someone as many times as you would like with a given interval!",
     )
     async def dm_spam(self, ctx, user: discord.User, message: str, amount: int, interval: str):
-        interval = parse_time(interval)
-        await execute_command(ctx, dm_spam_internal, user, message, amount, interval, ctx.channel)
+        parsed_interval:int = parse_time(interval)
+        await execute_command(ctx, dm_spam_internal, user, message, amount, parsed_interval, ctx.channel)
 
     @app_commands.command(
         name="get_attention",
@@ -121,7 +121,7 @@ class MessagingCommands(commands.Cog):
     async def get_attention(self, ctx, user: discord.User, message: str = "WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP",
                             amount: int = 100, interval: str = "10s"):
         parsed_interval: int = parse_time(interval)
-        await execute_command(ctx, get_attention_internal, user, message, amount, interval, ctx.channel)
+        await execute_command(ctx, get_attention_internal, user, message, amount, parsed_interval, ctx.channel)
 
     @app_commands.command(
         name="annoy",
@@ -129,7 +129,7 @@ class MessagingCommands(commands.Cog):
     )
     async def annoy(self, ctx, message: str, amount: int, interval: str, user: discord.User = None):
         parsed_interval: int = parse_time(interval)
-        await execute_command(ctx, annoy_internal, user, message, amount, interval, ctx.channel)
+        await execute_command(ctx, annoy_internal, user, message, amount, parsed_interval, ctx.channel)
 
 
 async def setup(bot):
