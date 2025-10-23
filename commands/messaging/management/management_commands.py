@@ -3,9 +3,9 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from utilities.elgatron import Elgatron
 from commands.messaging.management.management_view import ManageCommandsDropDown
-from commands.messaging.ActiveCommands import ActiveCommands
-from utilities.settings import guild_id, active_commands
+from utilities.settings import active_commands
 
 class CommandManagement(commands.Cog):
     def __init__(self, bot):
@@ -40,5 +40,5 @@ class CommandManagement(commands.Cog):
                                         delete_after=10)
 
 
-async def setup(bot):
-    await bot.add_cog(CommandManagement(bot), guild=bot.get_guild(guild_id))
+async def setup(bot: Elgatron):
+    await bot.add_cog(CommandManagement(bot), guild=bot.get_guild(bot.guild_id))

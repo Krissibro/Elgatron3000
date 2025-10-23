@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-from utilities.settings import guild_id
+from utilities.elgatron import Elgatron
 from commands.emulator.emulator_model import Emulator
 from commands.emulator.emulator_view import EmulatorController
 
@@ -33,6 +33,6 @@ class EmulatorCommands(commands.Cog):
         await msg.create_thread(name="Discuss Pokemon!")
 
 
-async def setup(bot):
-    await bot.add_cog(EmulatorCommands(bot), guild=bot.get_guild(guild_id))
+async def setup(bot: Elgatron):
+    await bot.add_cog(EmulatorCommands(bot), guild=bot.get_guild(bot.guild_id))
     print("loaded!")

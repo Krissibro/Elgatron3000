@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-from utilities.settings import guild_id
+from utilities.elgatron import Elgatron
 
 
 class PollCommands(commands.GroupCog, group_name = "poll"):
@@ -39,5 +39,5 @@ class PollCommands(commands.GroupCog, group_name = "poll"):
             await thread.send(content=role_mention.mention + " GET YO ASS IN HERE")
 
 
-async def setup(bot):
-    await bot.add_cog(PollCommands(bot), guild=bot.get_guild(guild_id))
+async def setup(bot: Elgatron):
+    await bot.add_cog(PollCommands(bot), guild=bot.get_guild(bot.guild_id))

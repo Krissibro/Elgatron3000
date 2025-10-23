@@ -5,7 +5,8 @@ from discord.ext import commands
 from apscheduler.triggers.cron import CronTrigger
 
 from commands.wordle.Wordle import Wordle
-from utilities.settings import testing, scheduler, guild_id
+from utilities.settings import scheduler
+from utilities.settings import Elgatron
 
 
 # TODO maybe split this class into 2, a wordle class and a Cog class.
@@ -52,7 +53,7 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         await ctx.response.send_message(embed=discord.Embed(title="Wordle has been reset!"), ephemeral=True, delete_after=10)
 
 
-async def setup(bot):
+async def setup(bot: Elgatron):
     wordle_cog = WordleCommands(bot)
 
     await wordle_cog.wordle.load_state()
@@ -64,7 +65,7 @@ async def setup(bot):
         reminder_trigger = CronTrigger(hour=22, minute=0, second=0, timezone='Europe/Oslo')
         scheduler.add_job(wordle_cog.wordle.send_reminder, reminder_trigger, id="wordle_reminder")
 
-    await bot.add_cog(wordle_cog, guild=bot.get_guild(guild_id))
+    await bot.add_cog(wordle_cog, guild=bot.get_guild(bot.guild_id))
 
 
 

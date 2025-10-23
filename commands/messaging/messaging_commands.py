@@ -1,4 +1,4 @@
-from typing import Union, Callable
+from typing import Optional, Callable
 
 import discord
 import asyncio
@@ -8,11 +8,11 @@ from discord.ext import commands
 
 from commands.messaging.MessagingInfo import MessagingInfo
 
-from utilities.helper_functions import parse_time, validate_interval, validate_amount
-from utilities.settings import guild_id, active_commands
+from utilities.helper_functions import parse_time
+from utilities.settings import Elgatron, active_commands
 
 
-async def execute_command(ctx, internal_function: Callable, user: discord.User, message: str, amount: int, interval: int, channel: discord.TextChannel) -> None:
+async def execute_command(ctx, internal_function: Callable, user: Optional[discord.User], message: str, amount: int, interval: int, channel: discord.TextChannel) -> None:
     """
     Executes a specified command with validation, tracking, and response handling.
 
@@ -30,10 +30,6 @@ async def execute_command(ctx, internal_function: Callable, user: discord.User, 
         It sends an ephemeral response message with the command details, executes the command, and cleans up after completion.
         If validation fails at any step, the function exits without executing the command.
     """
-
-    # Error handling
-    if not (await validate_amount(ctx, amount) and await validate_interval(ctx, interval)):
-        return
 
     # Create a Command object with the given information
     function_name = " ".join(internal_function.__name__.split('_')[:-1])
@@ -132,5 +128,5 @@ class MessagingCommands(commands.Cog):
         await execute_command(ctx, annoy_internal, user, message, amount, parsed_interval, ctx.channel)
 
 
-async def setup(bot):
-    await bot.add_cog(MessagingCommands(bot), guild=bot.get_guild(guild_id))
+async def setup(bot: Elgatron):
+    await bot.add_cog(MessagingCommands(bot), guild=bot.get_guild(bot.guild_id))

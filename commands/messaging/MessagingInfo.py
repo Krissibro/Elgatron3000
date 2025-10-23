@@ -4,27 +4,27 @@ from ast import literal_eval
 import discord
 
 from datetime import timedelta
-from typing import List, Union
+from typing import List, Optional, Union
 
 from commands.messaging.CommandInfo import CommandInfo
 
 from utilities.helper_functions import (
     char_to_emoji,
     format_seconds,
-    validate_numeric,
-    validate_amount,
+    validate_digit,
+    validate_natural_number,
     validate_interval,
     parse_time,
 )
 
 class MessagingInfo(CommandInfo):
-    def __init__(self, command_name: str, user: discord.User, message: str, amount: int, interval: int, channel: discord.TextChannel):
+    def __init__(self, command_name: str, user: Optional[discord.User], message: str, amount: int, interval: int, channel: discord.TextChannel):
         super().__init__(command_name, channel)
         self.message: str = message
         self.amount: int = amount
         self.remaining: int = amount
         self.interval: int = interval
-        self.user: Union[discord.User, discord.Role, None] = user
+        self.user: Optional[discord.User] = user
         self.messages: List[discord.Message] = []
         self.process = None
 
@@ -90,17 +90,22 @@ class EditMessagingCommandWindow(discord.ui.Modal):
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
         await interaction.response.defer()
-        if (
-            not await validate_numeric(interaction, self.amount_input.value, "Amount must be numeric") or
-            not await validate_amount(interaction, int(self.amount_input.value)) or
-            not await validate_interval(interaction, parse_time(self.interval_input.value))
-        ):
+
+        amount = validate_natural_number(self.amount_input.value)
+        interval = validate_interval(self.interval_input.value)
+
+        if isinstance(amount, discord.Embed):
+            await interaction.followup.send(embed=amount, ephemeral=True)
+            self.stop()
+            return
+        if isinstance(interval, discord.Embed):
+            await interaction.followup.send(embed=interval, ephemeral=True)
             self.stop()
             return
 
         self.messaging_info.message = self.message_input.value
-        self.messaging_info.amount = literal_eval(self.amount_input.value)
-        self.messaging_info.remaining = literal_eval(self.amount_input.value)
-        self.messaging_info.interval = parse_time(self.interval_input.value)
+        self.messaging_info.amount = amount
+        self.messaging_info.remaining = amount
+        self.messaging_info.interval = interval
 
         self.stop()
