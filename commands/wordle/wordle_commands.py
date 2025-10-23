@@ -65,7 +65,7 @@ async def setup(bot: Elgatron):
         reminder_trigger = CronTrigger(hour=22, minute=0, second=0, timezone='Europe/Oslo')
         scheduler.add_job(wordle_cog.wordle.send_reminder, reminder_trigger, id="wordle_reminder")
 
-    await bot.add_cog(wordle_cog, guild=bot.get_guild(bot.guild_id))
+        await bot.add_cog(wordle_cog, guild=discord.Object(id=bot.guild_id))
 
 
 

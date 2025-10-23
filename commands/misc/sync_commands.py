@@ -45,4 +45,4 @@ class CommandSync(commands.Cog):
 
 # Set up the cog
 async def setup(bot: Elgatron):
-    await bot.add_cog(CommandSync(bot), guild=bot.get_guild(bot.guild_id))
+    await bot.add_cog(CommandSync(bot), guild=discord.Object(id=bot.guild_id))

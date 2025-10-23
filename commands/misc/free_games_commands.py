@@ -122,4 +122,4 @@ async def setup(bot: Elgatron):
         scheduler.add_job(lambda: asyncio.create_task(scheduled_post_free_games(bot)), trigger=trigger, id=job_id)
 
 
-    await bot.add_cog(EpicGames(bot), guild=bot.get_guild(bot.guild_id))
+    await bot.add_cog(EpicGames(bot), guild=discord.Object(id=bot.guild_id))
