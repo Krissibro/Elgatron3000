@@ -110,4 +110,4 @@ class StimCommands(commands.GroupCog, group_name="stim"):
         await ctx.response.send_message(selected_gif)
 
 async def setup(bot: Elgatron):
-    await bot.add_cog(StimCommands(bot), guild=bot.get_guild(bot.guild_id))
+    await bot.add_cog(StimCommands(bot), guild=discord.Object(id=bot.guild_id))

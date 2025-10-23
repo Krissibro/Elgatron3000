@@ -1,4 +1,4 @@
-from typing import Optional, Callable
+from typing import Optional, Callable, Union
 
 import discord
 import asyncio
@@ -97,7 +97,8 @@ async def annoy_internal(ctx, messaging_info: MessagingInfo) -> None:
 
     await messaging_info.delete_messages()
 
-
+# TODO figure out how converters work 
+# https://discordpy.readthedocs.io/en/latest/interactions/api.html?highlight=app_commands#transformersclass MessagingCommands(commands.Cog):
 class MessagingCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -123,10 +124,10 @@ class MessagingCommands(commands.Cog):
         name="annoy",
         description="Spam a message at someone!",
     )
-    async def annoy(self, ctx, message: str, amount: int, interval: str, user: discord.User = None):
+    async def annoy(self, ctx, message: str, amount: int, interval: str, target: Union[discord.User, discord.Role, None] = None):
         parsed_interval: int = parse_time(interval)
-        await execute_command(ctx, annoy_internal, user, message, amount, parsed_interval, ctx.channel)
+        await execute_command(ctx, annoy_internal, target, message, amount, parsed_interval, ctx.channel)
 
 
 async def setup(bot: Elgatron):
-    await bot.add_cog(MessagingCommands(bot), guild=bot.get_guild(bot.guild_id))
+    await bot.add_cog(MessagingCommands(bot), guild=discord.Object(id=bot.guild_id))

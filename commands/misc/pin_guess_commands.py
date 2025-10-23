@@ -173,4 +173,4 @@ class GuessThatPin(commands.Cog):
 
 
 async def setup(bot: Elgatron):
-    await bot.add_cog(GuessThatPin(bot), guild=bot.get_guild(bot.guild_id))
+    await bot.add_cog(GuessThatPin(bot), guild=discord.Object(id=bot.guild_id))

@@ -55,4 +55,4 @@ class TestCommands(commands.GroupCog, group_name="test"):
 
 
 async def setup(bot: Elgatron):
-    await bot.add_cog(TestCommands(bot), guild=bot.get_guild(bot.guild_id))
+    await bot.add_cog(TestCommands(bot), guild=discord.Object(id=bot.guild_id))

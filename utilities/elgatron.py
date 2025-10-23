@@ -8,12 +8,12 @@ class Elgatron(Bot):
         intents.members = True
         intents.messages = True
         intents.message_content = True
+        intents.guilds = True
 
         self.guild_id = guild_id
         self.testing = testing
         
         super().__init__(intents=intents, command_prefix="/")
-
 
     async def setup_hook(self) -> None:
         for path in glob("./commands/**/*_commands.py", recursive=True):

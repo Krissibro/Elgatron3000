@@ -81,4 +81,4 @@ async def petting(avatar_image: Image) -> discord.File:
 
 
 async def setup(bot: Elgatron):
-    await bot.add_cog(Petting(bot), guild=bot.get_guild(bot.guild_id))
+    await bot.add_cog(Petting(bot), guild=discord.Object(id=bot.guild_id))
