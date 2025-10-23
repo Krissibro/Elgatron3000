@@ -70,8 +70,6 @@ class ManageCommandsButtons(discord.ui.View):
         if active_commands.check_if_command_exists(self.command_id):
             modal = active_commands[self.command_id].get_edit_window()
             await interaction.response.send_modal(modal)
-            await modal.finished_event.wait()  # Wait for the modal to be closed
+            await modal.wait()  # Wait for the modal to be closed
 
-            await self.make_command_embed(interaction)
-        else:
-            await self.return_to_dropdown(interaction)
+        await self.make_command_embed(interaction)

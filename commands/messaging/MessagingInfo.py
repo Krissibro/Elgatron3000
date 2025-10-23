@@ -88,8 +88,6 @@ class EditMessagingCommandWindow(discord.ui.Modal):
         self.add_item(self.amount_input)
         self.add_item(self.interval_input)
 
-        self.finished_event = asyncio.Event()
-
     async def on_submit(self, interaction: discord.Interaction) -> None:
         await interaction.response.defer()
         if (
@@ -98,7 +96,6 @@ class EditMessagingCommandWindow(discord.ui.Modal):
             not await validate_interval(interaction, parse_time(self.interval_input.value))
         ):
             self.stop()
-            self.finished_event.set()
             return
 
         self.messaging_info.message = self.message_input.value
@@ -107,4 +104,3 @@ class EditMessagingCommandWindow(discord.ui.Modal):
         self.messaging_info.interval = parse_time(self.interval_input.value)
 
         self.stop()
-        self.finished_event.set()  # Signal that the modal is closed
