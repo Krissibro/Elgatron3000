@@ -1,8 +1,9 @@
 import json
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from commands.messaging.ActiveCommands import ActiveCommands
 from utilities.elgatron import Elgatron
+
+# TODO deal with most the stuff in here, it should be in the bot i think
 
 active_commands: ActiveCommands = ActiveCommands()
 
