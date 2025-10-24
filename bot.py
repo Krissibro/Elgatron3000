@@ -3,7 +3,6 @@ import os
 from typing import Optional
 from dotenv import load_dotenv
 
-from utilities.elgatron import Elgatron
 from utilities.settings import bot
 
 load_dotenv("token.env")

@@ -33,6 +33,11 @@ class CommandManagement(commands.Cog):
             await ctx.response.send_message(embed=discord.Embed(title="Cannot delete less than 1 message"),
                                             ephemeral=True)
             return
+        if not isinstance(ctx.channel, (discord.TextChannel, discord.Thread)) :
+            await ctx.response.send_message(embed=discord.Embed(title="Can only clean up text channels"),
+                                            ephemeral=True)
+            return
+
         await ctx.response.defer()
         await ctx.channel.purge(limit=messages_amount, check=lambda m: m.author == self.bot.user)
         await ctx.response.send_message(embed=discord.Embed(title=f"Deleted {messages_amount} messages"),

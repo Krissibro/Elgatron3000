@@ -74,12 +74,20 @@ async def get_attention_internal(ctx, messaging_info: MessagingInfo) -> None:
 
 async def dm_spam_internal(ctx, messaging_info: MessagingInfo) -> None:
     try:
+        # these two should technically never happen 
+        if isinstance(messaging_info.target, discord.Role):
+            raise ValueError("Target user is invalid.")
+        if messaging_info.target is None:
+            raise ValueError("Target user is invalid.")
+        
         while messaging_info.remaining > 0:
             messaging_info.remaining -= 1
 
-            await messaging_info.user.send(messaging_info.message)
+            await messaging_info.target.send(messaging_info.message)
             await asyncio.sleep(messaging_info.interval)
-
+    except ValueError:
+        embed = discord.Embed(title="Can only message Users.")
+        await ctx.followup.send(embed=embed, ephemeral=True)
     except discord.Forbidden:
         embed = discord.Embed(title="I don't have permission to send messages to that user.")
         await ctx.followup.send(embed=embed, ephemeral=True)
@@ -99,7 +107,7 @@ async def annoy_internal(ctx, messaging_info: MessagingInfo) -> None:
     await messaging_info.delete_messages()
 
 # TODO figure out how converters work 
-# https://discordpy.readthedocs.io/en/latest/interactions/api.html?highlight=app_commands#transformersclass MessagingCommands(commands.Cog):
+# https://discordpy.readthedocs.io/en/latest/interactions/api.html?highlight=app_commands#transformerss
 class MessagingCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
