@@ -21,7 +21,12 @@ class MessagingCommands(commands.Cog):
         name="dm_spam",
         description="Annoy someone as many times as you would like with a given interval!",
     )
-    async def dm_spam(self, ctx, user: discord.User, message: str, amount: int, interval: str):
+    async def dm_spam(self, ctx, 
+                      user: discord.User, 
+                      message: str, 
+                      amount: discord.app_commands.Range[int, 1, None], 
+                      interval: str
+                    ):
         parsed_interval:int = parse_time(interval)
         await execute_command(ctx, dm_spam_internal, user, message, amount, parsed_interval, ctx.channel)
 
@@ -29,8 +34,12 @@ class MessagingCommands(commands.Cog):
         name="get_attention",
         description="Ping someone once every 10 seconds 100 times or until they react"
     )
-    async def get_attention(self, ctx, target: Union[discord.User, discord.Role, None], message: str = "WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP",
-                            amount: int = 100, interval: str = "10s"):
+    async def get_attention(self, ctx, 
+                            target: Union[discord.User, discord.Role, None], 
+                            message: str = "WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP",
+                            amount: app_commands.Range[int, 1, None] = 100, 
+                            interval: str = "10s"
+                            ):
         parsed_interval: int = parse_time(interval)
         await execute_command(ctx, get_attention_internal, target, message, amount, parsed_interval, ctx.channel)
 
@@ -38,7 +47,12 @@ class MessagingCommands(commands.Cog):
         name="annoy",
         description="Spam a message at someone!",
     )
-    async def annoy(self, ctx, message: str, amount: int, interval: str, target: Union[discord.User, discord.Role, None] = None):
+    async def annoy(self, ctx,
+                    message: str,
+                    amount: app_commands.Range[int, 1, None],
+                    interval: str,
+                    target: Union[discord.User, discord.Role, None] = None
+                    ):
         parsed_interval: int = parse_time(interval)
         await execute_command(ctx, annoy_internal, target, message, amount, parsed_interval, ctx.channel)
 
