@@ -8,7 +8,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 from utilities.settings import game_channel_id, testing_channel_id
 from utilities.state_helper import save_state, load_state
-from bot import Elgatron
+from utilities.elgatron import Elgatron
 from typing import List
 
 

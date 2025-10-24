@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-from bot import Elgatron
+from utilities.elgatron import Elgatron
 from commands.emulator.emulator_model import Emulator
 from commands.emulator.emulator_view import EmulatorController
 
@@ -35,4 +35,3 @@ class EmulatorCommands(commands.Cog):
 
 async def setup(bot: Elgatron):
     await bot.add_cog(EmulatorCommands(bot), guild=discord.Object(id=bot.guild_id))
-    print("loaded!")

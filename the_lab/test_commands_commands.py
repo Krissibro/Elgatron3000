@@ -4,7 +4,7 @@ import csv
 from discord import app_commands
 from discord.ext import commands
 
-from bot import Elgatron
+from utilities.elgatron import Elgatron
 from commands.misc.free_games_commands import scheduled_post_free_games
 
 
