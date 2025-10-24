@@ -5,7 +5,7 @@ from discord.ext import commands
 from apscheduler.triggers.cron import CronTrigger
 
 from commands.wordle.Wordle import Wordle
-from bot import Elgatron
+from utilities.elgatron import Elgatron
 
 
 # TODO maybe split this class into 2, a wordle class and a Cog class.

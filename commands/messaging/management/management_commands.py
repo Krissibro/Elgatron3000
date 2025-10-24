@@ -3,7 +3,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from bot import Elgatron
+from utilities.elgatron import Elgatron
 from commands.messaging.management.management_view import ManageCommandsDropDown
 from utilities.settings import active_commands
 

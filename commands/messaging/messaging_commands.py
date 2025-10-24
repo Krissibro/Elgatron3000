@@ -9,7 +9,7 @@ from discord.ext import commands
 from commands.messaging.MessagingInfo import MessagingInfo
 
 from utilities.helper_functions import parse_time
-from bot import Elgatron
+from utilities.elgatron import Elgatron
 from utilities.settings import active_commands 
 
 

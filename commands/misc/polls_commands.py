@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-from bot import Elgatron
+from utilities.elgatron import Elgatron
 
 
 class PollCommands(commands.GroupCog, group_name = "poll"):
