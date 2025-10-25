@@ -15,7 +15,7 @@ class IntervalTranfsormer(app_commands.Transformer):
     async def transform(self, interaction: discord.Interaction, value: str) -> int:
 
         result = parse_time(value)
-        if result == 0:
+        if result == 0: # invalid time format 
             embed = discord.Embed(
                 title="Invalid interval format. Please use formats like '10s', '5m5s', '2h30m', etc."
                 )

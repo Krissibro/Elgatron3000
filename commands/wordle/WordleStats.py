@@ -1,8 +1,9 @@
+from datetime import timedelta
 import discord
 import os
 import json
 
-from utilities.helper_functions import format_millisecond_duration
+from utilities.helper_functions import timedelta_format
 
 
 class WordleStats:
@@ -13,8 +14,8 @@ class WordleStats:
     correct_guess_streak = 0
     longest_guess_streak = 0
     number_of_guesses = 0
-    # In milliseconds
-    fastest_win = 0
+
+    fastest_win: timedelta = timedelta(seconds=0)
     number_guesses_per_game_counter = {}
 
     def __init__(self):
@@ -30,9 +31,9 @@ class WordleStats:
         self.longest_guess_streak = max(self.longest_guess_streak, self.correct_guess_streak)
         self.number_of_guesses += guesses
 
-        time_difference = correct_guess_time - reset_time
-        total_milliseconds = int(time_difference.total_seconds() * 1000)
-        self.fastest_win = min(self.fastest_win, total_milliseconds) if self.fastest_win > 0 else total_milliseconds
+        time_difference: timedelta = correct_guess_time - reset_time
+
+        self.fastest_win = min(self.fastest_win, time_difference) if self.fastest_win.microseconds > 0 else time_difference
 
         self.number_guesses_per_game_counter[str(guesses)] = self.number_guesses_per_game_counter.get(str(guesses), 0) + 1
         self.number_guesses_per_game_counter = {
@@ -46,7 +47,7 @@ class WordleStats:
         self.correct_guess_streak = 0
         self.save_stats()
 
-    async def make_embed(self):
+    def make_embed(self):
         percentage_wins = (
             f"{(self.wins / self.games_played * 100):.2f}"
             if self.games_played > 0 else "0.00"
@@ -61,8 +62,8 @@ class WordleStats:
         embed.add_field(name="Current streak", value=self.correct_guess_streak, inline=True)
         embed.add_field(name="Longest streak", value=self.longest_guess_streak, inline=True)
 
-        if self.fastest_win > 0:
-            embed.add_field(name="Fastest win", value=f"{format_millisecond_duration(self.fastest_win)}", inline=True)
+        if self.fastest_win.total_seconds() > 0:
+            embed.add_field(name="Fastest win", value=f"{timedelta_format(self.fastest_win)}", inline=True)
 
         # if wins are less than or equal than 0, there is no reason to show the rest, it also breaks the math
         if self.wins <= 0:
@@ -70,6 +71,11 @@ class WordleStats:
 
         embed.add_field(name="\u200b", value="", inline=False)
 
+        embed = self.add_guess_hist(embed)
+
+        return embed
+
+    def add_guess_hist(self, embed: discord.Embed) -> discord.Embed:
         highest_guess_count = max(self.number_guesses_per_game_counter.values())
         highest_guess_percentage = (highest_guess_count / self.wins) * 100
 
@@ -85,7 +91,6 @@ class WordleStats:
                 value=square_count * ":blue_square:" if square_count > 0 else ":black_large_square:",
                 inline=False
             )
-
         return embed
 
     def get_dict_of_data(self):
@@ -96,7 +101,7 @@ class WordleStats:
             "correct_guess_streak": self.correct_guess_streak,
             "longest_guess_streak": self.longest_guess_streak,
             "number_of_guesses": self.number_of_guesses,
-            "fastest_win": self.fastest_win,
+            "fastest_win": self.fastest_win.seconds*1000 + self.fastest_win.microseconds//1000,
             "number_guesses_per_game_counter": self.number_guesses_per_game_counter
         }
 
@@ -107,7 +112,10 @@ class WordleStats:
         self.correct_guess_streak = data.get("correct_guess_streak", 0)
         self.longest_guess_streak = data.get("longest_guess_streak", 0)
         self.number_of_guesses = data.get("number_of_guesses", 0)
-        self.fastest_win = data.get("fastest_win", 0)
+
+        fastest_win_data = data.get("fastest_win", 0)
+        self.fastest_win = timedelta(milliseconds=fastest_win_data)
+
         self.number_guesses_per_game_counter = data.get("number_guesses_per_game_counter", {})
 
     def save_stats(self):

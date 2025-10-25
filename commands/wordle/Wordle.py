@@ -4,11 +4,11 @@ import random
 import numpy as np
 import discord
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 from commands.wordle.WordleStats import WordleStats
-from utilities.helper_functions import format_millisecond_duration
+from utilities.helper_functions import timedelta_format
 from utilities.settings import testing_channel_id, testing, wordle_channel_id
 
 valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())
@@ -38,13 +38,14 @@ class Wordle:
         self.channel = bot.get_channel(channel)
 
         self.wordle_stats = WordleStats()
-
+    
+    # TODO i dont think this function should be async, if we remove async from it, we can load state during init
     async def pick_new_word(self) -> None:
         if not self.correct_guess and not self.daily_word == "":
 
             if self.wordle_stats.correct_guess_streak > 0:
                 await self.channel.send(embed=discord.Embed(
-                    title=f"No one guessed the word! {self.daily_word.upper()}!  :sob:",
+                    title=f"No one guessed the word! :sob:",
                     description=f"The word was **[{self.daily_word.upper()}](https://www.merriam-webster.com/dictionary/{self.daily_word.upper()})** \n\nGuess streak of   **{self.wordle_stats.correct_guess_streak}**   has been reset",
                     color=discord.Color.red()
                 ))
@@ -81,7 +82,7 @@ class Wordle:
         self.wordle_stats.increment_games_played()
         self.save_state()
 
-    async def guess_word(self, ctx: discord.Interaction, word: str) -> discord.Embed:
+    def guess_word(self, ctx: discord.Interaction, word: str) -> discord.Embed:
         guessed_word = word.strip().upper()
 
         invalid_guess_embed = self.check_valid_guess(guessed_word, ctx)
@@ -106,7 +107,7 @@ class Wordle:
 
         self.save_state()
 
-        embed = await self.make_embed()
+        embed = self.make_embed()
         return embed
 
     def check_valid_guess(self, guessed_word, ctx) -> Optional[discord.Embed]:
@@ -169,15 +170,15 @@ class Wordle:
         return ' '.join(guess_result)
 
 
-    async def make_embed(self) -> discord.Embed:
+    def make_embed(self) -> discord.Embed:
         if self.correct_guess:
             embed = discord.Embed(title=f"Congratulations!", color=discord.Color.green(), description=f"The word was **[{self.daily_word.upper()}](https://www.merriam-webster.com/dictionary/{self.daily_word})**!")
             embed.add_field(name=f"Guess streak:   ",
                             value=f"{self.wordle_stats.correct_guess_streak} days")
             if self.correct_guess_time:
-                time_difference = self.correct_guess_time - self.new_word_time
-                total_milliseconds = int(time_difference.total_seconds() * 1000)
-                formatted_time = format_millisecond_duration(total_milliseconds)
+                time_difference: timedelta = self.correct_guess_time - self.new_word_time
+
+                formatted_time: str = timedelta_format(time_difference)
                 embed.add_field(name=f"Time spent:   ",
                                 value=f"{formatted_time}", inline=False)
 
@@ -200,8 +201,8 @@ class Wordle:
         return embed
 
 
-    async def make_stats_embed(self) -> discord.Embed:
-        return await self.wordle_stats.make_embed()
+    def make_stats_embed(self) -> discord.Embed:
+        return self.wordle_stats.make_embed()
 
     async def send_reminder(self) -> None:
         if not self.correct_guess:
