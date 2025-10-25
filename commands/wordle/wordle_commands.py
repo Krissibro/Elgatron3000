@@ -20,21 +20,21 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         description="Attempt to guess the daily wordle!",
     )
     async def guess_word(self, ctx: discord.Interaction, word: str) -> None:
-        await ctx.response.send_message(embed=await self.wordle.guess_word(ctx, word))
+        await ctx.response.send_message(embed= self.wordle.guess_word(ctx, word))
 
     @app_commands.command(
         name="current",
         description="See the current progress of the daily wordle!",
     )
     async def current_game(self, ctx: discord.Interaction):
-        await ctx.response.send_message(embed=await self.wordle.make_embed())
+        await ctx.response.send_message(embed= self.wordle.make_embed())
 
     @app_commands.command(
         name="stats",
         description="See the wordle statistics!",
     )
     async def show_stats(self, ctx: discord.Interaction, only_show_to_me: bool = False):
-        await ctx.response.send_message(embed=await self.wordle.make_stats_embed(), ephemeral=only_show_to_me)
+        await ctx.response.send_message(embed=self.wordle.make_stats_embed(), ephemeral=only_show_to_me)
 
     @commands.is_owner()
     @app_commands.command(
@@ -61,6 +61,7 @@ async def setup(bot: Elgatron):
     if not bot.scheduler.get_job(job_id):
         new_word_trigger = CronTrigger(hour=8, minute=0, second=0, timezone='Europe/Oslo')
         bot.scheduler.add_job(wordle_cog.wordle.pick_new_word, new_word_trigger, id=job_id)
+        
         reminder_trigger = CronTrigger(hour=22, minute=0, second=0, timezone='Europe/Oslo')
         bot.scheduler.add_job(wordle_cog.wordle.send_reminder, reminder_trigger, id="wordle_reminder")
 
