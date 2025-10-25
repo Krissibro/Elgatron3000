@@ -11,6 +11,21 @@ from utilities.helper_functions import parse_time
 from utilities.elgatron import Elgatron
 
 
+class IntervalTranfsormer(app_commands.Transformer):
+    async def transform(self, interaction: discord.Interaction, value: str) -> int:
+
+        result = parse_time(value)
+        if result == 0:
+            embed = discord.Embed(
+                title="Invalid interval format. Please use formats like '10s', '5m5s', '2h30m', etc."
+                )
+            await interaction.response.send_message(
+                embed=embed,
+                ephemeral=True
+                )
+        return result
+
+
 # TODO figure out how converters work 
 # https://discordpy.readthedocs.io/en/latest/interactions/api.html?highlight=app_commands#transformerss
 class MessagingCommands(commands.Cog):
@@ -25,10 +40,12 @@ class MessagingCommands(commands.Cog):
                       user: discord.User, 
                       message: str, 
                       amount: discord.app_commands.Range[int, 1, None], 
-                      interval: str
+                      interval: app_commands.Transform[int, IntervalTranfsormer]
                     ):
-        parsed_interval:int = parse_time(interval)
-        await execute_command(ctx, dm_spam_internal, user, message, amount, parsed_interval, ctx.channel)
+        if ctx.response.is_done():
+            return
+        
+        await execute_command(ctx, dm_spam_internal, user, message, amount, interval, ctx.channel)
 
     @app_commands.command(
         name="get_attention",
@@ -38,10 +55,12 @@ class MessagingCommands(commands.Cog):
                             target: Union[discord.User, discord.Role, None], 
                             message: str = "WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP",
                             amount: app_commands.Range[int, 1, None] = 100, 
-                            interval: str = "10s"
+                            interval: app_commands.Transform[int, IntervalTranfsormer] = 10
                             ):
-        parsed_interval: int = parse_time(interval)
-        await execute_command(ctx, get_attention_internal, target, message, amount, parsed_interval, ctx.channel)
+        if ctx.response.is_done():
+            return
+        
+        await execute_command(ctx, get_attention_internal, target, message, amount, interval, ctx.channel)
 
     @app_commands.command(
         name="annoy",
@@ -50,11 +69,13 @@ class MessagingCommands(commands.Cog):
     async def annoy(self, ctx,
                     message: str,
                     amount: app_commands.Range[int, 1, None],
-                    interval: str,
+                    interval: app_commands.Transform[int, IntervalTranfsormer],
                     target: Union[discord.User, discord.Role, None] = None
                     ):
-        parsed_interval: int = parse_time(interval)
-        await execute_command(ctx, annoy_internal, target, message, amount, parsed_interval, ctx.channel)
+        if ctx.response.is_done():
+            return
+        
+        await execute_command(ctx, annoy_internal, target, message, amount, interval, ctx.channel)
 
 
 async def setup(bot: Elgatron):
