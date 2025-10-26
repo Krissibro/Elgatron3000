@@ -1,15 +1,17 @@
 import json
 import os
 import random
+import string
 import numpy as np
 import discord
 
-from datetime import datetime, timedelta
-from typing import Optional
+from datetime import datetime
+from typing import List, Optional, Set
 
 from commands.wordle.WordleStats import WordleStats
+from utilities.elgatron import Elgatron
 from utilities.helper_functions import timedelta_format
-from utilities.settings import testing_channel_id, testing, wordle_channel_id
+from utilities.settings import testing_channel_id, wordle_channel_id
 
 valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())
 word_bank = list(np.genfromtxt('./data/word-bank.csv', delimiter=',', dtype=str))
@@ -20,37 +22,46 @@ word_bank.extend(whitelisted_words)
 
 
 class Wordle:
-    def __init__(self, bot):
+    def __init__(self, bot: Elgatron):
+        self.bot: Elgatron = bot
+        self.state_file_path: str = "data/wordle_state.json"
+        # TODO if we make "load_state" not async, we can call it here during init
 
-        self.state_file_path = "data/wordle_state.json"
+        self.daily_word: str = ""
+        self.correct_guess: bool = False
+        
+        self.guessed_words: List[str] = []
+        self.guess_results: List[str] = []
+        self.guesser_ids:   List[int] = []
+        self.guesser_names: List[str] = []
 
-        self.daily_word = ""
-        self.correct_guess = False
-        self.guessed_words = set()
-        self.users_that_guessed = set()
-        self.known_letters = set()
-        self.available_letters = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
-        self.display_list = []
-        self.new_word_time = datetime.now()
-        self.correct_guess_time = None
+        self.known_letters:     Set[str] = set()
+        self.available_letters: Set[str] = set(string.ascii_uppercase)
+        
+        self.new_word_time: datetime = datetime.now()
+        self.time_taken: Optional[str] = None
 
-        channel = testing_channel_id if testing else wordle_channel_id
-        self.channel = bot.get_channel(channel)
+        self.channel_id = testing_channel_id if bot.testing else wordle_channel_id
 
-        self.wordle_stats = WordleStats()
+        # TODO this does not work since commands are loaded before the bot is connected
+        # the channel stuff should probably just use the command context to get the channel
+        # i have replaced self.channel with self.bot.get_channel(self.channel_id) for now
+        # self.channel = self.bot.get_channel(channel)
+
+        self.wordle_stats: WordleStats = WordleStats()
     
     # TODO i dont think this function should be async, if we remove async from it, we can load state during init
     async def pick_new_word(self) -> None:
         if not self.correct_guess and not self.daily_word == "":
 
             if self.wordle_stats.correct_guess_streak > 0:
-                await self.channel.send(embed=discord.Embed(
+                await self.bot.get_channel(self.channel_id).send(embed=discord.Embed(
                     title=f"No one guessed the word! :sob:",
                     description=f"The word was **[{self.daily_word.upper()}](https://www.merriam-webster.com/dictionary/{self.daily_word.upper()})** \n\nGuess streak of   **{self.wordle_stats.correct_guess_streak}**   has been reset",
                     color=discord.Color.red()
                 ))
             else:
-                await self.channel.send(embed=discord.Embed(
+                await self.bot.get_channel(self.channel_id).send(embed=discord.Embed(
                     title=f"No one guessed the word! :sob:",
                     description=f"The word was **[{self.daily_word.upper()}](https://www.merriam-webster.com/dictionary/{self.daily_word.upper()})**",
                     color=discord.Color.red()
@@ -63,21 +74,24 @@ class Wordle:
         # self.daily_word = "XOXOX"
         self.correct_guess = False
         self.guessed_words.clear()
-        self.users_that_guessed.clear()
+        self.guesser_ids.clear()
+        self.guesser_names.clear()
         self.known_letters.clear()
-        self.available_letters = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
-        self.display_list.clear()
+        self.guess_results.clear()
+        self.available_letters = set(string.ascii_uppercase)
         self.new_word_time = datetime.now()
-        self.correct_guess_time = None
-        print(self.daily_word)
+        self.time_taken = None
+
+        if self.bot.testing:
+            print(self.daily_word)
 
         embed = discord.Embed(title="New Daily Wordle dropped! :fire: :fire: ")
         embed.description = ("[Connections](https://www.nytimes.com/games/connections)\n" +
                              "[Real Wordle](https://www.nytimes.com/games/wordle/index.html)\n" +
                              "[Pokedoku](https://pokedoku.com/)")
 
-        if not testing:  # send embed if not testing
-            await self.channel.send(embed=embed)
+        if not self.bot.testing:  # send embed if not testing
+            await self.bot.get_channel(self.channel_id).send(embed=embed)
 
         self.wordle_stats.increment_games_played()
         self.save_state()
@@ -89,17 +103,11 @@ class Wordle:
         if invalid_guess_embed:
             return invalid_guess_embed
 
-        self.guessed_words.add(guessed_word)
-        self.users_that_guessed.add(ctx.user.id)
+        self.guesser_ids.append(ctx.user.id)
+        self.guesser_names.append(ctx.user.name)
+        self.guessed_words.append(guessed_word)
+        self.guess_results.append(self.wordle_logic(guessed_word))
         self.correct_guess = guessed_word == self.daily_word
-
-        # Four whitespaces
-        seperator = "\u00A0\u00A0\u00A0\u00A0"
-        guess_result = self.wordle_logic(guessed_word)
-        formatted_word = seperator.join(guessed_word)
-
-        self.display_list.append([ctx.user.name, formatted_word, guess_result])
-
 
         if self.correct_guess:
             time_taken = datetime.now() - self.new_word_time
@@ -121,8 +129,8 @@ class Wordle:
         if self.correct_guess:
             return discord.Embed(title="The daily wordle has already been guessed")
 
-        if not testing:
-            if ctx.user.id in self.users_that_guessed:
+        if not self.bot.testing:
+            if ctx.user.id in self.guesser_ids:
                 return discord.Embed(title=f"{ctx.user.display_name} has already guessed")
             if guessed_word not in whitelisted_words:
                 if not len(guessed_word) == 5:
@@ -176,25 +184,26 @@ class Wordle:
             embed = discord.Embed(title=f"Congratulations!", color=discord.Color.green(), description=f"The word was **[{self.daily_word.upper()}](https://www.merriam-webster.com/dictionary/{self.daily_word})**!")
             embed.add_field(name=f"Guess streak:   ",
                             value=f"{self.wordle_stats.correct_guess_streak} days")
-            if self.correct_guess_time:
-                time_difference: timedelta = self.correct_guess_time - self.new_word_time
-
-                formatted_time: str = timedelta_format(time_difference)
+            
+            if self.time_taken:
                 embed.add_field(name=f"Time spent:   ",
-                                value=f"{formatted_time}", inline=False)
+                                value=f"{self.time_taken}", inline=False)
 
             embed.add_field(name="", value="", inline=False)
 
         else:
             embed = discord.Embed(title="Daily Wordle")
 
-        if not self.display_list:
+        if not self.guessed_words:
             embed.description = "No guesses yet"
             return embed
 
-        for username, guessed_word, guess_result in self.display_list:
-            # user = await client.fetch_user(user_id)
-            embed.add_field(name=f"‎ **{guessed_word}**     <-  {username}",
+        for username, guessed_word, guess_result in zip(self.guesser_names, self.guessed_words, self.guess_results):
+            # format word
+            seperator = "\u00A0\u00A0\u00A0\u00A0"
+            formatted_word = seperator.join(guessed_word)
+
+            embed.add_field(name=f"‎ **{formatted_word}**     <-  {username}",
                             value=f"{guess_result}",
                             inline=False)
             embed.set_footer(text=self.format_available_letters())
@@ -209,14 +218,15 @@ class Wordle:
         if not self.correct_guess:
             embed = discord.Embed(title="Me when the and I and me when is and it",
                                   description="Uhhh:sob: :sob:")
-            await self.channel.send(embed=embed)
+            await self.bot.get_channel(self.channel_id).send(embed=embed)
 
 
     def format_available_letters(self) -> str:
-        sorted_available_letters = sorted(list(self.available_letters))
-        sorted_known_letters = sorted(list(self.known_letters))
-        known_letters = f"Known letters:\n{' '.join(sorted_known_letters)}"
-        rest = f"Available letters:\n{' '.join(sorted_available_letters)}"
+        # Are these not formatted by default?
+        #sorted_available_letters = sorted(list(self.available_letters))
+        #sorted_known_letters = sorted(list(self.known_letters))
+        known_letters = f"Known letters:\n{' '.join(self.known_letters)}"
+        rest = f"Available letters:\n{' '.join(self.available_letters)}"
         return f"{known_letters}\n{rest}"
 
 
@@ -225,26 +235,28 @@ class Wordle:
             "daily_word": self.daily_word,
             "correct_guess": self.correct_guess,
             "guessed_words": list(self.guessed_words),
-            "users_that_guessed": list(self.users_that_guessed),
+            "guess_results": self.guess_results,
+            "guesser_ids": list(self.guesser_ids),
+            "guesser_names": list(self.guesser_names),
             "known_letters": list(self.known_letters),
             "available_letters": list(self.available_letters),
-            "display_list": self.display_list,
             "new_word_time": self.new_word_time.isoformat(),
-            "correct_guess_time": self.correct_guess_time.isoformat() if self.correct_guess_time else None,
+            "time_taken": self.time_taken
         }
 
-    def retrieve_data_from_dict(self, data) -> None:
+    def retrieve_data_from_dict(self, data: dict) -> None:
         self.daily_word = data.get("daily_word", "")
         self.correct_guess = data.get("correct_guess", False)
-        self.guessed_words = set(data.get("guessed_words", []))
-        self.users_that_guessed = set(data.get("users_that_guessed", []))
+        self.guessed_words = data.get("guessed_words", [])
+        self.guesser_ids = data.get("users_that_guessed", [])
+        self.guesser_names = data.get("guesser_names", [])
+        self.guess_results = data.get("guess_results", [])
         self.known_letters = set(data.get("known_letters", []))
-        self.available_letters = set(data.get("available_letters", list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')))
-        self.display_list = data.get("display_list", [])
-        new_word_time_str = data.get("new_word_time")
-        correct_guess_time_str = data.get("correct_guess_time")
-        self.new_word_time = datetime.fromisoformat(new_word_time_str) if new_word_time_str else datetime.now()
-        self.correct_guess_time = datetime.fromisoformat(correct_guess_time_str) if correct_guess_time_str else None
+        self.available_letters = set(data.get("available_letters", list(string.ascii_uppercase)))
+        
+        new_word_time_str = data.get("new_word_time", datetime.now().isoformat())
+        self.new_word_time = datetime.fromisoformat(new_word_time_str)
+        self.time_taken = data.get("time_taken", None)
 
     def save_state(self) -> None:
         """Save the current state to a JSON file."""
