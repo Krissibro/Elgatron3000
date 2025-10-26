@@ -102,9 +102,10 @@ class Wordle:
 
 
         if self.correct_guess:
-            self.correct_guess_time = datetime.now()
-            self.wordle_stats.handle_win(len(self.display_list), self.new_word_time, self.correct_guess_time)
-
+            time_taken = datetime.now() - self.new_word_time
+            self.time_taken = timedelta_format(time_taken)
+            self.wordle_stats.handle_win(len(self.guessed_words), time_taken)
+        self.correct_guess = guessed_word == self.daily_word
         self.save_state()
 
         embed = self.make_embed()
