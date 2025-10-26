@@ -33,12 +33,12 @@ class Elgatron(Bot):
                 formatted_path = path[2:-3].replace("/", ".")
                 await self.load_extension(formatted_path)
 
+        self.scheduler.start()
+        self.scheduler.print_jobs()
+        
         await super().setup_hook()
 
     async def on_ready(self):
-        self.scheduler.start()
-        self.scheduler.print_jobs()
-
         if self.testing:
             # discord.Object(id=...) is better than bot.get_guild(...) because it works when disconnected
             await self.tree.sync(guild=discord.Object(id=self.guild_id))
