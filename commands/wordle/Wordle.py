@@ -8,6 +8,8 @@ import discord
 from datetime import datetime
 from typing import List, Optional, Set
 
+from apscheduler.triggers.cron import CronTrigger
+
 from commands.wordle.WordleStats import WordleStats
 from utilities.elgatron import Elgatron
 from utilities.helper_functions import timedelta_format
@@ -24,10 +26,30 @@ word_bank.extend(whitelisted_words)
 class Wordle:
     def __init__(self, bot: Elgatron):
         self.bot: Elgatron = bot
-        self.state_file_path: str = "data/wordle_state.json"
-        # TODO if we make "load_state" not async, we can call it here during init
 
-        self.daily_word: str = ""
+        self.state_file_path: str = "data/wordle_state.json"
+        self.load_state(self.state_file_path)
+
+        self.channel_id = testing_channel_id if bot.testing else wordle_channel_id
+
+        new_word_trigger = CronTrigger(hour=8, minute=0, second=0, timezone='Europe/Oslo')
+        bot.scheduler.add_job(self.pick_new_word, new_word_trigger, id="wordle_pick_new_word")
+        
+        reminder_trigger = CronTrigger(hour=22, minute=0, second=0, timezone='Europe/Oslo')
+        bot.scheduler.add_job(self.send_reminder, reminder_trigger, id="wordle_reminder")
+
+        # TODO this does not work since commands are loaded before the bot is connected
+        # the channel stuff should probably just use the command context to get the channel
+        # i have replaced self.channel with self.bot.get_channel(self.channel_id) for now
+        # self.channel = self.bot.get_channel(channel)
+
+        self.wordle_stats: WordleStats = WordleStats()
+
+    
+    def pick_new_word(self) -> None:
+
+        random_word = str(random.sample(word_bank, 1)[0])
+        self.daily_word = random_word.upper()
         self.correct_guess: bool = False
         
         self.guessed_words: List[str] = []
@@ -36,62 +58,11 @@ class Wordle:
         self.guesser_names: List[str] = []
 
         self.known_letters:     Set[str] = set()
-        self.available_letters: Set[str] = set(string.ascii_uppercase)
+        self.unknown_letters: Set[str] = set(string.ascii_uppercase)
         
         self.new_word_time: datetime = datetime.now()
         self.time_taken: Optional[str] = None
 
-        self.channel_id = testing_channel_id if bot.testing else wordle_channel_id
-
-        # TODO this does not work since commands are loaded before the bot is connected
-        # the channel stuff should probably just use the command context to get the channel
-        # i have replaced self.channel with self.bot.get_channel(self.channel_id) for now
-        # self.channel = self.bot.get_channel(channel)
-
-        self.wordle_stats: WordleStats = WordleStats()
-    
-    # TODO i dont think this function should be async, if we remove async from it, we can load state during init
-    async def pick_new_word(self) -> None:
-        if not self.correct_guess and not self.daily_word == "":
-
-            if self.wordle_stats.correct_guess_streak > 0:
-                await self.bot.get_channel(self.channel_id).send(embed=discord.Embed(
-                    title=f"No one guessed the word! :sob:",
-                    description=f"The word was **[{self.daily_word.upper()}](https://www.merriam-webster.com/dictionary/{self.daily_word.upper()})** \n\nGuess streak of   **{self.wordle_stats.correct_guess_streak}**   has been reset",
-                    color=discord.Color.red()
-                ))
-            else:
-                await self.bot.get_channel(self.channel_id).send(embed=discord.Embed(
-                    title=f"No one guessed the word! :sob:",
-                    description=f"The word was **[{self.daily_word.upper()}](https://www.merriam-webster.com/dictionary/{self.daily_word.upper()})**",
-                    color=discord.Color.red()
-                ))
-
-            self.wordle_stats.reset_streak()
-
-        random_word = str(random.sample(word_bank, 1)[0])
-        self.daily_word = random_word.upper()
-        # self.daily_word = "XOXOX"
-        self.correct_guess = False
-        self.guessed_words.clear()
-        self.guesser_ids.clear()
-        self.guesser_names.clear()
-        self.known_letters.clear()
-        self.guess_results.clear()
-        self.available_letters = set(string.ascii_uppercase)
-        self.new_word_time = datetime.now()
-        self.time_taken = None
-
-        if self.bot.testing:
-            print(self.daily_word)
-
-        embed = discord.Embed(title="New Daily Wordle dropped! :fire: :fire: ")
-        embed.description = ("[Connections](https://www.nytimes.com/games/connections)\n" +
-                             "[Real Wordle](https://www.nytimes.com/games/wordle/index.html)\n" +
-                             "[Pokedoku](https://pokedoku.com/)")
-
-        if not self.bot.testing:  # send embed if not testing
-            await self.bot.get_channel(self.channel_id).send(embed=embed)
 
         self.wordle_stats.increment_games_played()
         self.save_state()
@@ -173,8 +144,8 @@ class Wordle:
 
         # Remove unused letters from available letters
         for letter in guessed_word:
-            if letter in self.available_letters:
-                self.available_letters.remove(letter)
+            if letter in self.unknown_letters:
+                self.unknown_letters.remove(letter)
 
         return ' '.join(guess_result)
 
@@ -210,24 +181,51 @@ class Wordle:
 
         return embed
 
-
     def make_stats_embed(self) -> discord.Embed:
         return self.wordle_stats.make_embed()
 
     async def send_reminder(self) -> None:
+        channel = self.bot.get_channel(self.channel_id)
         if not self.correct_guess:
             embed = discord.Embed(title="Me when the and I and me when is and it",
                                   description="Uhhh:sob: :sob:")
-            await self.bot.get_channel(self.channel_id).send(embed=embed)
+            await channel.send(embed=embed)
 
+    async def start_new_game(self) -> None:
+        channel = self.bot.get_channel(self.channel_id)
+
+        if not self.correct_guess and not self.daily_word == "":
+            description = f"The word was **[{self.daily_word.upper()}](https://www.merriam-webster.com/dictionary/{self.daily_word.upper()})**"
+            if self.wordle_stats.correct_guess_streak > 0:
+                description += f"\n\nGuess streak of   **{self.wordle_stats.correct_guess_streak}**   has been reset"
+            
+            await channel.send(embed=discord.Embed(
+                title=f"No one guessed the word! :sob:",
+                description=description,
+                color=discord.Color.red()
+            ))
+    
+            self.wordle_stats.reset_streak()
+
+        self.pick_new_word()
+
+        if self.bot.testing:
+            print(self.daily_word)
+
+        embed = discord.Embed(title="New Daily Wordle dropped! :fire: :fire: ")
+        embed.description = ("[Connections](https://www.nytimes.com/games/connections)\n" +
+                             "[Real Wordle](https://www.nytimes.com/games/wordle/index.html)\n" +
+                             "[Pokedoku](https://pokedoku.com/)")
+
+        if not self.bot.testing:  # send embed if not testing
+            await channel.send(embed=embed)
 
     def format_available_letters(self) -> str:
-        # Are these not formatted by default?
-        #sorted_available_letters = sorted(list(self.available_letters))
-        #sorted_known_letters = sorted(list(self.known_letters))
-        known_letters = f"Known letters:\n{' '.join(self.known_letters)}"
-        rest = f"Available letters:\n{' '.join(self.available_letters)}"
-        return f"{known_letters}\n{rest}"
+        sorted_known_letters = sorted(list(self.known_letters))
+        sorted_available_letters = sorted(list(self.unknown_letters))
+        known_letters = f"Known letters:\n{' '.join(sorted_known_letters)}"
+        unknown_letters = f"Available letters:\n{' '.join(sorted_available_letters)}"
+        return f"{known_letters}\n{unknown_letters}"
 
 
     def get_dict_of_data(self) -> dict:
@@ -239,7 +237,7 @@ class Wordle:
             "guesser_ids": list(self.guesser_ids),
             "guesser_names": list(self.guesser_names),
             "known_letters": list(self.known_letters),
-            "available_letters": list(self.available_letters),
+            "unknown_letters": list(self.unknown_letters),
             "new_word_time": self.new_word_time.isoformat(),
             "time_taken": self.time_taken
         }
@@ -248,11 +246,11 @@ class Wordle:
         self.daily_word = data.get("daily_word", "")
         self.correct_guess = data.get("correct_guess", False)
         self.guessed_words = data.get("guessed_words", [])
-        self.guesser_ids = data.get("users_that_guessed", [])
+        self.guesser_ids = data.get("guesser_ids", [])
         self.guesser_names = data.get("guesser_names", [])
         self.guess_results = data.get("guess_results", [])
         self.known_letters = set(data.get("known_letters", []))
-        self.available_letters = set(data.get("available_letters", list(string.ascii_uppercase)))
+        self.unknown_letters = set(data.get("unknown_letters", list(string.ascii_uppercase)))
         
         new_word_time_str = data.get("new_word_time", datetime.now().isoformat())
         self.new_word_time = datetime.fromisoformat(new_word_time_str)
@@ -263,11 +261,11 @@ class Wordle:
         with open(self.state_file_path, 'w') as file:
             json.dump(self.get_dict_of_data(), file)
 
-    async def load_state(self) -> None:
+    def load_state(self, path) -> None:
         """Load the state from a JSON file if it exists, otherwise set a new word."""
-        if os.path.exists(self.state_file_path):
-            with open(self.state_file_path, 'r') as file:
+        if os.path.exists(path):
+            with open(path, 'r') as file:
                 wordle_dict = json.load(file)
                 self.retrieve_data_from_dict(wordle_dict)
         else:
-            await self.pick_new_word()
+            self.pick_new_word()

@@ -2,13 +2,10 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from apscheduler.triggers.cron import CronTrigger
-
 from commands.wordle.Wordle import Wordle
 from utilities.elgatron import Elgatron
 
 
-# TODO maybe split this class into 2, a wordle class and a Cog class.
 @app_commands.guild_only()
 class WordleCommands(commands.GroupCog, group_name="wordle"):
     def __init__(self, bot):
@@ -48,24 +45,12 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
             )
             return
 
-        await self.wordle.pick_new_word()
+        await self.wordle.start_new_game()
         await ctx.response.send_message(embed=discord.Embed(title="Wordle has been reset!"), ephemeral=True, delete_after=10)
 
 
 async def setup(bot: Elgatron):
-    wordle_cog = WordleCommands(bot)
-
-    await wordle_cog.wordle.load_state()
-
-    job_id = "wordle_pick_new_word"
-    if not bot.scheduler.get_job(job_id):
-        new_word_trigger = CronTrigger(hour=8, minute=0, second=0, timezone='Europe/Oslo')
-        bot.scheduler.add_job(wordle_cog.wordle.pick_new_word, new_word_trigger, id=job_id)
-        
-        reminder_trigger = CronTrigger(hour=22, minute=0, second=0, timezone='Europe/Oslo')
-        bot.scheduler.add_job(wordle_cog.wordle.send_reminder, reminder_trigger, id="wordle_reminder")
-
-        await bot.add_cog(wordle_cog, guild=discord.Object(id=bot.guild_id))
+    await bot.add_cog(WordleCommands(bot), guild=discord.Object(id=bot.guild_id))
 
 
 
