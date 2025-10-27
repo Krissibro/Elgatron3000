@@ -14,6 +14,7 @@ from commands.wordle.WordleStats import WordleStats
 from utilities.elgatron import Elgatron
 from utilities.helper_functions import timedelta_format
 from utilities.settings import testing_channel_id, wordle_channel_id
+from utilities.validators import validate_text_channel
 
 valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())
 word_bank = list(np.genfromtxt('./data/word-bank.csv', delimiter=',', dtype=str))
@@ -185,14 +186,19 @@ class Wordle:
         return self.wordle_stats.make_embed()
 
     async def send_reminder(self) -> None:
-        channel = self.bot.get_channel(self.channel_id)
+        channel = validate_text_channel(self.bot.get_channel(self.channel_id))
+        if channel is None:
+            raise ValueError("The channel ID provided does not correspond to a text channel.")
+
         if not self.correct_guess:
             embed = discord.Embed(title="Me when the and I and me when is and it",
                                   description="Uhhh:sob: :sob:")
             await channel.send(embed=embed)
 
     async def start_new_game(self) -> None:
-        channel = self.bot.get_channel(self.channel_id)
+        channel = validate_text_channel(self.bot.get_channel(self.channel_id))
+        if channel is None:
+            raise ValueError("The channel ID provided does not correspond to a text channel.")
 
         if not self.correct_guess and not self.daily_word == "":
             description = f"The word was **[{self.daily_word.upper()}](https://www.merriam-webster.com/dictionary/{self.daily_word.upper()})**"
