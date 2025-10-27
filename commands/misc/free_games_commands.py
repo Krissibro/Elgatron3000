@@ -1,3 +1,4 @@
+import json
 import discord
 import asyncio
 from discord import app_commands
@@ -7,8 +8,8 @@ from epicstore_api import EpicGamesStoreAPI
 from apscheduler.triggers.cron import CronTrigger
 
 from utilities.settings import game_channel_id, testing_channel_id
-from utilities.state_helper import save_state, load_state
 from utilities.elgatron import Elgatron
+from utilities.validators import validate_text_channel
 from typing import List
 
 
@@ -76,9 +77,6 @@ def update_free_games_state(free_games: List[dict]) -> None:
     save_state(state)
 
 
-previous_free_game_titles = get_free_games_state()
-
-
 async def scheduled_post_free_games(bot: Elgatron) -> None:
     global previous_free_game_titles
     free_games = await get_free_games()
@@ -94,9 +92,31 @@ async def scheduled_post_free_games(bot: Elgatron) -> None:
         else:
             channel = bot.get_channel(testing_channel_id)
 
+        channel = validate_text_channel(channel)
+        if channel is None:
+            raise ValueError("The channel ID provided does not correspond to a text channel.")
+
         # Send the free games embed
         await channel.send(embed=await make_link_embed())
         await send_games_embed(channel, free_games)
+
+
+def load_state():
+    default_state = {
+        "free_games": []
+    }
+    try:
+        with open(state_path, 'r') as file:
+            return json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        # If there's no file, or it's corrupted, save the default state to a new file
+        save_state(default_state)
+        return default_state
+
+
+def save_state(state):
+    with open(state_path, 'w') as file:
+        json.dump(state, file, indent=4)
 
 
 # TODO: Clean up everything in this file and move it into a cog
@@ -111,8 +131,16 @@ class EpicGames(commands.Cog):
     async def free_games_rn(self, ctx: discord.Interaction):
         await ctx.response.send_message(embed=await make_link_embed())
         free_games = await get_free_games()
-        await send_games_embed(ctx.channel, free_games)
+        
+        channel = validate_text_channel(ctx.channel)
+        if channel is None:
+            raise ValueError("The channel ID provided does not correspond to a text channel.")
+        
+        await send_games_embed(channel, free_games)
 
+
+state_path = "./data/bot_state.json"
+previous_free_game_titles = get_free_games_state()
 
 async def setup(bot: Elgatron):
     trigger = CronTrigger(hour=18, minute=0, second=0, timezone='Europe/Oslo')

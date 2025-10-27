@@ -5,12 +5,8 @@ from typing import List, Union
 
 from commands.messaging.CommandInfo import CommandInfo
 
-from utilities.helper_functions import (
-    char_to_emoji,
-    format_seconds,
-    validate_natural_number,
-    validate_interval
-)
+from utilities.helper_functions import char_to_emoji, format_seconds
+from utilities.validators import validate_natural_number, validate_interval
 
 class MessagingInfo(CommandInfo):
     def __init__(self, command_name: str, target: Union[discord.User, discord.Role, None], message: str, amount: int, interval: int, channel: discord.TextChannel):
