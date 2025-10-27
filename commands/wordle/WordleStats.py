@@ -8,18 +8,8 @@ from utilities.helper_functions import timedelta_format
 
 
 class WordleStats:
-    stats_file_path = "data/wordle_stats.json"
-
-    games_played = 0
-    wins = 0
-    correct_guess_streak = 0
-    longest_guess_streak = 0
-    number_of_guesses = 0
-
-    fastest_win: timedelta = timedelta(seconds=0)
-    number_guesses_per_game_counter = defaultdict(int)
-
     def __init__(self):
+        self.stats_file_path: str = "data/wordle_stats.json"
         self.load_stats()
 
     def increment_games_played(self):
@@ -38,7 +28,7 @@ class WordleStats:
         else:
             self.fastest_win = min(self.fastest_win, time_taken)
 
-        self.number_guesses_per_game_counter[str(guesses)] += 1
+        self.guess_distribution[str(guesses)] += 1
 
         self.save_stats()
 
@@ -75,11 +65,11 @@ class WordleStats:
         return embed
 
     def add_guess_hist(self, embed: discord.Embed) -> discord.Embed:
-        highest_guess_count = max(self.number_guesses_per_game_counter.values())
+        highest_guess_count = max(self.guess_distribution.values())
         highest_guess_percentage = (highest_guess_count / self.wins) * 100
 
-        sorted_guesses = sorted(self.number_guesses_per_game_counter.items(), key=lambda key: int(key[0]))
-        for guess_amount, guess_count in sorted_guesses:
+        sorted_guess_distribution = sorted(self.guess_distribution.items(), key=lambda key: int(key[0]))
+        for guess_amount, guess_count in sorted_guess_distribution:
             if guess_count == 0:
                 continue
             percentage = (guess_count / self.wins) * 100
@@ -102,7 +92,7 @@ class WordleStats:
             "longest_guess_streak": self.longest_guess_streak,
             "number_of_guesses": self.number_of_guesses,
             "fastest_win": self.fastest_win.seconds*1000 + self.fastest_win.microseconds//1000,
-            "number_guesses_per_game_counter": dict(self.number_guesses_per_game_counter)
+            "number_guesses_per_game_counter": dict(self.guess_distribution)
         }
 
     def retrieve_data_from_dict(self, data):
@@ -116,7 +106,7 @@ class WordleStats:
         fastest_win_data = data.get("fastest_win", 0)
         self.fastest_win = timedelta(milliseconds=fastest_win_data)
 
-        self.number_guesses_per_game_counter = defaultdict(int, data.get("number_guesses_per_game_counter", {}))
+        self.guess_distribution = defaultdict(int, data.get("number_guesses_per_game_counter", {}))
 
     def save_stats(self):
         """Save the current state to a JSON file."""
@@ -130,4 +120,12 @@ class WordleStats:
                 stats_dict = json.load(file)
                 self.retrieve_data_from_dict(stats_dict)
         else:
+            self.games_played:         int = 0
+            self.wins:                 int = 0
+            self.correct_guess_streak: int = 0
+            self.longest_guess_streak: int = 0
+            self.number_of_guesses:    int = 0
+
+            self.fastest_win: timedelta = timedelta(seconds=0)
+            self.guess_distribution = defaultdict(int)
             self.save_stats()
