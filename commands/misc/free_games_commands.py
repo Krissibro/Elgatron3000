@@ -123,6 +123,10 @@ def save_state(state):
 class EpicGames(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        trigger = CronTrigger(hour=18, minute=0, second=0, timezone='Europe/Oslo')
+        job_id = "post_free_games"
+        if not bot.scheduler.get_job(job_id):
+            bot.scheduler.add_job(lambda: asyncio.create_task(scheduled_post_free_games(bot)), trigger=trigger, id=job_id)
 
     @app_commands.command(
         name="free_games_rn",
@@ -143,10 +147,4 @@ state_path = "./data/bot_state.json"
 previous_free_game_titles = get_free_games_state()
 
 async def setup(bot: Elgatron):
-    trigger = CronTrigger(hour=18, minute=0, second=0, timezone='Europe/Oslo')
-    job_id = "post_free_games"
-    if not bot.scheduler.get_job(job_id):
-        bot.scheduler.add_job(lambda: asyncio.create_task(scheduled_post_free_games(bot)), trigger=trigger, id=job_id)
-
-
     await bot.add_cog(EpicGames(bot), guild=discord.Object(id=bot.guild_id))
