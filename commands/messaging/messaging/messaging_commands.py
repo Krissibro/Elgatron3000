@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import Union
 
 import discord
@@ -7,7 +8,6 @@ from discord.ext import commands
 
 from commands.messaging.messaging.messaging_model import execute_command, get_attention_internal, annoy_internal, dm_spam_internal
 
-from utilities.helper_functions import parse_time
 from utilities.elgatron import Elgatron
 from utilities.transformers import IntervalTranfsormer
 
@@ -24,7 +24,7 @@ class MessagingCommands(commands.Cog):
                       user: discord.User, 
                       message: str, 
                       amount: discord.app_commands.Range[int, 1, None], 
-                      interval: app_commands.Transform[int, IntervalTranfsormer]
+                      interval: app_commands.Transform[timedelta, IntervalTranfsormer]
                     ):
         if ctx.response.is_done():
             return
@@ -39,7 +39,7 @@ class MessagingCommands(commands.Cog):
                             target: Union[discord.User, discord.Role, None], 
                             message: str = "WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP WAKE UP",
                             amount: app_commands.Range[int, 1, None] = 100, 
-                            interval: app_commands.Transform[int, IntervalTranfsormer] = 10
+                            interval: app_commands.Transform[timedelta, IntervalTranfsormer] = timedelta(seconds=10)
                             ):
         if ctx.response.is_done():
             return
@@ -53,7 +53,7 @@ class MessagingCommands(commands.Cog):
     async def annoy(self, ctx,
                     message: str,
                     amount: app_commands.Range[int, 1, None],
-                    interval: app_commands.Transform[int, IntervalTranfsormer],
+                    interval: app_commands.Transform[timedelta, IntervalTranfsormer],
                     target: Union[discord.User, discord.Role, None] = None
                     ):
         if ctx.response.is_done():

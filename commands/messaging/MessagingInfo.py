@@ -5,16 +5,17 @@ from typing import List, Union
 
 from commands.messaging.CommandInfo import CommandInfo
 
+from utilities.transformers import IntervalTranfsormer, PositiveIntTransformer
 from utilities.helper_functions import char_to_emoji, format_seconds
 from utilities.validators import validate_natural_number, validate_interval
 
 class MessagingInfo(CommandInfo):
-    def __init__(self, command_name: str, target: Union[discord.User, discord.Role, None], message: str, amount: int, interval: int, channel: discord.TextChannel):
+    def __init__(self, command_name: str, target: Union[discord.User, discord.Role, None], message: str, amount: int, interval: timedelta, channel: discord.TextChannel):
         super().__init__(command_name, channel)
         self.message: str = message
         self.amount: int = amount
         self.remaining: int = amount
-        self.interval: int = interval
+        self.interval: timedelta = interval
         self.target: Union[discord.User, discord.Role, None] = target
         self.messages: List[discord.Message] = []
         self.process = None
@@ -27,7 +28,7 @@ class MessagingInfo(CommandInfo):
         if self.target is not None:
             embed.add_field(name="User:", value=f"{self.get_mention()}", inline=False)
         embed.add_field(name="Amount:", value=f"{self.remaining}/{self.amount}", inline=True)
-        embed.add_field(name="Interval:", value=f"{timedelta(seconds=self.interval)}", inline=True)
+        embed.add_field(name="Interval:", value=f"{self.interval}", inline=True)
         return embed
 
     def make_overview(self, index, embed):
@@ -73,25 +74,17 @@ class EditMessagingCommandWindow(discord.ui.Modal):
         self.interval_input = discord.ui.TextInput(
             label="Interval:",
             style=discord.TextStyle.short,
-            default=format_seconds(messaging_info.interval)
+            default=format_seconds(messaging_info.interval.seconds)
         )
         self.add_item(self.message_input)
         self.add_item(self.amount_input)
         self.add_item(self.interval_input)
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
-        await interaction.response.defer()
+        interval = await IntervalTranfsormer().transform(interaction, self.interval_input.value)
+        amount = await PositiveIntTransformer().transform(interaction, self.amount_input.value)
 
-        amount = validate_natural_number(self.amount_input.value)
-        interval = validate_interval(self.interval_input.value)
-
-        if isinstance(amount, discord.Embed):
-            await interaction.followup.send(embed=amount, ephemeral=True)
-            self.stop()
-            return
-        if isinstance(interval, discord.Embed):
-            await interaction.followup.send(embed=interval, ephemeral=True)
-            self.stop()
+        if interaction.response.is_done():
             return
 
         self.messaging_info.message = self.message_input.value

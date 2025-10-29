@@ -1,3 +1,4 @@
+from datetime import timedelta
 import discord
 import asyncio
 
@@ -6,7 +7,7 @@ from typing import Callable, Union
 
 from utilities.settings import active_commands
 
-async def execute_command(ctx, internal_function: Callable, target: Union[discord.User, discord.Role, None], message: str, amount: int, interval: int, channel: discord.TextChannel) -> None:
+async def execute_command(ctx, internal_function: Callable, target: Union[discord.User, discord.Role, None], message: str, amount: int, interval: timedelta, channel: discord.TextChannel) -> None:
     """
     Executes a specified command with validation, tracking, and response handling.
 
@@ -52,13 +53,13 @@ async def get_attention_internal(ctx, messaging_info: MessagingInfo) -> None:
         messaging_info.remaining -= 1
 
         mention = messaging_info.get_mention()
-        button = ReactButton(timeout=messaging_info.interval * 2)
+        button = ReactButton(timeout=messaging_info.interval.seconds * 2)
         embed = discord.Embed(title=f"{messaging_info.message}")
 
         message = await ctx.channel.send(mention, embed=embed, view=button)
         messaging_info.add_message(message) # message added to list so that it can be deleted in the future.
 
-        await asyncio.sleep(messaging_info.interval)
+        await asyncio.sleep(messaging_info.interval.seconds)
         if button.is_finished():
             break
 
@@ -77,7 +78,7 @@ async def dm_spam_internal(ctx, messaging_info: MessagingInfo) -> None:
             messaging_info.remaining -= 1
 
             await messaging_info.target.send(messaging_info.message)
-            await asyncio.sleep(messaging_info.interval)
+            await asyncio.sleep(messaging_info.interval.seconds)
     except ValueError:
         embed = discord.Embed(title="Can only message Users.")
         await ctx.followup.send(embed=embed, ephemeral=True)
@@ -95,6 +96,6 @@ async def annoy_internal(ctx, messaging_info: MessagingInfo) -> None:
         message = await ctx.channel.send(f"{messaging_info.get_mention()} {messaging_info.message}")
         messaging_info.add_message(message)
 
-        await asyncio.sleep(messaging_info.interval)
+        await asyncio.sleep(messaging_info.interval.seconds)
 
     await messaging_info.delete_messages()
