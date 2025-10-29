@@ -12,10 +12,20 @@ class PollCommands(commands.GroupCog, group_name = "poll"):
         name="start",
         description="start a poll",
     )
-    async def start_poll(self, ctx: discord.Interaction, title: str, option1: str, option2: str, description: str = None,
-                         role_mention: discord.Role = None, option3: str = None, option4: str = None, option5: str = None,
-                         option6: str = None, option7: str = None, option8: str = None, option9: str = None,
-                         option10: str = None):
+    async def start_poll(self, ctx: discord.Interaction, 
+                         title: str, 
+                         option1: str, 
+                         option2: str, 
+                         description: discord.Optional[str] = None,
+                         role_mention: discord.Optional[discord.Role] = None,
+                         option3: discord.Optional[str] = None,
+                         option4: discord.Optional[str] = None, 
+                         option5: discord.Optional[str] = None,
+                         option6: discord.Optional[str] = None, 
+                         option7: discord.Optional[str] = None, 
+                         option8: discord.Optional[str] = None, 
+                         option9: discord.Optional[str] = None,
+                         option10: discord.Optional[str] = None):
 
         # Make list with valid options
         options = [option1, option2, option3, option4, option5, option6, option7, option8, option9, option10]
