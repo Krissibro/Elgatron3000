@@ -9,25 +9,9 @@ from commands.messaging.messaging.messaging_model import execute_command, get_at
 
 from utilities.helper_functions import parse_time
 from utilities.elgatron import Elgatron
+from utilities.transformers import IntervalTranfsormer
 
 
-class IntervalTranfsormer(app_commands.Transformer):
-    async def transform(self, interaction: discord.Interaction, value: str) -> int:
-
-        result = parse_time(value)
-        if result == 0: # invalid time format 
-            embed = discord.Embed(
-                title="Invalid interval format. Please use formats like '10s', '5m5s', '2h30m', etc."
-                )
-            await interaction.response.send_message(
-                embed=embed,
-                ephemeral=True
-                )
-        return result
-
-
-# TODO figure out how converters work 
-# https://discordpy.readthedocs.io/en/latest/interactions/api.html?highlight=app_commands#transformerss
 class MessagingCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
