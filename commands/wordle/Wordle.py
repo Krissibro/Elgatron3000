@@ -187,7 +187,7 @@ class Wordle:
 
     async def send_reminder(self) -> None:
         channel = validate_text_channel(self.bot.get_channel(self.channel_id))
-        if channel is None:
+        if isinstance(channel, discord.Embed):
             raise ValueError("The channel ID provided does not correspond to a text channel.")
 
         if not self.correct_guess:
@@ -197,7 +197,7 @@ class Wordle:
 
     async def start_new_game(self) -> None:
         channel = validate_text_channel(self.bot.get_channel(self.channel_id))
-        if channel is None:
+        if isinstance(channel, discord.Embed):
             raise ValueError("The channel ID provided does not correspond to a text channel.")
 
         if not self.correct_guess and not self.daily_word == "":
