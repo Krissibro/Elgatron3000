@@ -44,7 +44,7 @@ class PinManager:
                 try:
                     channel_pins: AsyncIterable[discord.Message] = channel.pins()
                     # TODO: this is async in discord.py 2.6, so we need to figure out how to handle that
-                    self.pins.extend([make_pin(pin) for pin in await channel_pins])
+                    self.pins.extend([make_pin(pin) for pin in channel_pins])
                 except Exception as e:
                     print(f"Failed to fetch pins from {channel.name}: {e}")
 
