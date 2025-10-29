@@ -1,4 +1,4 @@
-from typing import List
+from typing import AsyncIterable, List
 import discord
 import random
 import pickle
@@ -32,6 +32,9 @@ class PinManager:
         except (OSError, IOError) as e:
             self.pins = []
             guild = bot.get_guild(bot.guild_id)
+            if guild is None:
+                print("Guild not found!")
+                return
 
             # Fetch pins from all channels
             for i, channel in enumerate(guild.text_channels):
@@ -39,8 +42,9 @@ class PinManager:
                 print(f"|{(i * '#'):<{len(guild.text_channels)}}| {len(self.pins):<{4}} | {channel.name}", end="\n")
 
                 try:
-                    channel_pins = channel.pins()
-                    self.pins.extend([make_pin(pin) for pin in channel_pins])
+                    channel_pins: AsyncIterable[discord.Message] = channel.pins()
+                    # TODO: this is async in discord.py 2.6, so we need to figure out how to handle that
+                    self.pins.extend([make_pin(pin) for pin in await channel_pins])
                 except Exception as e:
                     print(f"Failed to fetch pins from {channel.name}: {e}")
 
@@ -88,6 +92,7 @@ class PinView(discord.ui.View):
         embed: discord.Embed = await self.make_first_embed()
         embed.add_field(name="By",
                         value=f"{self.pin.author}", inline=True)
+        # TODO guild id hardcoded, make dynamic
         embed.add_field(name="Context",
                         value=f"https://discord.com/channels/{guild_id}/{self.pin.channel}/{self.pin.id}")
         return embed
@@ -104,7 +109,7 @@ class PinView(discord.ui.View):
         self.stop()  # Ensure that we stop the view
 
     @discord.ui.button(label="Reveal the sinner!", style=discord.ButtonStyle.success)
-    async def reveal_button(self, button: discord.ui.Button, interaction: discord.Interaction):
+    async def reveal_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await self.reveal_author()
 
     async def on_timeout(self):
@@ -159,6 +164,7 @@ class GuessThatPin(commands.Cog):
         await view.send_attachments()
 
 # Todo: handle if a pinned message is deleted or ehh?
+# I assume we could just make it so that it re-syncs every time it connects? i dont think it's that demanding?
 
 # Alternative method, but without the previous state of the message
 # @client.event
