@@ -93,7 +93,7 @@ async def scheduled_post_free_games(bot: Elgatron) -> None:
             channel = bot.get_channel(testing_channel_id)
 
         channel = validate_text_channel(channel)
-        if channel is None:
+        if isinstance(channel, discord.Embed):
             raise ValueError("The channel ID provided does not correspond to a text channel.")
 
         # Send the free games embed
@@ -137,8 +137,9 @@ class EpicGames(commands.Cog):
         free_games = await get_free_games()
         
         channel = validate_text_channel(ctx.channel)
-        if channel is None:
-            raise ValueError("The channel ID provided does not correspond to a text channel.")
+        if isinstance(channel, discord.Embed):
+            await ctx.followup.send(embed=channel)
+            return
         
         await send_games_embed(channel, free_games)
 
