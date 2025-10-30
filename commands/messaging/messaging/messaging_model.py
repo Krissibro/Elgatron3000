@@ -21,24 +21,18 @@ async def execute_command(ctx, internal_function: Callable, target: Union[discor
         channel (discord.TextChannel): The channel in which the command is being executed.
 
     Description:
-        This function validates user input, creates a command with necessary information, and tracks it using a command tracker.
-        It sends an ephemeral response message with the command details, executes the command, and cleans up after completion.
+        Creates a command with necessary information, and tracks it using a command tracker.
+        It sends an ephemeral response with the command details, executes the command, and cleans up after completion.
         If validation fails at any step, the function exits without executing the command.
     """
-
-    # Create a Command object with the given information
-    function_name = " ".join(internal_function.__name__.split('_')[:-1])
-    messaging_info = MessagingInfo(function_name, target, message, amount, interval, channel)
-
-    async_task = asyncio.create_task(internal_function(ctx, messaging_info))
-    command_id = active_commands.add_command(messaging_info, async_task)
+    messaging_info = MessagingInfo(internal_function, target, message, amount, interval, channel)
 
     # Run the given command
     await ctx.response.send_message(embed=messaging_info.make_embed(), ephemeral=True, delete_after=10)
-    await async_task
+    await messaging_info.process
 
     # Clean up after Command
-    active_commands.kill(command_id)
+    await active_commands.kill(messaging_info.command_id)
 
 
 class ReactButton(discord.ui.View):
@@ -48,7 +42,7 @@ class ReactButton(discord.ui.View):
         self.stop()
 
 
-async def get_attention_internal(ctx, messaging_info: MessagingInfo) -> None:
+async def get_attention_internal(messaging_info: MessagingInfo) -> None:
     while messaging_info.remaining > 0:
         messaging_info.remaining -= 1
 
@@ -56,17 +50,15 @@ async def get_attention_internal(ctx, messaging_info: MessagingInfo) -> None:
         button = ReactButton(timeout=messaging_info.interval.seconds * 2)
         embed = discord.Embed(title=f"{messaging_info.message}")
 
-        message = await ctx.channel.send(mention, embed=embed, view=button)
+        message = await messaging_info.channel.send(mention, embed=embed, view=button)
         messaging_info.add_message(message) # message added to list so that it can be deleted in the future.
 
         await asyncio.sleep(messaging_info.interval.seconds)
         if button.is_finished():
             break
 
-    await messaging_info.delete_messages()
 
-
-async def dm_spam_internal(ctx, messaging_info: MessagingInfo) -> None:
+async def dm_spam_internal(messaging_info: MessagingInfo) -> None:
     try:
         # these two should technically never happen 
         if isinstance(messaging_info.target, discord.Role):
@@ -77,25 +69,19 @@ async def dm_spam_internal(ctx, messaging_info: MessagingInfo) -> None:
         while messaging_info.remaining > 0:
             messaging_info.remaining -= 1
 
-            await messaging_info.target.send(messaging_info.message)
-            await asyncio.sleep(messaging_info.interval.seconds)
-    except ValueError:
-        embed = discord.Embed(title="Can only message Users.")
-        await ctx.followup.send(embed=embed, ephemeral=True)
-    except discord.Forbidden:
-        embed = discord.Embed(title="I don't have permission to send messages to that user.")
-        await ctx.followup.send(embed=embed, ephemeral=True)
-    except AttributeError:
-        embed = discord.Embed(title="Unable to message a bot user.")
-        await ctx.followup.send(embed=embed, ephemeral=True)
+            message = await messaging_info.target.send(messaging_info.message)
+            messaging_info.add_message(message)
 
-async def annoy_internal(ctx, messaging_info: MessagingInfo) -> None:
+            await asyncio.sleep(messaging_info.interval.seconds)
+    except:
+        embed = discord.Embed(title="I don't have permission to message that user.")
+        await messaging_info.channel.send(embed=embed)
+
+async def annoy_internal(messaging_info: MessagingInfo) -> None:
     while messaging_info.remaining > 0:
         messaging_info.remaining -= 1
 
-        message = await ctx.channel.send(f"{messaging_info.get_mention()} {messaging_info.message}")
+        message = await messaging_info.channel.send(f"{messaging_info.get_mention()} {messaging_info.message}")
         messaging_info.add_message(message)
 
         await asyncio.sleep(messaging_info.interval.seconds)
-
-    await messaging_info.delete_messages()

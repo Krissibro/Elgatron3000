@@ -7,18 +7,22 @@ from commands.messaging.CommandInfo import CommandInfo
 
 from utilities.transformers import IntervalTranfsormer, PositiveIntTransformer
 from utilities.helper_functions import char_to_emoji, format_seconds
-from utilities.validators import validate_natural_number, validate_interval
+from utilities.settings import active_commands
 
 class MessagingInfo(CommandInfo):
-    def __init__(self, command_name: str, target: Union[discord.User, discord.Role, None], message: str, amount: int, interval: timedelta, channel: discord.TextChannel):
-        super().__init__(command_name, channel)
+    def __init__(self, internal_function: Callable, target: Union[discord.User, discord.Role, None], message: str, amount: int, interval: timedelta, channel: discord.TextChannel):
         self.message: str = message
         self.amount: int = amount
         self.remaining: int = amount
         self.interval: timedelta = interval
         self.target: Union[discord.User, discord.Role, None] = target
         self.messages: List[discord.Message] = []
-        self.process = None
+
+        self.process = asyncio.create_task(internal_function(self))
+        self.command_id = active_commands.add_command(self)
+
+        command_name = " ".join(internal_function.__name__.split('_')[:-1])
+        super().__init__(command_name, channel)
 
     def make_embed(self):
         embed = discord.Embed(
