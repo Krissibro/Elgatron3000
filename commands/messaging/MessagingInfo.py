@@ -21,27 +21,27 @@ class MessagingInfo(CommandInfo):
                  ):
         self.message: str = message
         self.remaining: int = amount
-        self.current_trigger = start_time
-        self.interval: timedelta = interval
         self.target: Union[discord.User, discord.Role, None] = target
         self.messages: List[discord.Message] = []
+        
         self.internal_function: Callable[["MessagingInfo"], Awaitable[None]] = internal_function
-
+        self.current_trigger = start_time
+        self.interval: timedelta = interval
         self.scheduler = scheduler
         self.job_id = f"message_scheduler_{id(self)}"
 
         command_name = " ".join(internal_function.__name__.split('_')[:-1])
         super().__init__(command_name, channel)
 
-    def new_job(self) -> None:
+    def start_job(self) -> None:
         trigger = DateTrigger(self.current_trigger, timezone='Europe/Oslo')
         self.scheduler.add_job(
-            self.reschedule, 
+            self.run_command, 
             trigger=trigger, 
             id=self.job_id
         )
 
-    async def reschedule(self) -> None:
+    async def run_command(self) -> None:
         await self.internal_function(self)
         self.remaining -= 1
         
@@ -50,7 +50,7 @@ class MessagingInfo(CommandInfo):
 
         self.current_trigger += self.interval
         self.scheduler.add_job(
-            self.reschedule,
+            self.run_command,
             trigger=DateTrigger(self.current_trigger, timezone="Europe/Oslo"),
             id=self.job_id,
             replace_existing=True

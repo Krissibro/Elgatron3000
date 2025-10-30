@@ -10,15 +10,23 @@ class ActiveCommands:
     def __init__(self):
         self.running_commands_dict: Dict[int, CommandInfo]  = {}
 
-    # Assigns the lowest ID
-    def assign_id(self) -> int:
-        command_id = max(self.running_commands_dict.keys(), default=0) + 1 
-        return command_id
-
     def add_command(self, command: CommandInfo) -> int:
-        command_id = self.assign_id()
+        command_id = max(self.running_commands_dict.keys(), default=0) + 1 
         self.running_commands_dict[command_id] = command
         return command_id
+
+    def get_ids(self) -> List[int]:
+        return list(self.running_commands_dict.keys())
+
+    def is_empty(self) -> bool:
+        return not self.running_commands_dict
+
+    def check_if_command_exists(self, command_id) -> bool:
+        return command_id in self.running_commands_dict
+
+    async def kill(self, command_id: int) -> None:
+        await self[command_id].kill()
+        del self.running_commands_dict[command_id]
 
     def make_overview_embed(self) -> discord.Embed:
         embed = discord.Embed(title="Showing all running processes:",
@@ -42,19 +50,6 @@ class ActiveCommands:
     def get_command_embed(self, command_id) -> discord.Embed:
         embed = self[command_id].make_embed()
         return embed
-
-    def get_ids(self) -> List[int]:
-        return list(self.running_commands_dict.keys())
-
-    async def kill(self, command_id: int) -> None:
-        await self[command_id].kill()
-        del self.running_commands_dict[command_id]
-
-    def is_empty(self) -> bool:
-        return not self.running_commands_dict
-
-    def check_if_command_exists(self, command_id) -> bool:
-        return command_id in self.running_commands_dict
 
     def __getitem__(self, index) -> CommandInfo:
         return self.running_commands_dict[index]

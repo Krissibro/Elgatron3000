@@ -5,18 +5,21 @@ from discord.ext.commands import Bot
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
+from commands.messaging.ActiveCommands import ActiveCommands
+
 class Elgatron(Bot):
     def __init__(self, guild_id, testing):
-        intents = discord.Intents.default()
-        intents.members = True
-        intents.messages = True
+        intents: discord.Intents = discord.Intents.default()
+        intents.members         = True
+        intents.messages        = True
         intents.message_content = True
-        intents.guilds = True
+        intents.guilds          = True
 
-        self.guild_id = guild_id
-        self.testing = testing
+        self.guild_id: int = guild_id
+        self.testing: bool = testing
 
-        self.scheduler = AsyncIOScheduler(timezone='Europe/Oslo')
+        self.scheduler: AsyncIOScheduler = AsyncIOScheduler(timezone='Europe/Oslo')
+        self.active_commands: ActiveCommands = ActiveCommands()
         
         super().__init__(intents=intents, command_prefix="/")
 
