@@ -12,10 +12,8 @@ class ActiveCommands:
 
     # Assigns the lowest ID
     def assign_id(self) -> int:
-        i = 1
-        while i in self.running_commands_dict.keys():
-            i += 1
-        return i
+        command_id = max(self.running_commands_dict.keys(), default=0) + 1 
+        return command_id
 
     def add_command(self, command: CommandInfo) -> int:
         command_id = self.assign_id()
