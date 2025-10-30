@@ -67,7 +67,7 @@ class ManageCommandsButtons(discord.ui.View):
     async def edit_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
 
         if active_commands.check_if_command_exists(self.command_id):
-            modal = active_commands[self.command_id].get_edit_window()
+            modal = active_commands[self.command_id].get_edit_window(interaction)
             await interaction.response.send_modal(modal)
             await modal.wait()  # Wait for the modal to be closed
 
