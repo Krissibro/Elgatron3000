@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Union
 
 import discord
@@ -6,15 +6,16 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from commands.messaging.messaging.messaging_model import execute_command, get_attention_internal, annoy_internal, dm_spam_internal
+from commands.messaging.MessagingInfo import MessagingInfo
+from commands.messaging.messaging.messaging_model import get_attention_internal, annoy_internal, dm_spam_internal
 
 from utilities.elgatron import Elgatron
 from utilities.transformers import IntervalTranfsormer
 
 
 class MessagingCommands(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
+    def __init__(self, bot: Elgatron):
+        self.bot: Elgatron = bot
 
     @app_commands.command(
         name="dm_spam",
@@ -29,7 +30,17 @@ class MessagingCommands(commands.Cog):
         if ctx.response.is_done():
             return
         
-        await execute_command(ctx, dm_spam_internal, user, message, amount, interval, ctx.channel)
+        messaging_info = MessagingInfo(dm_spam_internal, 
+                                       user, 
+                                       message, 
+                                       amount, 
+                                       ctx.channel, 
+                                       datetime.now() + timedelta(seconds=1),
+                                       interval,
+                                       self.bot.scheduler
+                                       )
+        messaging_info.new_job()
+        await ctx.response.send_message(embed=messaging_info.make_embed(), ephemeral=True, delete_after=10)
 
     @app_commands.command(
         name="get_attention",
@@ -44,7 +55,18 @@ class MessagingCommands(commands.Cog):
         if ctx.response.is_done():
             return
         
-        await execute_command(ctx, get_attention_internal, target, message, amount, interval, ctx.channel)
+        messaging_info = MessagingInfo(get_attention_internal, 
+                                       target, 
+                                       message, 
+                                       amount, 
+                                       ctx.channel, 
+                                       datetime.now() + timedelta(seconds=1),
+                                       interval,
+                                       self.bot.scheduler
+                                       )
+        messaging_info.new_job()
+        await ctx.response.send_message(embed=messaging_info.make_embed(), ephemeral=True, delete_after=10)
+
 
     @app_commands.command(
         name="annoy",
@@ -59,7 +81,17 @@ class MessagingCommands(commands.Cog):
         if ctx.response.is_done():
             return
         
-        await execute_command(ctx, annoy_internal, target, message, amount, interval, ctx.channel)
+        messaging_info = MessagingInfo(annoy_internal, 
+                                       target, 
+                                       message, 
+                                       amount, 
+                                       ctx.channel, 
+                                       datetime.now() + timedelta(seconds=1),
+                                       interval,
+                                       self.bot.scheduler
+                                       )
+        messaging_info.new_job()
+        await ctx.response.send_message(embed=messaging_info.make_embed(), ephemeral=True, delete_after=10)
 
 
 async def setup(bot: Elgatron):

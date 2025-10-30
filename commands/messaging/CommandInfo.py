@@ -18,21 +18,13 @@ class CommandInfo(ABC):
         pass
     
     @abstractmethod
-    def make_select_option(self, index: int, command_id: int) -> discord.SelectOption:
-        pass
-
-    @abstractmethod
-    async def kill(self) -> None:
-        pass
-
-    @abstractmethod
-    def add_message(self, message) -> None:
-        pass
-
-    @abstractmethod
-    async def delete_messages(self) -> None:
+    def get_select_description(self) -> str:
         pass
 
     @abstractmethod
     def get_edit_window(self, interaction) -> discord.ui.Modal:
+        pass
+
+    @abstractmethod
+    async def kill(self) -> None:
         pass
