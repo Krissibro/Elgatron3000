@@ -1,31 +1,71 @@
-import asyncio
-from collections.abc import Callable
+from datetime import datetime, timedelta
+from typing import Awaitable, Callable, Union, List
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.date import DateTrigger
+
 import discord
 
-from datetime import timedelta
-from typing import List, Union
-
 from commands.messaging.CommandInfo import CommandInfo
-
-from utilities.transformers import IntervalTranfsormer, PositiveIntTransformer
 from utilities.helper_functions import char_to_emoji, format_seconds
-from utilities.settings import active_commands
+from utilities.transformers import IntervalTranfsormer, PositiveIntTransformer
 
 class MessagingInfo(CommandInfo):
-    def __init__(self, internal_function: Callable, target: Union[discord.User, discord.Role, None], message: str, amount: int, interval: timedelta, channel: discord.TextChannel):
+    def __init__(self, internal_function: Callable[["MessagingInfo"], Awaitable[None]],
+                 target: Union[discord.User, discord.Role, None], 
+                 message: str, 
+                 amount: int, 
+                 channel: discord.TextChannel, 
+                 start_time: datetime,  
+                 interval: timedelta,
+                 scheduler: AsyncIOScheduler
+                 ):
         self.message: str = message
         self.remaining: int = amount
+        self.current_trigger = start_time
         self.interval: timedelta = interval
         self.target: Union[discord.User, discord.Role, None] = target
         self.messages: List[discord.Message] = []
+        self.internal_function: Callable[["MessagingInfo"], Awaitable[None]] = internal_function
 
-        self.process = asyncio.create_task(internal_function(self))
-        self.command_id = active_commands.add_command(self)
+        self.scheduler = scheduler
+        self.job_id = f"message_scheduler_{id(self)}"
 
         command_name = " ".join(internal_function.__name__.split('_')[:-1])
         super().__init__(command_name, channel)
 
-    def make_embed(self):
+    def new_job(self) -> None:
+        trigger = DateTrigger(self.current_trigger, timezone='Europe/Oslo')
+        self.scheduler.add_job(
+            self.reschedule, 
+            trigger=trigger, 
+            id=self.job_id
+        )
+
+    async def reschedule(self) -> None:
+        await self.internal_function(self)
+        self.remaining -= 1
+        
+        if self.remaining <= 0:
+            return
+
+        self.current_trigger += self.interval
+        self.scheduler.add_job(
+            self.reschedule,
+            trigger=DateTrigger(self.current_trigger, timezone="Europe/Oslo"),
+            id=self.job_id,
+            replace_existing=True
+        )
+
+    def get_mention(self) -> str:
+        return self.target.mention if self.target else ""
+    
+    def add_message(self, message: discord.Message) -> None:
+        self.messages.append(message)
+
+    async def delete_messages(self) -> None:
+        await self.channel.delete_messages(self.messages[1:])
+
+    def make_embed(self) -> discord.Embed:
         embed = discord.Embed(
             title=f"Command: {self.command_name}",
             description=f"Message: {self.message}"
@@ -40,26 +80,17 @@ class MessagingInfo(CommandInfo):
         embed.add_field(name=f"{char_to_emoji(index)}: {self.command_name}",
                         value=f"{self.get_mention()}\n{self.message}",
                         inline=False)
-
-    def make_select_option(self, index: int, command_id: int) -> discord.SelectOption:
-        return discord.SelectOption(label=f"{index}:", value=str(command_id), description=f"{self.message}"[:100])
-
-    async def kill(self) -> None:
-        self.process.cancel()
-        await self.delete_messages()
-
-    def add_message(self, message: discord.Message) -> None:
-        self.messages.append(message)
-
-    async def delete_messages(self) -> None:
-        await self.channel.delete_messages(self.messages[1:])
+    
+    def get_select_description(self) -> str:
+        return self.message
 
     def get_edit_window(self, interaction) -> discord.ui.Modal:
         return EditMessagingCommandWindow(interaction, self)
 
-    def get_mention(self) -> str:
-        return self.target.mention if self.target else ""
-
+    async def kill(self) -> None:
+        self.scheduler.remove_job(job_id=self.job_id)
+        await self.delete_messages()
+        
 class EditMessagingCommandWindow(discord.ui.Modal):
     def __init__(self, interaction: discord.Interaction, messaging_info: MessagingInfo) -> None:
         super().__init__(title="Edit")
