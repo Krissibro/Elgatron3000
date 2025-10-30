@@ -17,8 +17,7 @@ class ActiveCommands:
             i += 1
         return i
 
-    def add_command(self, command: CommandInfo, async_task: Task) -> int:
-        command.process = async_task
+    def add_command(self, command: CommandInfo) -> int:
         command_id = self.assign_id()
         self.running_commands_dict[command_id] = command
         return command_id
@@ -27,17 +26,19 @@ class ActiveCommands:
         embed = discord.Embed(title="Showing all running processes:",
                               color=discord.Color.blue())
 
-        for index, command in self.running_commands_dict.items():
-            embed = command.make_overview(index, embed)
+        for index, command in enumerate(self.running_commands_dict.values()):
+            command.add_info_field(index+1, embed)
 
         return embed
 
     def make_dropdown_options(self) -> List[discord.SelectOption]:
-        return [command_info.make_select_option(index) for index, command_info in self.running_commands_dict.items()]
-
+        dropdown_options = []
+        for index, (command_id, command_info) in enumerate(self.running_commands_dict.items()):
+            dropdown_options.append(command_info.make_select_option(index+1, command_id))
+        return dropdown_options
+    
     def get_command_embed(self, command_id) -> discord.Embed:
         embed = self[command_id].make_embed()
-        embed.add_field(name="ID:", value=f"{command_id}", inline=True)
         return embed
 
     def get_ids(self) -> List[int]:
