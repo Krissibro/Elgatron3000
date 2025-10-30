@@ -5,23 +5,22 @@ from discord.ext import commands
 
 from utilities.elgatron import Elgatron
 from commands.messaging.management.management_view import ManageCommandsDropDown
-from utilities.settings import active_commands
 
 class CommandManagement(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
+    def __init__(self, bot: Elgatron):
+        self.bot: Elgatron = bot
 
     @app_commands.command(
         name="manage_commands",
         description="See and manage running commands"
     )
     async def manage_commands(self, ctx: discord.Interaction):
-        if active_commands.is_empty():
+        if self.bot.active_commands.is_empty():
             await ctx.response.send_message(embed=discord.Embed(title="No commands running",
                     color=discord.Color.red()), ephemeral=True)
             return
-        view = ManageCommandsDropDown()
-        first_embed = active_commands.make_overview_embed()
+        view = ManageCommandsDropDown(self.bot.active_commands)
+        first_embed = self.bot.active_commands.make_overview_embed()
         await ctx.response.send_message(embed=first_embed, view=view, ephemeral=True)
 
     @app_commands.command(

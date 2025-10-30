@@ -121,12 +121,13 @@ def save_state(state):
 
 # TODO: Clean up everything in this file and move it into a cog
 class EpicGames(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: Elgatron):
         self.bot = bot
         trigger = CronTrigger(hour=18, minute=0, second=0, timezone='Europe/Oslo')
         job_id = "post_free_games"
         if not bot.scheduler.get_job(job_id):
-            bot.scheduler.add_job(lambda: asyncio.create_task(scheduled_post_free_games(bot)), trigger=trigger, id=job_id)
+            bot.scheduler.add_job(scheduled_post_free_games, trigger=trigger, id=job_id, kwargs={"bot": bot}
+)
 
     @app_commands.command(
         name="free_games_rn",

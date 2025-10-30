@@ -1,11 +1,8 @@
 import json
 
-from commands.messaging.ActiveCommands import ActiveCommands
 from utilities.elgatron import Elgatron
 
 # TODO deal with most the stuff in here, it should be in the bot i think
-
-active_commands: ActiveCommands = ActiveCommands()
 
 with open("utilities/config.json", "r") as f:
     contents = json.load(f)

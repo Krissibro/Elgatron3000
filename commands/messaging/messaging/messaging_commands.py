@@ -39,7 +39,8 @@ class MessagingCommands(commands.Cog):
                                        interval,
                                        self.bot.scheduler
                                        )
-        messaging_info.new_job()
+        messaging_info.start_job()
+        self.bot.active_commands.add_command(messaging_info)
         await ctx.response.send_message(embed=messaging_info.make_embed(), ephemeral=True, delete_after=10)
 
     @app_commands.command(
@@ -64,7 +65,8 @@ class MessagingCommands(commands.Cog):
                                        interval,
                                        self.bot.scheduler
                                        )
-        messaging_info.new_job()
+        messaging_info.start_job()
+        self.bot.active_commands.add_command(messaging_info)
         await ctx.response.send_message(embed=messaging_info.make_embed(), ephemeral=True, delete_after=10)
 
 
@@ -90,7 +92,8 @@ class MessagingCommands(commands.Cog):
                                        interval,
                                        self.bot.scheduler
                                        )
-        messaging_info.new_job()
+        messaging_info.start_job()
+        self.bot.active_commands.add_command(messaging_info)
         await ctx.response.send_message(embed=messaging_info.make_embed(), ephemeral=True, delete_after=10)
 
 
