@@ -58,9 +58,7 @@ class ManageCommandsButtons(discord.ui.View):
         await interaction.response.defer()
 
         if active_commands.check_if_command_exists(self.command_id):
-            active_commands[self.command_id].kill()
-            await active_commands[self.command_id].delete_messages()
-            active_commands.kill(self.command_id)
+            await active_commands.kill(self.command_id)
             
         await self.return_to_dropdown(interaction)
 
