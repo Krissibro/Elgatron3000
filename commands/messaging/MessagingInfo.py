@@ -1,3 +1,5 @@
+import asyncio
+from collections.abc import Callable
 import discord
 
 from datetime import timedelta
@@ -30,12 +32,12 @@ class MessagingInfo(CommandInfo):
         )
         if self.target is not None:
             embed.add_field(name="User:", value=f"{self.get_mention()}", inline=False)
-        embed.add_field(name="Amount:", value=f"{self.remaining}/{self.amount}", inline=True)
+        embed.add_field(name="Remaining:", value=f"{self.remaining}", inline=True)
         embed.add_field(name="Interval:", value=f"{self.interval}", inline=True)
         return embed
 
-    def make_overview(self, index, embed):
-        embed.add_field(name=f"{char_to_emoji(index)} {self.command_name}",
+    def add_info_field(self, index: int, embed: discord.Embed) -> None:
+        embed.add_field(name=f"{char_to_emoji(index)}: {self.command_name}",
                         value=f"{self.get_mention()}\n{self.message}",
                         inline=False)
 
@@ -46,17 +48,17 @@ class MessagingInfo(CommandInfo):
         self.process.cancel()
         await self.delete_messages()
 
-    def add_message(self, message):
+    def add_message(self, message: discord.Message) -> None:
         self.messages.append(message)
 
-    async def delete_messages(self):
+    async def delete_messages(self) -> None:
         await self.channel.delete_messages(self.messages[1:])
 
-    def get_mention(self):
-        return self.target.mention if self.target else ""
+    def get_edit_window(self, interaction) -> discord.ui.Modal:
+        return EditMessagingCommandWindow(interaction, self)
 
-    def get_edit_window(self):
-        return EditMessagingCommandWindow(self)
+    def get_mention(self) -> str:
+        return self.target.mention if self.target else ""
 
 class EditMessagingCommandWindow(discord.ui.Modal):
     def __init__(self, interaction: discord.Interaction, messaging_info: MessagingInfo) -> None:
