@@ -14,25 +14,25 @@ class CommandInfo(ABC):
         pass
 
     @abstractmethod
-    def make_overview(self, index, embed) -> discord.Embed:
+    def add_info_field(self, index: int, embed: discord.Embed) -> None:
         pass
     
     @abstractmethod
-    def make_select_option(self, index) -> discord.SelectOption:
+    def make_select_option(self, index: int, command_id: int) -> discord.SelectOption:
         pass
 
     @abstractmethod
-    def add_message(self, message):
+    async def kill(self) -> None:
         pass
 
     @abstractmethod
-    def kill(self):
+    def add_message(self, message) -> None:
         pass
 
     @abstractmethod
-    async def delete_messages(self):
+    async def delete_messages(self) -> None:
         pass
 
     @abstractmethod
-    def get_edit_window(self) -> discord.ui.Modal:
+    def get_edit_window(self, interaction) -> discord.ui.Modal:
         pass
