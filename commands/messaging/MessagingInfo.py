@@ -40,13 +40,12 @@ class MessagingInfo(CommandInfo):
                         value=f"{self.get_mention()}\n{self.message}",
                         inline=False)
 
-        return embed
+    def make_select_option(self, index: int, command_id: int) -> discord.SelectOption:
+        return discord.SelectOption(label=f"{index}:", value=str(command_id), description=f"{self.message}"[:100])
 
-    def make_select_option(self, index):
-        return discord.SelectOption(label=f"{index}:", value=str(index), description=f"{self.message}"[:100])
-
-    def kill(self):
+    async def kill(self) -> None:
         self.process.cancel()
+        await self.delete_messages()
 
     def add_message(self, message):
         self.messages.append(message)

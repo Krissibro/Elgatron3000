@@ -44,8 +44,8 @@ class ActiveCommands:
     def get_ids(self) -> List[int]:
         return list(self.running_commands_dict.keys())
 
-    def kill(self, command_id: int) -> None:
-        self[command_id].kill()
+    async def kill(self, command_id: int) -> None:
+        await self[command_id].kill()
         del self.running_commands_dict[command_id]
 
     def is_empty(self) -> bool:
