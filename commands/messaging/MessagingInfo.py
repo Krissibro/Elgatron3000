@@ -12,7 +12,6 @@ from utilities.settings import active_commands
 class MessagingInfo(CommandInfo):
     def __init__(self, internal_function: Callable, target: Union[discord.User, discord.Role, None], message: str, amount: int, interval: timedelta, channel: discord.TextChannel):
         self.message: str = message
-        self.amount: int = amount
         self.remaining: int = amount
         self.interval: timedelta = interval
         self.target: Union[discord.User, discord.Role, None] = target
@@ -60,9 +59,10 @@ class MessagingInfo(CommandInfo):
         return EditMessagingCommandWindow(self)
 
 class EditMessagingCommandWindow(discord.ui.Modal):
-    def __init__(self, messaging_info: MessagingInfo) -> None:
+    def __init__(self, interaction: discord.Interaction, messaging_info: MessagingInfo) -> None:
         super().__init__(title="Edit")
         self.messaging_info: MessagingInfo = messaging_info
+        self.original_response = interaction
 
         self.message_input = discord.ui.TextInput(
             label="Message:",
@@ -84,15 +84,15 @@ class EditMessagingCommandWindow(discord.ui.Modal):
         self.add_item(self.interval_input)
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
+        message = self.message_input.value
         interval = await IntervalTranfsormer().transform(interaction, self.interval_input.value)
         amount = await PositiveIntTransformer().transform(interaction, self.amount_input.value)
 
         if interaction.response.is_done():
             return
-
-        self.messaging_info.message = self.message_input.value
-        self.messaging_info.amount = amount
-        self.messaging_info.remaining = amount
-        self.messaging_info.interval = interval
-
-        self.stop()
+        
+        await interaction.response.defer()
+        self.messaging_info.message     = message
+        self.messaging_info.remaining   = amount
+        self.messaging_info.interval    = interval
+        await self.original_response.edit_original_response(embed=self.messaging_info.make_embed())
