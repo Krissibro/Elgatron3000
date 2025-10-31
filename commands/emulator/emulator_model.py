@@ -58,7 +58,7 @@ class Emulator(PyBoy):
         return img_byte_arr
 
     def tick(self, count: int = 3, render: bool = True, sound: bool = False) -> bool:
-        result = super().tick(count=count, render=render)
+        result = super().tick(count=count, render=render, sound=sound)
         if self.screen.image is not None:
             image = self.screen.image.copy()
             image = image.resize((image.width* 2, image.height*2))
