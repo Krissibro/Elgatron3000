@@ -93,10 +93,10 @@ class MessagingInfo(CommandInfo):
 
     async def kill(self) -> None:
         self.active_commands.remove_command(self.command_id)
-        await self.delete_messages()
-
         if self.scheduler.get_job(self.job_id) is not None:
             self.scheduler.remove_job(job_id=self.job_id)
+
+        await self.delete_messages()
         
 class EditMessagingCommandWindow(discord.ui.Modal):
     def __init__(self, interaction: discord.Interaction, messaging_info: MessagingInfo) -> None:
