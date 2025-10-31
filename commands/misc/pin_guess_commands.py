@@ -124,9 +124,9 @@ class PinView(discord.ui.View):
         await self.reveal_author()
 
 class GuessThatPin(commands.GroupCog, group_name="pin"):
-    def __init__(self, bot):
-        self.bot = bot
-        self.pin_manager = PinManager()
+    def __init__(self, bot: Elgatron):
+        self.bot: Elgatron = bot
+        self.pin_manager: PinManager = PinManager()
         self.pin_manager.load_pins()
 
     @commands.Cog.listener('on_message_edit')
