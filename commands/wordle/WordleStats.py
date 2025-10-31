@@ -9,6 +9,15 @@ from utilities.helper_functions import timedelta_format
 
 class WordleStats:
     def __init__(self):
+        self.games_played: int = 0
+        self.wins: int = 0
+        self.correct_guess_streak: int = 0
+        self.longest_guess_streak: int = 0
+        self.number_of_guesses: int = 0
+
+        self.fastest_win: timedelta = timedelta(seconds=0)
+        self.guess_distribution = defaultdict(int)
+
         self.stats_file_path: str = "data/wordle_stats.json"
         self.load_stats()
 
@@ -119,13 +128,3 @@ class WordleStats:
             with open(self.stats_file_path, 'r') as file:
                 stats_dict = json.load(file)
                 self.retrieve_data_from_dict(stats_dict)
-        else:
-            self.games_played:         int = 0
-            self.wins:                 int = 0
-            self.correct_guess_streak: int = 0
-            self.longest_guess_streak: int = 0
-            self.number_of_guesses:    int = 0
-
-            self.fastest_win: timedelta = timedelta(seconds=0)
-            self.guess_distribution = defaultdict(int)
-            self.save_stats()

@@ -31,9 +31,9 @@ class TestCommands(commands.GroupCog, group_name="test"):
                     message.created_at,
                     message.clean_content,
                     [reaction.emoji for reaction in message.reactions],
-                    [".".join(attatchment.filename.split(".")[0:-1]) for attatchment in message.attachments],
-                    [attatchment.filename.split(".")[1] for attatchment in message.attachments],
-                    [attatchment.content_type for attatchment in message.attachments]
+                    [".".join(attachment.filename.split(".")[0:-1]) for attachment in message.attachments],
+                    [attachment.filename.split(".")[1] for attachment in message.attachments],
+                    [attachment.content_type for attachment in message.attachments]
                 ] async for message in i.history(limit=10)])
             except:  # TODO specify what kind of error can occur here?
                 continue
