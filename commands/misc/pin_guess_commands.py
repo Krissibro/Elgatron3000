@@ -8,6 +8,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from utilities.elgatron import Elgatron
+from utilities.validators import validate_text_channel
 
 from collections import namedtuple
 
@@ -25,6 +26,7 @@ class PinManager:
     def __init__(self, bot: Elgatron):
         self.pins: List[Pin] = []
 
+    async def load_pins(self, bot):
         """Fetches all pinned messages and stores them in ./data."""
         # Load if there are pins already stored, else store all the pins
         try:
@@ -43,8 +45,8 @@ class PinManager:
 
                 try:
                     channel_pins: AsyncIterable[discord.Message] = channel.pins()
-                    # TODO: this is async in discord.py 2.6, so we need to figure out how to handle that
-                    self.pins.extend([make_pin(pin) for pin in channel_pins])
+                    async for message_pin in channel_pins:
+                        self.pins.append(make_pin(message_pin))
                 except Exception as e:
                     print(f"Failed to fetch pins from {channel.name}: {e}")
 
@@ -78,8 +80,8 @@ class PinView(discord.ui.View):
     def __init__(self, message_ctx, pin, timeout=15*60):
         super().__init__(timeout=timeout)
         self.pin: Pin = pin
-        self.message_ctx = message_ctx
-        self.task = asyncio.create_task(self.auto_reveal())
+        self.message_ctx: discord.Interaction = message_ctx
+        self.task: asyncio.Task = asyncio.create_task(self.auto_reveal())
 
     async def make_first_embed(self) -> discord.Embed:
         """Creates the embed containing the title and the selected pin.
@@ -94,13 +96,18 @@ class PinView(discord.ui.View):
                         value=f"{self.pin.author}", inline=True)
         # TODO guild id hardcoded, make dynamic
         embed.add_field(name="Context",
-                        value=f"https://discord.com/channels/{guild_id}/{self.pin.channel}/{self.pin.id}")
+                        value=f"https://discord.com/channels/{self.message_ctx.guild_id}/{self.pin.channel}/{self.pin.id}")
         return embed
 
     async def send_attachments(self) -> None:
         """Sends the attachments of the pin to the channel if there are any."""
+        channel = self.message_ctx.channel
+        text_channel = validate_text_channel(channel)
+        if isinstance(text_channel, discord.Embed):
+            return
+
         if self.pin.attachments:
-            await self.message_ctx.channel.send("\n".join(attachment for attachment in self.pin.attachments))
+            await text_channel.send("\n".join(attachment for attachment in self.pin.attachments))
 
     async def reveal_author(self):
         """Method to reveal the author and edit the original message."""
@@ -119,6 +126,8 @@ class PinView(discord.ui.View):
 
     async def auto_reveal(self):
         # Wait until just before the timeout
+        if self.timeout is None or self.timeout <= 0:
+            return
         await asyncio.sleep(self.timeout - 10)  # Reveal 10 seconds before timeout
         if not self.is_finished():
             await self.reveal_author()
@@ -131,6 +140,9 @@ class GuessThatPin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.pin_manager = PinManager(bot)
+
+    async def cog_load(self):
+        await self.pin_manager.load_pins(self.bot)
 
     @commands.Cog.listener('on_message_edit')
     async def on_message_edit(self, before, after):
