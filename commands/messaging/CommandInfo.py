@@ -2,12 +2,16 @@ import discord
 
 from abc import ABC, abstractmethod
 
+from commands.messaging.ActiveCommands import ActiveCommands
+
 
 class CommandInfo(ABC):
     @abstractmethod
-    def __init__(self, command_name: str,  channel: discord.TextChannel):
+    def __init__(self, command_name: str,  channel: discord.TextChannel, active_commands: ActiveCommands):
         self.command_name = command_name
         self.channel = channel
+        self.active_commands = active_commands
+        self.command_id: int = self.active_commands.add_command(self)
 
     @abstractmethod
     def make_embed(self) -> discord.Embed:

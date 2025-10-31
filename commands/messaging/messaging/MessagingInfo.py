@@ -5,6 +5,7 @@ from apscheduler.triggers.date import DateTrigger
 
 import discord
 
+from commands.messaging.ActiveCommands import ActiveCommands
 from commands.messaging.CommandInfo import CommandInfo
 from utilities.helper_functions import char_to_emoji, format_seconds
 from utilities.transformers import IntervalTranfsormer, PositiveIntTransformer
@@ -18,21 +19,22 @@ class MessagingInfo(CommandInfo):
                  channel: discord.TextChannel, 
                  start_time: datetime,  
                  interval: timedelta,
-                 scheduler: AsyncIOScheduler
+                 scheduler: AsyncIOScheduler,
+                 active_commands: ActiveCommands
                  ):
+        command_name = " ".join(internal_function.__name__.split('_')[:-1])
+        super().__init__(command_name, channel, active_commands)
+
         self.message: str = message
         self.remaining: int = amount
         self.target: Union[discord.User, discord.Role, None] = target
         self.messages: List[discord.Message] = []
-        
+
         self.internal_function: Callable[["MessagingInfo"], Awaitable[None]] = internal_function
         self.current_trigger = start_time
         self.interval: timedelta = interval
         self.scheduler = scheduler
-        self.job_id = f"message_scheduler_{id(self)}"
-
-        command_name = " ".join(internal_function.__name__.split('_')[:-1])
-        super().__init__(command_name, channel)
+        self.job_id = f"message_scheduler_{self.command_id}"
 
     def start_job(self) -> None:
         trigger = DateTrigger(self.current_trigger, timezone='Europe/Oslo')
@@ -47,6 +49,7 @@ class MessagingInfo(CommandInfo):
         self.remaining -= 1
         
         if self.remaining <= 0:
+            await self.kill()
             return
 
         self.current_trigger += self.interval
@@ -89,8 +92,11 @@ class MessagingInfo(CommandInfo):
         return EditMessagingCommandWindow(interaction, self)
 
     async def kill(self) -> None:
-        self.scheduler.remove_job(job_id=self.job_id)
+        self.active_commands.remove_command(self.command_id)
         await self.delete_messages()
+
+        if self.scheduler.get_job(self.job_id) is not None:
+            self.scheduler.remove_job(job_id=self.job_id)
         
 class EditMessagingCommandWindow(discord.ui.Modal):
     def __init__(self, interaction: discord.Interaction, messaging_info: MessagingInfo) -> None:
