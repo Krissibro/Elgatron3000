@@ -2,7 +2,7 @@ from typing import AsyncIterable, List
 import discord
 import random
 import pickle
-import asyncio
+import os
 
 from discord import app_commands
 from discord.ext import commands
@@ -26,33 +26,6 @@ class PinManager:
     def __init__(self, bot: Elgatron):
         self.pins: List[Pin] = []
 
-    async def load_pins(self, bot):
-        """Fetches all pinned messages and stores them in ./data."""
-        # Load if there are pins already stored, else store all the pins
-        try:
-            self.pins = pickle.load(open("./data/pins.pkl", "rb"))
-        except (OSError, IOError) as e:
-            self.pins = []
-            guild = bot.get_guild(bot.guild_id)
-            if guild is None:
-                print("Guild not found!")
-                return
-
-            # Fetch pins from all channels
-            for i, channel in enumerate(guild.text_channels):
-                # Epic loading bar for fun
-                print(f"|{(i * '#'):<{len(guild.text_channels)}}| {len(self.pins):<{4}} | {channel.name}", end="\n")
-
-                try:
-                    channel_pins: AsyncIterable[discord.Message] = channel.pins()
-                    async for message_pin in channel_pins:
-                        self.pins.append(make_pin(message_pin))
-                except Exception as e:
-                    print(f"Failed to fetch pins from {channel.name}: {e}")
-
-            self.save_pins()
-        print(f"Initialized with {len(self.pins)} pins")
-
     def load_random_pin(self) -> Pin:
         """Loads a random pin from the stored chunks."""
         return random.choice(self.pins)
@@ -69,6 +42,35 @@ class PinManager:
         self.pins.remove(pinned_message)
         self.save_pins()
 
+    async def fetch_pins(self, bot: Elgatron) -> None:
+        self.pins = []
+        guild = bot.get_guild(bot.guild_id)
+        if guild is None:
+            print("Guild not found!")
+            return
+
+        # Fetch pins from all channels
+        for i, channel in enumerate(guild.text_channels):
+            # Epic loading bar for fun
+            print(f"|{(i * '#'):<{len(guild.text_channels)}}| {len(self.pins):<{4}} | {channel.name}", end="\n")
+
+            try:
+                channel_pins: AsyncIterable[discord.Message] = channel.pins()
+                async for message_pin in channel_pins:
+                    self.pins.append(make_pin(message_pin))
+            except Exception as e:
+                print(f"Failed to fetch pins from {channel.name}: {e}")
+
+        self.save_pins()
+
+    async def load_pins(self):
+        path = "./data/pins.pkl"
+        if os.path.exists(path):
+            with open(path, 'r') as file:
+                self.pins = pickle.load(open("./data/pins.pkl", "rb"))
+
+        print(f"Initialized with {len(self.pins)} pins")
+
     def save_pins(self) -> None:
         """Saves all the pins to the disk."""
         print(f"Saving {len(self.pins)} pins")
@@ -77,11 +79,10 @@ class PinManager:
 
 
 class PinView(discord.ui.View):
-    def __init__(self, message_ctx, pin, timeout=15*60):
+    def __init__(self, message_ctx, pin, timeout=10*60):
         super().__init__(timeout=timeout)
         self.pin: Pin = pin
         self.message_ctx: discord.Interaction = message_ctx
-        self.task: asyncio.Task = asyncio.create_task(self.auto_reveal())
 
     async def make_first_embed(self) -> discord.Embed:
         """Creates the embed containing the title and the selected pin.
@@ -113,36 +114,24 @@ class PinView(discord.ui.View):
         """Method to reveal the author and edit the original message."""
         sinner_embed = await self.make_sinner_embed()
         await self.message_ctx.edit_original_response(embed=sinner_embed, view=None)
-        self.stop()  # Ensure that we stop the view
+
+    async def on_timeout(self):
+        # We might want to double-check here in case it times out exactly at the same time
+        await self.reveal_author()
 
     @discord.ui.button(label="Reveal the sinner!", style=discord.ButtonStyle.success)
     async def reveal_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await self.reveal_author()
 
-    async def on_timeout(self):
-        # We might want to double-check here in case it times out exactly at the same time
-        if not self.is_finished():
-            await self.reveal_author()
-
-    async def auto_reveal(self):
-        # Wait until just before the timeout
-        if self.timeout is None or self.timeout <= 0:
-            return
-        await asyncio.sleep(self.timeout - 10)  # Reveal 10 seconds before timeout
-        if not self.is_finished():
-            await self.reveal_author()
-
-    def __del__(self):
-        self.task.cancel()  # Clean up the task when the view is garbage collected
-
-
-class GuessThatPin(commands.Cog):
+class GuessThatPin(commands.GroupCog, group_name="pin"):
     def __init__(self, bot):
         self.bot = bot
         self.pin_manager = PinManager(bot)
 
     async def cog_load(self):
-        await self.pin_manager.load_pins(self.bot)
+        await self.pin_manager.load_pins()
+        await super().cog_load()
+
 
     @commands.Cog.listener('on_message_edit')
     async def on_message_edit(self, before, after):
@@ -159,7 +148,7 @@ class GuessThatPin(commands.Cog):
             self.pin_manager.remove_pin(after)
 
     @app_commands.command(
-        name="guess_the_pin",
+        name="guess",
         description="Guess the pin!",
     )
     async def guess_that_pin(self, ctx: discord.Interaction):
@@ -174,6 +163,16 @@ class GuessThatPin(commands.Cog):
 
         await ctx.response.send_message(embed=embed, view=view)
         await view.send_attachments()
+
+    @app_commands.command(
+        name="sync",
+        description="re-sync pins!",
+    )
+    async def sync_pins(self, ctx: discord.Interaction):
+        await self.pin_manager.fetch_pins(self.bot)
+
+        embed = discord.Embed(title=f"{len(self.pin_manager.pins)} pins were loaded!",)
+        await ctx.response.send_message(embed=embed)
 
 # Todo: handle if a pinned message is deleted or ehh?
 # I assume we could just make it so that it re-syncs every time it connects? i dont think it's that demanding?
