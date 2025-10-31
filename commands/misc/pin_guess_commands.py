@@ -66,8 +66,8 @@ class PinManager:
     def load_pins(self):
         path = "./data/pins.pkl"
         if os.path.exists(path):
-            with open(path, 'r') as file:
-                self.pins = pickle.load(open("./data/pins.pkl", "rb"))
+            with open(path, 'rb') as file:
+                self.pins = pickle.load(file)
 
         print(f"Initialized with {len(self.pins)} pins")
 
