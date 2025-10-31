@@ -63,7 +63,7 @@ class PinManager:
 
         self.save_pins()
 
-    async def load_pins(self):
+    def load_pins(self):
         path = "./data/pins.pkl"
         if os.path.exists(path):
             with open(path, 'r') as file:
@@ -127,11 +127,7 @@ class GuessThatPin(commands.GroupCog, group_name="pin"):
     def __init__(self, bot):
         self.bot = bot
         self.pin_manager = PinManager(bot)
-
-    async def cog_load(self):
-        await self.pin_manager.load_pins()
-        await super().cog_load()
-
+        self.pin_manager.load_pins()
 
     @commands.Cog.listener('on_message_edit')
     async def on_message_edit(self, before, after):
