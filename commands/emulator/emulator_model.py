@@ -1,7 +1,6 @@
 import io
 import os.path
 
-import PIL
 from PIL.Image import Image
 from pyboy import PyBoy
 from typing import List, Optional

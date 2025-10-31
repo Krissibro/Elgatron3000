@@ -30,7 +30,7 @@ async def dm_spam_internal(messaging_info: MessagingInfo) -> None:
         message = await messaging_info.target.send(messaging_info.message)
         messaging_info.add_message(message)
 
-    except:
+    except (discord.Forbidden, discord.HTTPException, ValueError):
         embed = discord.Embed(title="I don't have permission to message that user.")
         await messaging_info.channel.send(embed=embed)
         

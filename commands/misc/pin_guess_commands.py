@@ -23,7 +23,7 @@ def make_pin(message: discord.Message) -> Pin:
 
 
 class PinManager:
-    def __init__(self, bot: Elgatron):
+    def __init__(self):
         self.pins: List[Pin] = []
 
     def load_random_pin(self) -> Pin:
@@ -126,7 +126,7 @@ class PinView(discord.ui.View):
 class GuessThatPin(commands.GroupCog, group_name="pin"):
     def __init__(self, bot):
         self.bot = bot
-        self.pin_manager = PinManager(bot)
+        self.pin_manager = PinManager()
         self.pin_manager.load_pins()
 
     @commands.Cog.listener('on_message_edit')
