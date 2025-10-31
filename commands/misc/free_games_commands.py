@@ -42,7 +42,7 @@ async def get_free_games() -> List[dict]:
     return free_promotions
 
 
-async def send_games_embed(channel: discord.abc.MessageableChannel, games: List[dict]) -> None:
+async def send_games_embed(channel: discord.TextChannel, games: List[dict]) -> None:
     """
     :param channel: The channel you want to send the Games Embed to
     :param games: Dictionary with game data.
