@@ -6,7 +6,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from commands.messaging.MessagingInfo import MessagingInfo
+from commands.messaging.messaging.MessagingInfo import MessagingInfo
 from commands.messaging.messaging.messaging_model import get_attention_internal, annoy_internal, dm_spam_internal
 
 from utilities.elgatron import Elgatron
@@ -37,10 +37,10 @@ class MessagingCommands(commands.Cog):
                                        ctx.channel, 
                                        datetime.now() + timedelta(seconds=1),
                                        interval,
-                                       self.bot.scheduler
+                                       self.bot.scheduler,
+                                       self.bot.active_commands
                                        )
         messaging_info.start_job()
-        self.bot.active_commands.add_command(messaging_info)
         await ctx.response.send_message(embed=messaging_info.make_embed(), ephemeral=True, delete_after=10)
 
     @app_commands.command(
@@ -63,10 +63,10 @@ class MessagingCommands(commands.Cog):
                                        ctx.channel, 
                                        datetime.now() + timedelta(seconds=1),
                                        interval,
-                                       self.bot.scheduler
+                                       self.bot.scheduler,
+                                       self.bot.active_commands
                                        )
         messaging_info.start_job()
-        self.bot.active_commands.add_command(messaging_info)
         await ctx.response.send_message(embed=messaging_info.make_embed(), ephemeral=True, delete_after=10)
 
 
@@ -90,10 +90,10 @@ class MessagingCommands(commands.Cog):
                                        ctx.channel, 
                                        datetime.now() + timedelta(seconds=1),
                                        interval,
-                                       self.bot.scheduler
+                                       self.bot.scheduler,
+                                       self.bot.active_commands
                                        )
         messaging_info.start_job()
-        self.bot.active_commands.add_command(messaging_info)
         await ctx.response.send_message(embed=messaging_info.make_embed(), ephemeral=True, delete_after=10)
 
 

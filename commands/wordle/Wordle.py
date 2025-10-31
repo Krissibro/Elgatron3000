@@ -165,8 +165,8 @@ class Wordle:
     def make_embed(self) -> discord.Embed:
         if self.correct_guess:
             embed = discord.Embed(title=f"Congratulations!", color=discord.Color.green(), description=f"The word was **[{self.daily_word.upper()}](https://www.merriam-webster.com/dictionary/{self.daily_word})**!")
-            embed.add_field(name=f"Guess streak:   ",
-                            value=f"{self.wordle_stats.correct_guess_streak} days")
+            embed.add_field(name=f"Win streak:   ",
+                            value=f"{self.wordle_stats.win_streak} days")
             
             if self.time_taken:
                 embed.add_field(name=f"Time spent:   ",
@@ -176,6 +176,8 @@ class Wordle:
 
         else:
             embed = discord.Embed(title="Daily Wordle")
+
+        embed.set_footer(text=self.format_available_letters())
 
         if not self.guessed_words:
             embed.description = "No guesses yet"
@@ -213,8 +215,8 @@ class Wordle:
 
         if not self.correct_guess and not self.daily_word == "":
             description = f"The word was **[{self.daily_word.upper()}](https://www.merriam-webster.com/dictionary/{self.daily_word.upper()})**"
-            if self.wordle_stats.correct_guess_streak > 0:
-                description += f"\n\nGuess streak of   **{self.wordle_stats.correct_guess_streak}**   has been reset"
+            if self.wordle_stats.win_streak > 0:
+                description += f"\n\nWin streak of   **{self.wordle_stats.win_streak}**   has been reset"
             
             await channel.send(embed=discord.Embed(
                 title=f"No one guessed the word! :sob:",

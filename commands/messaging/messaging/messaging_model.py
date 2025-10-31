@@ -1,6 +1,6 @@
 import discord
 
-from commands.messaging.MessagingInfo import MessagingInfo
+from commands.messaging.messaging.MessagingInfo import MessagingInfo
 
 
 class ReactButton(discord.ui.View):

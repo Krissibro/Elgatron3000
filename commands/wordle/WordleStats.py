@@ -11,8 +11,8 @@ class WordleStats:
     def __init__(self):
         self.games_played: int = 0
         self.wins: int = 0
-        self.correct_guess_streak: int = 0
-        self.longest_guess_streak: int = 0
+        self.win_streak: int = 0
+        self.longest_win_streak: int = 0
         self.number_of_guesses: int = 0
 
         self.fastest_win: timedelta = timedelta(seconds=0)
@@ -27,8 +27,8 @@ class WordleStats:
 
     def handle_win(self, guesses, time_taken):
         self.wins += 1
-        self.correct_guess_streak += 1
-        self.longest_guess_streak = max(self.longest_guess_streak, self.correct_guess_streak)
+        self.win_streak += 1
+        self.longest_win_streak = max(self.longest_win_streak, self.win_streak)
         self.number_of_guesses += guesses
 
         if self.fastest_win.total_seconds() == 0:
@@ -42,7 +42,7 @@ class WordleStats:
         self.save_stats()
 
     def reset_streak(self):
-        self.correct_guess_streak = 0
+        self.win_streak = 0
         self.save_stats()
 
     def make_embed(self):
@@ -57,8 +57,8 @@ class WordleStats:
         embed.add_field(name="Wins", value=f"{self.wins} \u00A0\u00A0\u00A0 ({percentage_wins}%)", inline=True)
         embed.add_field(name="\t Number of guesses", value=self.number_of_guesses, inline=True)
         embed.add_field(name="Average guesses", value=f"{average_guesses:.3f}", inline=True)
-        embed.add_field(name="Current streak", value=self.correct_guess_streak, inline=True)
-        embed.add_field(name="Longest streak", value=self.longest_guess_streak, inline=True)
+        embed.add_field(name="Current streak", value=self.win_streak, inline=True)
+        embed.add_field(name="Longest streak", value=self.longest_win_streak, inline=True)
 
         if self.fastest_win.total_seconds() > 0:
             embed.add_field(name="Fastest win", value=f"{timedelta_format(self.fastest_win)}", inline=True)
@@ -97,8 +97,8 @@ class WordleStats:
         return {
             "number_of_games_played": self.games_played,
             "number_of_correct_guesses": self.wins,
-            "correct_guess_streak": self.correct_guess_streak,
-            "longest_guess_streak": self.longest_guess_streak,
+            "win_streak": self.win_streak,
+            "longest_win_streak": self.longest_win_streak,
             "number_of_guesses": self.number_of_guesses,
             "fastest_win": self.fastest_win.seconds*1000 + self.fastest_win.microseconds//1000,
             "number_guesses_per_game_counter": dict(self.guess_distribution)
@@ -108,8 +108,8 @@ class WordleStats:
         """Load the state from a dictionary."""
         self.games_played = data.get("number_of_games_played", 0)
         self.wins = data.get("number_of_correct_guesses", 0)
-        self.correct_guess_streak = data.get("correct_guess_streak", 0)
-        self.longest_guess_streak = data.get("longest_guess_streak", 0)
+        self.win_streak = data.get("correct_guess_streak", 0)
+        self.longest_win_streak = data.get("longest_guess_streak", 0)
         self.number_of_guesses = data.get("number_of_guesses", 0)
 
         fastest_win_data = data.get("fastest_win", 0)
