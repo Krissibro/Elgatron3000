@@ -10,7 +10,8 @@ from utilities.helper_functions import char_to_emoji, format_seconds
 from utilities.transformers import IntervalTranfsormer, PositiveIntTransformer
 
 class MessagingInfo(CommandInfo):
-    def __init__(self, internal_function: Callable[["MessagingInfo"], Awaitable[None]],
+    def __init__(self,
+                 internal_function: Callable[["MessagingInfo"], Awaitable[None]],
                  target: Union[discord.User, discord.Role, None], 
                  message: str, 
                  amount: int, 

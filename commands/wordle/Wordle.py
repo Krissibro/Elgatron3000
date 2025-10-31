@@ -27,6 +27,17 @@ word_bank.extend(whitelisted_words)
 class Wordle:
     def __init__(self, bot: Elgatron):
         self.bot: Elgatron = bot
+        # default state values
+        self.daily_word: str = ""
+        self.correct_guess: bool = False
+        self.guessed_words: List[str] = []
+        self.guess_results: List[str] = []
+        self.guesser_ids: List[int] = []
+        self.guesser_names: List[str] = []
+        self.known_letters: Set[str] = set()
+        self.unknown_letters: Set[str] = set(string.ascii_uppercase)
+        self.new_word_time: datetime = datetime.now()
+        self.time_taken: Optional[str] = None
 
         self.state_file_path: str = "data/wordle_state.json"
         self.load_state(self.state_file_path)
@@ -111,7 +122,7 @@ class Wordle:
                     return discord.Embed(title=f'"{guessed_word}" is not a valid word')
         if guessed_word in self.guessed_words:
             return discord.Embed(title=f'"{guessed_word}" has already been guessed')
-
+        return None
 
     def wordle_logic(self, guessed_word: str) -> str:
         """

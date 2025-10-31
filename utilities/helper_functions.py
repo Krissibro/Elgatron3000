@@ -79,8 +79,8 @@ def timedelta_format(time_diff: timedelta) -> str:
       612 s  -> 00 : 01 : 01
       3661 s -> 01 : 01 : 01
     """
-    totalSeconds = time_diff.seconds
-    hours, remainder = divmod(totalSeconds, 3600)
+    total_seconds = time_diff.seconds
+    hours, remainder = divmod(total_seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
 
     # Zero-pad hours/minutes (2 digits) and seconds_with_ms (width 5, 2 decimals)

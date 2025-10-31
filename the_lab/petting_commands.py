@@ -28,7 +28,7 @@ class Petting(commands.Cog):
         await ctx.response.send_message(file=file)
 
 
-async def petting(avatar_image: Image) -> discord.File:
+async def petting(avatar_image: Image.Image) -> discord.File:
     images = []
     with open("data/template.gif", "rb") as f:
         template_gif: ImageSequence = Image.open(f)
