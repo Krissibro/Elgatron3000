@@ -11,7 +11,7 @@ class ActiveCommands:
         self.running_commands_dict: Dict[int, CommandInfo]  = {}
 
     def add_command(self, command: CommandInfo) -> int:
-        command_id = max(self.running_commands_dict.keys(), default=0) + 1 
+        command_id = max(self.running_commands_dict.keys(), default=0) + 1
         self.running_commands_dict[command_id] = command
         return command_id
 
@@ -25,7 +25,9 @@ class ActiveCommands:
         return command_id in self.running_commands_dict
 
     async def kill(self, command_id: int) -> None:
-        await self[command_id].kill()
+        await self.running_commands_dict[command_id].kill()
+
+    def remove_command(self, command_id: int) -> None:
         del self.running_commands_dict[command_id]
 
     def make_overview_embed(self) -> discord.Embed:
