@@ -1,4 +1,4 @@
-from typing import AsyncIterable, List
+from typing import AsyncIterable, List, Optional
 import discord
 import random
 import pickle
@@ -13,18 +13,23 @@ from utilities.validators import validate_text_channel
 from collections import namedtuple
 
 # Pickle will not store the message object itself, so it had to be dumbed down to a namedtuple
-Pin = namedtuple("Pin", ["author", "content", "attachments", "channel", "id"])
+Pin = namedtuple("Pin", ["author", "content", "attachments", "channel_id", "message_id"])
 
 
 def make_pin(message: discord.Message) -> Pin:
-    return Pin(message.author.display_name, message.content,
+    return Pin(message.author.display_name,
+               message.content,
                [attachment.url for attachment in message.attachments],
-               message.channel.id, message.id)
+               message.channel.id,
+               message.id
+               )
 
 
 class PinManager:
     def __init__(self):
+        self.path = "./data/pins.pkl"
         self.pins: List[Pin] = []
+        self.load_pins()
 
     def load_random_pin(self) -> Pin:
         """Loads a random pin from the stored chunks."""
@@ -64,59 +69,57 @@ class PinManager:
         self.save_pins()
 
     def load_pins(self):
-        path = "./data/pins.pkl"
-        if os.path.exists(path):
-            with open(path, 'rb') as file:
+        if os.path.exists(self.path):
+            with open(self.path, 'rb') as file:
                 self.pins = pickle.load(file)
 
         print(f"Initialized with {len(self.pins)} pins")
 
     def save_pins(self) -> None:
-        """Saves all the pins to the disk."""
         print(f"Saving {len(self.pins)} pins")
-        with open("./data/pins.pkl", "wb") as file:
+
+        with open(self.path, "wb") as file:
             pickle.dump(self.pins, file)
 
 
 class PinView(discord.ui.View):
-    def __init__(self, message_ctx, pin, timeout=10*60):
+    def __init__(self, message_ctx, pin, timeout=20*60):
         super().__init__(timeout=timeout)
         self.pin: Pin = pin
         self.message_ctx: discord.Interaction = message_ctx
+        self.original_message: Optional[discord.Message] = None
 
-    async def make_first_embed(self) -> discord.Embed:
+    def make_first_embed(self) -> discord.Embed:
         """Creates the embed containing the title and the selected pin.
         Also appends the attachments if there are any"""
         embed: discord.Embed = discord.Embed(title="Guess the pin!",
                                              description=self.pin.content if self.pin.content else None)
         return embed
 
-    async def make_sinner_embed(self) -> discord.Embed:
-        embed: discord.Embed = await self.make_first_embed()
+    def make_sinner_embed(self) -> discord.Embed:
+        embed: discord.Embed = self.make_first_embed()
         embed.add_field(name="By",
                         value=f"{self.pin.author}", inline=True)
-        # TODO guild id hardcoded, make dynamic
+        # TODO add guild_ID to pin, this solution works alright for now, but having it as a part of the pin object is prolly better
         embed.add_field(name="Context",
-                        value=f"https://discord.com/channels/{self.message_ctx.guild_id}/{self.pin.channel}/{self.pin.id}")
+                        value=f"https://discord.com/channels/{self.message_ctx.guild_id}/{self.pin.channel_id}/{self.pin.message_id}")
         return embed
 
     async def send_attachments(self) -> None:
-        """Sends the attachments of the pin to the channel if there are any."""
-        channel = self.message_ctx.channel
-        text_channel = validate_text_channel(channel)
-        if isinstance(text_channel, discord.Embed):
-            return
-
+        """Sends the attachments of the pin to the channel if there are any.
+        Must be called AFTER the initial response"""
+        self.original_message = await self.message_ctx.original_response()
         if self.pin.attachments:
-            await text_channel.send("\n".join(attachment for attachment in self.pin.attachments))
+            await self.original_message.reply("\n".join(attachment for attachment in self.pin.attachments))
 
     async def reveal_author(self):
         """Method to reveal the author and edit the original message."""
-        sinner_embed = await self.make_sinner_embed()
-        await self.message_ctx.edit_original_response(embed=sinner_embed, view=None)
+        if self.original_message is None:
+            raise ValueError("Original message is undefined")
+        sinner_embed = self.make_sinner_embed()
+        await self.original_message.edit(embed=sinner_embed, view=None)
 
     async def on_timeout(self):
-        # We might want to double-check here in case it times out exactly at the same time
         await self.reveal_author()
 
     @discord.ui.button(label="Reveal the sinner!", style=discord.ButtonStyle.success)
@@ -127,7 +130,6 @@ class GuessThatPin(commands.GroupCog, group_name="pin"):
     def __init__(self, bot: Elgatron):
         self.bot: Elgatron = bot
         self.pin_manager: PinManager = PinManager()
-        self.pin_manager.load_pins()
 
     @commands.Cog.listener('on_message_edit')
     async def on_message_edit(self, before, after):
@@ -155,7 +157,7 @@ class GuessThatPin(commands.GroupCog, group_name="pin"):
         pin = self.pin_manager.load_random_pin()
 
         view = PinView(ctx, pin)
-        embed = await view.make_first_embed()
+        embed = view.make_first_embed()
 
         await ctx.response.send_message(embed=embed, view=view)
         await view.send_attachments()
@@ -169,21 +171,6 @@ class GuessThatPin(commands.GroupCog, group_name="pin"):
 
         embed = discord.Embed(title=f"{len(self.pin_manager.pins)} pins were loaded!",)
         await ctx.response.send_message(embed=embed)
-
-# Todo: handle if a pinned message is deleted or ehh?
-# I assume we could just make it so that it re-syncs every time it connects? i dont think it's that demanding?
-
-# Alternative method, but without the previous state of the message
-# @client.event
-# async def on_raw_message_edit(payload):
-#     """Detects if any message has been edited.
-#     If a message is pinned or have been pinned previously and just edited, it is detected."""
-#     print(f"Edit detected")
-#     if not client.get_channel(payload.channel_id):
-#         return
-#     if payload.data["pinned"]:
-#         print("Get pinned")
-
 
 async def setup(bot: Elgatron):
     await bot.add_cog(GuessThatPin(bot), guild=discord.Object(id=bot.guild_id))
