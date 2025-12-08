@@ -3,7 +3,9 @@ import os
 from typing import Optional
 from dotenv import load_dotenv
 
-from utilities.settings import bot
+from utilities.elgatron import Elgatron
+
+bot = Elgatron()
 
 load_dotenv("token.env")
 token: Optional[str] = os.getenv("TOKEN")

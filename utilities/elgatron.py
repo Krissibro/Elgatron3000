@@ -1,5 +1,6 @@
 import discord
 
+import json
 from glob import glob
 from discord.ext.commands import Bot
 
@@ -8,15 +9,21 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from commands.messaging.ActiveCommands import ActiveCommands
 
 class Elgatron(Bot):
-    def __init__(self, guild_id, testing):
+    def __init__(self):
         intents: discord.Intents = discord.Intents.default()
         intents.members         = True
         intents.messages        = True
         intents.message_content = True
         intents.guilds          = True
 
-        self.guild_id: int = guild_id
-        self.testing: bool = testing
+        with open("utilities/config.json", "r") as f:
+            contents = json.load(f)
+
+        self.guild_id = contents["guild"]
+        self.testing = contents["testing"]
+        self.game_channel_id = contents["game_channel_id"]
+        self.wordle_channel_id = contents["wordle_channel_id"]
+        self.testing_channel_id = contents["testing_channel_id"]
 
         self.scheduler: AsyncIOScheduler = AsyncIOScheduler(timezone='Europe/Oslo')
         self.active_commands: ActiveCommands = ActiveCommands()

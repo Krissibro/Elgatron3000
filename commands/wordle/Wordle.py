@@ -13,7 +13,6 @@ from apscheduler.triggers.cron import CronTrigger
 from commands.wordle.WordleStats import WordleStats
 from utilities.elgatron import Elgatron
 from utilities.helper_functions import timedelta_format
-from utilities.settings import testing_channel_id, wordle_channel_id
 from utilities.validators import validate_text_channel
 
 valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())
@@ -42,7 +41,7 @@ class Wordle:
         self.state_file_path: str = "data/wordle_state.json"
         self.load_state(self.state_file_path)
 
-        self.channel_id = testing_channel_id if bot.testing else wordle_channel_id
+        self.channel_id = bot.testing_channel_id if bot.testing else bot.wordle_channel_id
 
         new_word_trigger = CronTrigger(hour=8, minute=0, second=0, timezone='Europe/Oslo')
         bot.scheduler.add_job(self.pick_new_word, new_word_trigger, id="wordle_pick_new_word")

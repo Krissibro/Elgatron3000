@@ -6,7 +6,6 @@ from discord.ext import commands
 from epicstore_api import EpicGamesStoreAPI
 from apscheduler.triggers.cron import CronTrigger
 
-from utilities.settings import game_channel_id, testing_channel_id
 from utilities.elgatron import Elgatron
 from utilities.validators import validate_text_channel
 from typing import List
@@ -87,9 +86,9 @@ async def scheduled_post_free_games(bot: Elgatron) -> None:
         update_free_games_state(current_free_game_titles)
 
         if not bot.testing:
-            channel = bot.get_channel(game_channel_id)
+            channel = bot.get_channel(bot.game_channel_id)
         else:
-            channel = bot.get_channel(testing_channel_id)
+            channel = bot.get_channel(bot.testing_channel_id)
 
         channel = validate_text_channel(channel)
         if isinstance(channel, discord.Embed):
