@@ -29,55 +29,68 @@ class Petting(commands.Cog):
 
 
 async def petting(avatar_image: Image.Image) -> discord.File:
-    images = []
+    frames_out = []
+    SCALES = [
+        (1.00, 1.00),  # frame 0
+        (0.97, 1.03),  # frame 0
+        (0.94, 1.06),  # frame 1
+        (0.91, 1.09),  # frame 1
+        (0.88, 1.12),  # frame 2
+        (0.88, 1.12),  # frame 2
+        (0.91, 1.09),  # frame 3
+        (0.94, 1.06),  # frame 3
+        (0.97, 1.03),  # frame 4
+        (1.00, 1.00)  # frame 4
+    ]
+
+    # Load template hand gif
     with open("data/template.gif", "rb") as f:
-        template_gif: ImageSequence = Image.open(f)
+        template = Image.open(f)
 
-        frames = template_gif.n_frames
-        avatar_size = 0.85
-        max_stretch = 0.25
+        canvas_w, canvas_h = template.size
+        base_size = int(canvas_w * 0.75)
 
-        # get sizes
-        canvas_width, canvas_height = template_gif.size
-        avatar_width, avatar_height = int(canvas_width * avatar_size), int(canvas_height * avatar_size)
+        # Force avatar square (pet-pet standard)
+        avatar_image = avatar_image.resize((base_size, base_size), Image.LANCZOS)
 
-        stretch = [abs((i - frames // 2) / (frames // 2)) * max_stretch for i in range(frames)]
-        pull = stretch[5:] + stretch[:5]
+        for i, hand_frame in enumerate(ImageSequence.Iterator(template)):
+            # Loop scale values across frames
+            scale = SCALES[i % len(SCALES)]
+            sx, sy = scale
 
-        for i, hand_frame in enumerate(ImageSequence.Iterator(template_gif)):
-            # prepare the new frame
-            hand_frame = hand_frame.convert("RGBA")
-            frame = Image.new("RGBA", (canvas_width, canvas_height), (0, 0, 0, 0))
+            # Resize avatar with squeeze/stretch
+            resized_avatar = avatar_image.resize(
+                (int(base_size * sx), int(base_size * sy)),
+                Image.LANCZOS
+            )
 
-            # find the new dimensions and location and modify the avatar
-            new_avatar_width = int(avatar_width * (1 - pull[i]))
-            new_avatar_height = int(avatar_height * (1 - stretch[i]))
+            # Center the avatar on canvas
+            ax = (canvas_w - resized_avatar.width) // 2
+            ay = (canvas_h - resized_avatar.height) // 2
 
-            avatar_y = canvas_width - new_avatar_width
-            avatar_x = canvas_height - new_avatar_height
+            # Prepare final frame
+            frame = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
+            frame.paste(resized_avatar, (ax, ay), resized_avatar)
 
-            temp_avatar = avatar_image.resize((new_avatar_height, new_avatar_width))
+            hand = hand_frame.convert("RGBA")
+            frame.paste(hand, (0, 0), hand)
 
-            # Paste avatar, then hand on top
-            frame.paste(temp_avatar, (avatar_x, avatar_y), temp_avatar)
-            frame.paste(hand_frame, (0, 0), hand_frame)
+            frames_out.append(frame)
 
-            images.append(frame)
-
-    # save the gif
-    img_byte_arr = BytesIO()
-    images[0].save(
-        img_byte_arr,
+    # Export GIF
+    out = BytesIO()
+    frames_out[0].save(
+        out,
         format="GIF",
         save_all=True,
-        append_images=images[1:],
+        append_images=frames_out[1:],
         duration=30,
-        disposal=2,  # 2 = Restore to background color.
-        loop=0
+        loop=0,
+        disposal=2
     )
-    img_byte_arr.seek(0)
+    out.seek(0)
+    return discord.File(out, filename="petting.gif")
 
-    return discord.File(fp=img_byte_arr, filename="petting.gif")
 
 
 async def setup(bot: Elgatron):

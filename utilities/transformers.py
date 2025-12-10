@@ -21,7 +21,7 @@ class IntervalTranfsormer(app_commands.Transformer):
     
 class DateTransformer(app_commands.Transformer):
     async def transform(self, interaction: discord.Interaction, value: str) -> datetime:
-        # Placeholder implementation, do some error handling
+        # TODO Placeholder implementation, do some error handling
         return datetime.strptime(value, "%Y-%m-%d")
     
 class PositiveIntTransformer(app_commands.Transformer):
