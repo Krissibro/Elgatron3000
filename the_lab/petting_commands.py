@@ -30,7 +30,7 @@ class Petting(commands.Cog):
 
 async def petting(avatar_image: Image.Image) -> discord.File:
     frames_out = []
-    SCALES = [
+    squash_and_stretch = [
         (1.00, 1.00),  # frame 0
         (0.97, 1.03),  # frame 0
         (0.94, 1.06),  # frame 1
@@ -55,7 +55,7 @@ async def petting(avatar_image: Image.Image) -> discord.File:
 
         for i, hand_frame in enumerate(ImageSequence.Iterator(template)):
             # Loop scale values across frames
-            scale = SCALES[i % len(SCALES)]
+            scale = squash_and_stretch[i % len(squash_and_stretch)]
             sx, sy = scale
 
             # Resize avatar with squeeze/stretch
@@ -65,8 +65,10 @@ async def petting(avatar_image: Image.Image) -> discord.File:
             )
 
             # Center the avatar on canvas
-            ax = (canvas_w - resized_avatar.width) // 2
-            ay = (canvas_h - resized_avatar.height) // 2
+            vertical_offset = 10
+            horizontal_offset = 6
+            ax = (canvas_w - resized_avatar.width) // 2 + horizontal_offset
+            ay = (canvas_h - resized_avatar.height) // 2 + vertical_offset
 
             # Prepare final frame
             frame = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
