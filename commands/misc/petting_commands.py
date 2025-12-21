@@ -51,7 +51,7 @@ async def petting(avatar_image: Image.Image) -> discord.File:
         base_size = int(canvas_w * 0.75)
 
         # Force avatar square (pet-pet standard)
-        avatar_image = avatar_image.resize((base_size, base_size), Image.LANCZOS)
+        avatar_image = avatar_image.resize((base_size, base_size))
 
         for i, hand_frame in enumerate(ImageSequence.Iterator(template)):
             # Loop scale values across frames
@@ -60,9 +60,7 @@ async def petting(avatar_image: Image.Image) -> discord.File:
 
             # Resize avatar with squeeze/stretch
             resized_avatar = avatar_image.resize(
-                (int(base_size * sx), int(base_size * sy)),
-                Image.LANCZOS
-            )
+                (int(base_size * sx), int(base_size * sy)))
 
             # Center the avatar on canvas
             vertical_offset = 10
