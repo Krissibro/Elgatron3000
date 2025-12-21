@@ -16,19 +16,25 @@ class Petting(commands.Cog):
         description="give people pets!"
     )
     async def petting(self, ctx, user: discord.User):
-        # Get the profile picture
-        avatar = BytesIO()
-        await user.display_avatar.save(fp=avatar, seek_begin=True)
-        avatar_image = Image.open(avatar).convert("RGBA")
+        try:
+            await ctx.response.send_message(file=discord.File(f"data/assets/petting/{user.id}.gif"))
+        except FileNotFoundError:
+            avatar_image: Image.Image = await get_profile_avatar(user)
+            file: BytesIO = await petting(avatar_image)
 
-        # go through the frames of the gif
+            with open(f"data/assets/petting/{user.id}.gif", "wb") as f:
+                f.write(file.getbuffer())
 
-        file = await petting(avatar_image)
-
-        await ctx.response.send_message(file=file)
+            await ctx.response.send_message(file=discord.File(file, filename="petting.gif"))
 
 
-async def petting(avatar_image: Image.Image) -> discord.File:
+async def get_profile_avatar(user: discord.User):
+    avatar = BytesIO()
+    await user.display_avatar.save(fp=avatar, seek_begin=True)
+    return Image.open(avatar).convert("RGBA")
+
+
+async def petting(avatar_image: Image.Image) -> BytesIO:
     frames_out = []
     squash_and_stretch = [
         (1.00, 1.00),  # frame 0
@@ -89,7 +95,7 @@ async def petting(avatar_image: Image.Image) -> discord.File:
         disposal=2
     )
     out.seek(0)
-    return discord.File(out, filename="petting.gif")
+    return out
 
 
 
