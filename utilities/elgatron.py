@@ -8,14 +8,19 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from commands.messaging.ActiveCommands import ActiveCommands
 
+
+def get_intents():
+    intents: discord.Intents = discord.Intents.default()
+    intents.members = True
+    intents.messages = True
+    intents.message_content = True
+    intents.guilds = True
+
+    return intents
+
+
 class Elgatron(Bot):
     def __init__(self):
-        intents: discord.Intents = discord.Intents.default()
-        intents.members         = True
-        intents.messages        = True
-        intents.message_content = True
-        intents.guilds          = True
-
         with open("utilities/config.json", "r") as f:
             contents = json.load(f)
 
@@ -28,7 +33,7 @@ class Elgatron(Bot):
         self.scheduler: AsyncIOScheduler = AsyncIOScheduler(timezone='Europe/Oslo')
         self.active_commands: ActiveCommands = ActiveCommands()
         
-        super().__init__(intents=intents, command_prefix="/")
+        super().__init__(intents=get_intents(), command_prefix="/")
 
     async def setup_hook(self) -> None:
         for path in glob("./commands/**/*_commands.py", recursive=True):
@@ -47,8 +52,6 @@ class Elgatron(Bot):
 
         self.scheduler.start()
         self.scheduler.print_jobs()
-        
-        await super().setup_hook()
 
     async def on_ready(self):
         if self.testing:
@@ -56,3 +59,4 @@ class Elgatron(Bot):
             await self.tree.sync(guild=discord.Object(id=self.guild_id))
 
         print("Ready!")
+

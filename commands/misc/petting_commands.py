@@ -38,15 +38,15 @@ async def petting(avatar_image: Image.Image) -> BytesIO:
     frames_out = []
     squash_and_stretch = [
         (1.00, 1.00),  # frame 0
-        (0.97, 1.03),  # frame 0
-        (0.94, 1.06),  # frame 1
-        (0.91, 1.09),  # frame 1
-        (0.88, 1.12),  # frame 2
-        (0.88, 1.12),  # frame 2
+        (0.97, 1.03),  # frame 1
+        (0.94, 1.06),  # frame 2
         (0.91, 1.09),  # frame 3
-        (0.94, 1.06),  # frame 3
-        (0.97, 1.03),  # frame 4
-        (1.00, 1.00)  # frame 4
+        (0.88, 1.12),  # frame 4
+        (0.88, 1.12),  # frame 5
+        (0.91, 1.09),  # frame 6
+        (0.94, 1.06),  # frame 7
+        (0.97, 1.03),  # frame 8
+        (1.00, 1.00)   # frame 9
     ]
 
     # Load template hand gif
