@@ -56,7 +56,7 @@ class PollCommands(commands.GroupCog, group_name = "poll"):
         await make_poll(ctx, option_dict, title, description, role_mention)
 
 
-async def make_poll(ctx: discord.Interaction, options: Dict[str, str], title: str, description: discord.Optional[str] = None, role_mention: discord.Optional[discord.Role] = None):
+async def make_poll(ctx: discord.Interaction, options: Dict[str, str], title: str, description: discord.Optional[str] = None, role_mention: discord.Optional[discord.Role] = None) -> None:
     emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
 
     embed = discord.Embed(title=title, description=description)
