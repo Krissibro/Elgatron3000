@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Awaitable, Callable, Union, List
+from typing import Awaitable, Callable, Optional, Union, List
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.date import DateTrigger
 
@@ -124,11 +124,11 @@ class EditMessagingCommandWindow(discord.ui.Modal):
         self.add_item(self.interval_input)
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
-        message = self.message_input.value
-        interval = await IntervalTranfsormer().transform(interaction, self.interval_input.value)
-        amount = await PositiveIntTransformer().transform(interaction, self.amount_input.value)
+        message: str = self.message_input.value
+        interval: Optional[timedelta] = await IntervalTranfsormer().transform(interaction, self.interval_input.value)
+        amount: Optional[int] = await PositiveIntTransformer().transform(interaction, self.amount_input.value)
 
-        if interaction.response.is_done():
+        if interaction.response.is_done() or amount is None or interval is None:
             return
         
         await interaction.response.defer()

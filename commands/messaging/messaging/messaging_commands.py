@@ -53,7 +53,7 @@ class MessagingCommands(commands.Cog):
                             amount: app_commands.Range[int, 1, None] = 100, 
                             interval: app_commands.Transform[timedelta, IntervalTranfsormer] = timedelta(seconds=10)
                             ):
-        if ctx.response.is_done():
+        if ctx.response.is_done(): # if input is invalid, then the ctx has been responded to
             return
         
         messaging_info = MessagingInfo(get_attention_internal, 
@@ -82,12 +82,12 @@ class MessagingCommands(commands.Cog):
                     ):
         if ctx.response.is_done():
             return
-        
-        messaging_info = MessagingInfo(annoy_internal, 
-                                       target, 
-                                       message, 
-                                       amount, 
-                                       ctx.channel, 
+
+        messaging_info = MessagingInfo(annoy_internal,
+                                       target,
+                                       message,
+                                       amount,
+                                       ctx.channel,
                                        datetime.now() + timedelta(seconds=1),
                                        interval,
                                        self.bot.scheduler,

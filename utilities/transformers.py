@@ -6,10 +6,13 @@ from datetime import datetime, timedelta
 from utilities.helper_functions import parse_time
 
 class IntervalTranfsormer(app_commands.Transformer):
-    async def transform(self, interaction: discord.Interaction, value: str) -> timedelta:
+    async def transform(self, interaction: discord.Interaction, value: str) -> Optional[timedelta]:
 
         interval = timedelta(seconds=parse_time(value))
-        if interval.seconds == 0: # invalid time format 
+        if interval != 0:
+            return interval
+
+        else: # invalid time format
             embed = discord.Embed(
                 title="Invalid interval format. Please use formats like '10s', '5m5s', '2h30m', etc."
                 )
@@ -17,7 +20,7 @@ class IntervalTranfsormer(app_commands.Transformer):
                 embed=embed,
                 ephemeral=True
                 )
-        return interval
+            return None
     
 class DateTransformer(app_commands.Transformer):
     async def transform(self, interaction: discord.Interaction, value: str) -> datetime:
@@ -25,7 +28,7 @@ class DateTransformer(app_commands.Transformer):
         return datetime.strptime(value, "%Y-%m-%d")
     
 class PositiveIntTransformer(app_commands.Transformer):
-    async def transform(self, interaction: discord.Interaction, value: str) -> int:
+    async def transform(self, interaction: discord.Interaction, value: str) -> Optional[int]:
         try:
             int_value = int(value)
             if int_value < 0:
@@ -35,8 +38,8 @@ class PositiveIntTransformer(app_commands.Transformer):
             embed = discord.Embed(
                 title="Invalid number format. Please enter a positive integer."
                 )
-            await interaction.response.send_message(
-                embed=embed,
-                ephemeral=True
-                )
-            return -1
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return None
+
+if "__main__" == __name__:
+    print(datetime.strptime("1.1.21", "%d.%m.%y"))
