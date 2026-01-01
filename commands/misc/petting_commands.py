@@ -16,16 +16,17 @@ class Petting(commands.Cog):
         description="give people pets!"
     )
     async def petting(self, ctx, user: discord.User):
+        file_name = f"{user.id}.gif"
         try:
-            await ctx.response.send_message(file=discord.File(f"data/assets/petting/{user.id}.gif"))
+            await ctx.response.send_message(file=discord.File(f"data/assets/petting/{file_name}"))
         except FileNotFoundError:
             avatar_image: Image.Image = await get_profile_avatar(user)
             file: BytesIO = await petting(avatar_image)
 
-            with open(f"data/assets/petting/{user.id}.gif", "wb") as f:
+            with open(f"data/assets/petting/{file_name}", "wb") as f:
                 f.write(file.getbuffer())
 
-            await ctx.response.send_message(file=discord.File(file, filename="petting.gif"))
+            await ctx.response.send_message(file=discord.File(file, filename=file_name))
 
 
 async def get_profile_avatar(user: discord.User):
@@ -50,7 +51,7 @@ async def petting(avatar_image: Image.Image) -> BytesIO:
     ]
 
     # Load template hand gif
-    with open("data/template.gif", "rb") as f:
+    with open("data/assets/petting/template.gif", "rb") as f:
         template = Image.open(f)
 
         canvas_w, canvas_h = template.size

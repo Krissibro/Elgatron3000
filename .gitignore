@@ -20,3 +20,4 @@ data/wordle_state.json
 data/wordle_stats.json
 data/messages.csv
 data/assets/petting/*
+!data/assets/petting/template.gif
