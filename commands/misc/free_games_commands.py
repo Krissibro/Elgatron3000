@@ -7,7 +7,7 @@ from epicstore_api import EpicGamesStoreAPI
 from apscheduler.triggers.cron import CronTrigger
 
 from utilities.elgatron import Elgatron
-from utilities.validators import validate_text_channel
+from utilities.validators import validate_messageable
 from typing import List
 
 
@@ -41,7 +41,7 @@ async def get_free_games() -> List[dict]:
     return free_promotions
 
 
-async def send_games_embed(channel: discord.TextChannel, games: List[dict]) -> None:
+async def send_games_embed(channel: discord.abc.Messageable, games: List[dict]) -> None:
     """
     :param channel: The channel you want to send the Games Embed to
     :param games: Dictionary with game data.
@@ -90,7 +90,7 @@ async def scheduled_post_free_games(bot: Elgatron) -> None:
         else:
             channel = bot.get_channel(bot.testing_channel_id)
 
-        channel = validate_text_channel(channel)
+        channel = validate_messageable(channel)
         if isinstance(channel, discord.Embed):
             raise ValueError("The channel ID provided does not correspond to a text channel.")
 
@@ -135,7 +135,7 @@ class EpicGames(commands.Cog):
         await ctx.response.send_message(embed=await make_link_embed())
         free_games = await get_free_games()
         
-        channel = validate_text_channel(ctx.channel)
+        channel = validate_messageable(ctx.channel)
         if isinstance(channel, discord.Embed):
             await ctx.followup.send(embed=channel)
             return

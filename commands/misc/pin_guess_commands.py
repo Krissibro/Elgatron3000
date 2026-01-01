@@ -8,7 +8,6 @@ from discord import app_commands
 from discord.ext import commands
 
 from utilities.elgatron import Elgatron
-from utilities.validators import validate_text_channel
 
 from collections import namedtuple
 

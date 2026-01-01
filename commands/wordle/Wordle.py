@@ -13,7 +13,7 @@ from apscheduler.triggers.cron import CronTrigger
 from commands.wordle.WordleStats import WordleStats
 from utilities.elgatron import Elgatron
 from utilities.helper_functions import timedelta_format
-from utilities.validators import validate_text_channel
+from utilities.validators import validate_messageable
 
 valid_words = set(np.genfromtxt('./data/valid-words.csv', delimiter=',', dtype=str).flatten())
 word_bank = list(np.genfromtxt('./data/word-bank.csv', delimiter=',', dtype=str))
@@ -197,7 +197,7 @@ class Wordle:
         return self.wordle_stats.make_embed()
 
     async def send_reminder(self) -> None:
-        channel = validate_text_channel(self.bot.get_channel(self.channel_id))
+        channel = validate_messageable(self.bot.get_channel(self.channel_id))
         if isinstance(channel, discord.Embed):
             raise ValueError("The channel ID provided does not correspond to a text channel.")
 
@@ -207,7 +207,7 @@ class Wordle:
             await channel.send(embed=embed)
 
     async def start_new_game(self) -> None:
-        channel = validate_text_channel(self.bot.get_channel(self.channel_id))
+        channel = validate_messageable(self.bot.get_channel(self.channel_id))
         if isinstance(channel, discord.Embed):
             raise ValueError("The channel ID provided does not correspond to a text channel.")
 

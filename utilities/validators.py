@@ -24,7 +24,7 @@ def validate_digit(amount: str) -> int | discord.Embed:
         return discord.Embed(title=f"{amount} is not a valid number,\nAmount must be a whole number.")
     return int(amount)
 
-def validate_text_channel(channel: Optional[Union[discord.abc.GuildChannel, discord.abc.PrivateChannel, discord.Thread]]) -> Union[discord.TextChannel, discord.Embed]:
-    if not isinstance(channel, discord.TextChannel):
+def validate_messageable(channel: Optional[Union[discord.abc.GuildChannel, discord.abc.PrivateChannel, discord.Thread]]) -> Union[discord.abc.Messageable, discord.Embed]:
+    if not isinstance(channel, discord.abc.Messageable):
         return discord.Embed(title="The specified channel is not a text channel.")
     return channel
