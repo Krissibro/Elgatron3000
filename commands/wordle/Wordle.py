@@ -29,6 +29,7 @@ class Wordle:
         # default state values
         self.daily_word: str = ""
         self.guessed_words: List[str] = []
+        self.correct_guess: bool = self.daily_word in self.guessed_words
         self.guess_results: List[List[int]] = []
         self.guesser_ids: List[int] = []
         self.guesser_names: List[str] = []
@@ -36,7 +37,6 @@ class Wordle:
         self.unknown_letters: Set[str] = set(string.ascii_uppercase)
         self.new_word_time: datetime = datetime.now()
         self.time_taken: Optional[str] = None
-        self.correct_guess: bool = self.time_taken is not None
 
         self.state_file_path: str = "data/wordle_state.json"
         self.load_state(self.state_file_path)
@@ -258,15 +258,16 @@ class Wordle:
     def retrieve_data_from_dict(self, data: dict) -> None:
         self.daily_word = data.get("daily_word", "")
         self.guessed_words = data.get("guessed_words", [])
-        self.guesser_ids = data.get("guesser_ids", [])
-        self.guesser_names = data.get("guesser_names", [])
+        self.correct_guess = self.daily_word in self.guessed_words
         for word in self.guessed_words:
             self.guess_results.append(self.wordle_logic(word))
+
+        self.guesser_ids = data.get("guesser_ids", [])
+        self.guesser_names = data.get("guesser_names", [])
         
         new_word_time_str = data.get("new_word_time", datetime.now().isoformat())
         self.new_word_time = datetime.fromisoformat(new_word_time_str)
         self.time_taken = data.get("time_taken", None)
-        self.correct_guess = self.time_taken is not None
 
     def save_state(self) -> None:
         """Save the current state to a JSON file."""
