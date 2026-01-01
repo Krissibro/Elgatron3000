@@ -10,7 +10,7 @@ def parse_time(time_str: str) -> int:
     if matchings is not None:
         parts = matchings.groupdict()
     else:
-        return 0
+        raise ValueError(time_str)
 
     time_params = {x: int(y) for (x, y) in parts.items() if y}
 
