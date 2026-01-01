@@ -82,12 +82,13 @@ class PinManager:
             pickle.dump(self.pins, file)
 
 
+# TODO original message should not be .original response, and we should not ctx.response.send_message because that gives an object with limited availability
 class PinView(discord.ui.View):
-    def __init__(self, message_ctx, pin, timeout=20*60):
+    def __init__(self, message_ctx, pin, timeout=14*60):
         super().__init__(timeout=timeout)
         self.pin: Pin = pin
         self.message_ctx: discord.Interaction = message_ctx
-        self.original_message: Optional[discord.Message] = None
+        self.original_message: Optional[discord.InteractionMessage] = None
 
     def make_first_embed(self) -> discord.Embed:
         """Creates the embed containing the title and the selected pin.
