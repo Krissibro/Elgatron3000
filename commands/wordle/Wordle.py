@@ -28,15 +28,15 @@ class Wordle:
         self.bot: Elgatron = bot
         # default state values
         self.daily_word: str = ""
-        self.correct_guess: bool = False
         self.guessed_words: List[str] = []
-        self.guess_results: List[str] = []
+        self.guess_results: List[List[int]] = []
         self.guesser_ids: List[int] = []
         self.guesser_names: List[str] = []
         self.known_letters: Set[str] = set()
         self.unknown_letters: Set[str] = set(string.ascii_uppercase)
         self.new_word_time: datetime = datetime.now()
         self.time_taken: Optional[str] = None
+        self.correct_guess: bool = self.time_taken is not None
 
         self.state_file_path: str = "data/wordle_state.json"
         self.load_state(self.state_file_path)
@@ -64,7 +64,7 @@ class Wordle:
         self.correct_guess: bool = False
         
         self.guessed_words: List[str] = []
-        self.guess_results: List[str] = []
+        self.guess_results: List[List[int]] = []
         self.guesser_ids:   List[int] = []
         self.guesser_names: List[str] = []
 
@@ -95,7 +95,6 @@ class Wordle:
             time_taken = datetime.now() - self.new_word_time
             self.time_taken = timedelta_format(time_taken)
             self.wordle_stats.handle_win(len(self.guessed_words), time_taken)
-        self.correct_guess = guessed_word == self.daily_word
         self.save_state()
 
         embed = self.make_embed()
@@ -123,7 +122,7 @@ class Wordle:
             return discord.Embed(title=f'"{guessed_word}" has already been guessed')
         return None
 
-    def wordle_logic(self, guessed_word: str) -> str:
+    def wordle_logic(self, guessed_word: str) -> List[int]:
         """
         Function to handle wordle logic
         :param guessed_word: The word that is being checked
@@ -131,7 +130,7 @@ class Wordle:
         :
         """
         # Initialize result with all red squares
-        guess_result = [":red_square:"] * len(guessed_word)
+        guess_result = [0] * len(guessed_word)
         yellow_checker = list(self.daily_word)
 
         # Check for correct letters
@@ -139,7 +138,7 @@ class Wordle:
             if index >= len(self.daily_word):
                 break
             if letter == self.daily_word[index]:
-                guess_result[index] = ":green_square:"
+                guess_result[index] = 2
                 # if a letter is found, we don't want it to be found again
                 yellow_checker.remove(letter)
                 self.known_letters.add(letter)
@@ -149,7 +148,7 @@ class Wordle:
             if index < len(self.daily_word) and letter == self.daily_word[index]:
                 continue
             if letter in yellow_checker:
-                guess_result[index] = ":yellow_square:"
+                guess_result[index] = 1
                 yellow_checker.remove(letter)
                 self.known_letters.add(letter)
 
@@ -158,7 +157,7 @@ class Wordle:
             if letter in self.unknown_letters:
                 self.unknown_letters.remove(letter)
 
-        return ' '.join(guess_result)
+        return guess_result
 
 
     def make_embed(self) -> discord.Embed:
@@ -188,7 +187,7 @@ class Wordle:
             formatted_word = seperator.join(guessed_word)
 
             embed.add_field(name=f"‎ **{formatted_word}**     <-  {username}",
-                            value=f"{guess_result}",
+                            value=f"{format_word(guess_result)}",
                             inline=False)
             embed.set_footer(text=self.format_available_letters())
 
@@ -249,30 +248,25 @@ class Wordle:
     def get_dict_of_data(self) -> dict:
         return {
             "daily_word": self.daily_word,
-            "correct_guess": self.correct_guess,
             "guessed_words": list(self.guessed_words),
-            "guess_results": self.guess_results,
             "guesser_ids": list(self.guesser_ids),
             "guesser_names": list(self.guesser_names),
-            "known_letters": list(self.known_letters),
-            "unknown_letters": list(self.unknown_letters),
             "new_word_time": self.new_word_time.isoformat(),
             "time_taken": self.time_taken
         }
 
     def retrieve_data_from_dict(self, data: dict) -> None:
         self.daily_word = data.get("daily_word", "")
-        self.correct_guess = data.get("correct_guess", False)
         self.guessed_words = data.get("guessed_words", [])
         self.guesser_ids = data.get("guesser_ids", [])
         self.guesser_names = data.get("guesser_names", [])
-        self.guess_results = data.get("guess_results", [])
-        self.known_letters = set(data.get("known_letters", []))
-        self.unknown_letters = set(data.get("unknown_letters", list(string.ascii_uppercase)))
+        for word in self.guessed_words:
+            self.guess_results.append(self.wordle_logic(word))
         
         new_word_time_str = data.get("new_word_time", datetime.now().isoformat())
         self.new_word_time = datetime.fromisoformat(new_word_time_str)
         self.time_taken = data.get("time_taken", None)
+        self.correct_guess = self.time_taken is not None
 
     def save_state(self) -> None:
         """Save the current state to a JSON file."""
@@ -287,3 +281,7 @@ class Wordle:
                 self.retrieve_data_from_dict(wordle_dict)
         else:
             self.pick_new_word()
+
+def format_word(result: List[int]) -> str:
+    result_map = {0: ":red_square:", 1:":yellow_square:", 2:":green_square:"}
+    return " ".join([result_map[result] for result in result])
