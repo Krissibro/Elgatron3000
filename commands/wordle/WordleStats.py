@@ -101,7 +101,7 @@ class WordleStats:
             "longest_win_streak": self.longest_win_streak,
             "number_of_guesses": self.number_of_guesses,
             "fastest_win": self.fastest_win.seconds*1000 + self.fastest_win.microseconds//1000,
-            "number_guesses_per_game_counter": dict(self.guess_distribution)
+            "guess_distribution": dict(self.guess_distribution)
         }
 
     def retrieve_data_from_dict(self, data):
@@ -115,7 +115,7 @@ class WordleStats:
         fastest_win_data = data.get("fastest_win", 0)
         self.fastest_win = timedelta(milliseconds=fastest_win_data)
 
-        self.guess_distribution = defaultdict(int, data.get("number_guesses_per_game_counter", {}))
+        self.guess_distribution = defaultdict(int, data.get("guess_distribution", {}))
 
     def save_stats(self):
         """Save the current state to a JSON file."""
