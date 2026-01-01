@@ -1,3 +1,4 @@
+from typing import Optional
 import discord
 from discord import app_commands
 
@@ -23,9 +24,17 @@ class IntervalTranfsormer(app_commands.Transformer):
             return None
     
 class DateTransformer(app_commands.Transformer):
-    async def transform(self, interaction: discord.Interaction, value: str) -> datetime:
-        # TODO Placeholder implementation, do some error handling
-        return datetime.strptime(value, "%Y-%m-%d")
+    async def transform(self, interaction: discord.Interaction, value: str) -> Optional[datetime]:
+        try:
+            result = datetime.strptime(value, "%d.%m.%y", )
+            return result
+        except ValueError:
+            embed = discord.Embed(
+                title="Invalid date format. Please enter a valid date (dd.mm.yy)."
+            )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return None
+
     
 class PositiveIntTransformer(app_commands.Transformer):
     async def transform(self, interaction: discord.Interaction, value: str) -> Optional[int]:

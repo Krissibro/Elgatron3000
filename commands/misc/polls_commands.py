@@ -1,4 +1,5 @@
 import asyncio
+import time
 
 import discord
 from discord.ext import commands
@@ -6,6 +7,8 @@ from discord import app_commands
 
 from typing import Dict
 from utilities.elgatron import Elgatron
+from utilities.transformers import DateTransformer
+from datetime import datetime, timedelta
 
 
 class PollCommands(commands.GroupCog, group_name = "poll"):
@@ -44,7 +47,7 @@ class PollCommands(commands.GroupCog, group_name = "poll"):
     )
     async def start_numbers(self, ctx: discord.Interaction,
                             title: str,
-                            options: int,
+                            options: app_commands.Range[int, 2, 10],
                             description: discord.Optional[str] = None,
                             role_mention: discord.Optional[discord.Role] = None):
         emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
@@ -54,6 +57,28 @@ class PollCommands(commands.GroupCog, group_name = "poll"):
             option_dict[emoji] = ""
 
         await make_poll(ctx, option_dict, title, description, role_mention)
+
+    @app_commands.command(
+        name="dates",
+        description="create a date poll",
+    )
+    async def start_dates(self, ctx: discord.Interaction,
+                          title: str,
+                          date: app_commands.Transform[datetime, DateTransformer],
+                          days: app_commands.Range[int, 2, 10],
+                          description: discord.Optional[str] = None,
+                          role_mention: discord.Optional[discord.Role] = None):
+        if ctx.response.is_done():
+            return
+
+        emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
+        option_dict = {}
+
+        for i in range(days):
+            option_dict[emojis[i]] = (date + timedelta(days=i)).strftime('%A %d.%m')
+
+        await make_poll(ctx, option_dict, title, description, role_mention)
+
 
 
 async def make_poll(ctx: discord.Interaction, options: Dict[str, str], title: str, description: discord.Optional[str] = None, role_mention: discord.Optional[discord.Role] = None) -> None:
