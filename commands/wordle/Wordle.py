@@ -42,7 +42,7 @@ class Wordle:
         self.time_taken: Optional[str] = None
 
         self.state_file_path: str = "data/wordle_state.json"
-        self.load_state(self.state_file_path)
+        self.load_state()
 
         self.channel_id = bot.testing_channel_id if bot.testing else bot.wordle_channel_id
 
@@ -280,10 +280,10 @@ class Wordle:
         with open(self.state_file_path, 'w') as file:
             json.dump(self.get_dict_of_data(), file)
 
-    def load_state(self, path) -> None:
+    def load_state(self) -> None:
         """Load the state from a JSON file if it exists, otherwise set a new word."""
-        if os.path.exists(path):
-            with open(path, 'r') as file:
+        if os.path.exists(self.state_file_path):
+            with open(self.state_file_path, 'r') as file:
                 wordle_dict = json.load(file)
                 self.retrieve_data_from_dict(wordle_dict)
         else:

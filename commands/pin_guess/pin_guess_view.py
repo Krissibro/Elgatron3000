@@ -1,14 +1,16 @@
 import discord
 from typing import Optional
+
 from commands.pin_guess.pin_guess_model import Pin
+
 
 # TODO original message should not be .original response, and we should not ctx.response.send_message because that gives an object with limited availability
 class PinView(discord.ui.View):
-    def __init__(self, message_ctx, pin, timeout=14*60):
+    def __init__(self, pin: Pin, timeout=60):
         super().__init__(timeout=timeout)
         self.pin: Pin = pin
-        self.message_ctx: discord.Interaction = message_ctx
         self.original_message: Optional[discord.InteractionMessage] = None
+
 
     def make_first_embed(self) -> discord.Embed:
         """Creates the embed containing the title and the selected pin.
@@ -18,20 +20,16 @@ class PinView(discord.ui.View):
         return embed
 
     def make_sinner_embed(self) -> discord.Embed:
+        if self.pin.message is None: # should technically never happen
+            return discord.Embed(title="Result has not loaded yet!!",)
+
         embed: discord.Embed = self.make_first_embed()
         embed.add_field(name="By",
-                        value=f"{self.pin.author}", inline=True)
-        # TODO add guild_ID to pin, this solution works alright for now, but having it as a part of the pin object is prolly better
+                        value=f"{self.pin.message.author}", inline=True)
         embed.add_field(name="Context",
-                        value=f"https://discord.com/channels/{self.message_ctx.guild_id}/{self.pin.channel_id}/{self.pin.message_id}")
+                        value=self.pin.message.jump_url)
         return embed
 
-    async def send_attachments(self) -> None:
-        """Sends the attachments of the pin to the channel if there are any.
-        Must be called AFTER the initial response"""
-        self.original_message = await self.message_ctx.original_response()
-        if self.pin.attachments:
-            await self.original_message.reply("\n".join(attachment for attachment in self.pin.attachments))
 
     async def reveal_author(self):
         """Method to reveal the author and edit the original message."""
