@@ -1,3 +1,4 @@
+import json
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -5,9 +6,8 @@ from discord.ext import commands
 from epicstore_api import EpicGamesStoreAPI
 from apscheduler.triggers.cron import CronTrigger
 
-from utilities.settings import testing, game_channel_id, testing_channel_id, bot
-from utilities.settings import guild_id, scheduler
-from utilities.state_helper import save_state, load_state
+from utilities.elgatron import Elgatron
+from utilities.validators import validate_messageable
 from typing import List
 
 
@@ -41,7 +41,7 @@ async def get_free_games() -> List[dict]:
     return free_promotions
 
 
-async def send_games_embed(channel: discord.TextChannel, games: List[dict]) -> None:
+async def send_games_embed(channel: discord.abc.Messageable, games: List[dict]) -> None:
     """
     :param channel: The channel you want to send the Games Embed to
     :param games: Dictionary with game data.
@@ -75,10 +75,7 @@ def update_free_games_state(free_games: List[dict]) -> None:
     save_state(state)
 
 
-previous_free_game_titles = get_free_games_state()
-
-
-async def scheduled_post_free_games() -> None:
+async def scheduled_post_free_games(bot: Elgatron) -> None:
     global previous_free_game_titles
     free_games = await get_free_games()
     current_free_game_titles = [game["title"] for game in free_games]
@@ -88,20 +85,47 @@ async def scheduled_post_free_games() -> None:
         previous_free_game_titles = current_free_game_titles
         update_free_games_state(current_free_game_titles)
 
-        if not testing:
-            channel = bot.get_channel(game_channel_id)
+        if not bot.testing:
+            channel = bot.get_channel(bot.game_channel_id)
         else:
-            channel = bot.get_channel(testing_channel_id)
+            channel = bot.get_channel(bot.testing_channel_id)
+
+        channel = validate_messageable(channel)
+        if isinstance(channel, discord.Embed):
+            raise ValueError("The channel ID provided does not correspond to a text channel.")
 
         # Send the free games embed
         await channel.send(embed=await make_link_embed())
         await send_games_embed(channel, free_games)
 
 
+def load_state():
+    default_state = {
+        "free_games": []
+    }
+    try:
+        with open(state_path, 'r') as file:
+            return json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        # If there's no file, or it's corrupted, save the default state to a new file
+        save_state(default_state)
+        return default_state
+
+
+def save_state(state):
+    with open(state_path, 'w') as file:
+        json.dump(state, file, indent=4)
+
+
 # TODO: Clean up everything in this file and move it into a cog
 class EpicGames(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: Elgatron):
         self.bot = bot
+        trigger = CronTrigger(hour=18, minute=0, second=0, timezone='Europe/Oslo')
+        job_id = "post_free_games"
+        if not bot.scheduler.get_job(job_id):
+            bot.scheduler.add_job(scheduled_post_free_games, trigger=trigger, id=job_id, kwargs={"bot": bot}
+)
 
     @app_commands.command(
         name="free_games_rn",
@@ -110,14 +134,17 @@ class EpicGames(commands.Cog):
     async def free_games_rn(self, ctx: discord.Interaction):
         await ctx.response.send_message(embed=await make_link_embed())
         free_games = await get_free_games()
-        await send_games_embed(ctx.channel, free_games)
+        
+        channel = validate_messageable(ctx.channel)
+        if isinstance(channel, discord.Embed):
+            await ctx.followup.send(embed=channel)
+            return
+        
+        await send_games_embed(channel, free_games)
 
 
-async def setup(bot):
-    trigger = CronTrigger(hour=18, minute=0, second=0, timezone='Europe/Oslo')
-    job_id = "post_free_games"
-    if not scheduler.get_job(job_id):
-        scheduler.add_job(scheduled_post_free_games, trigger, id=job_id)
+state_path = "./data/bot_state.json"
+previous_free_game_titles = get_free_games_state()
 
-
-    await bot.add_cog(EpicGames(bot), guild=bot.get_guild(guild_id))
+async def setup(bot: Elgatron):
+    await bot.add_cog(EpicGames(bot), guild=discord.Object(id=bot.guild_id))

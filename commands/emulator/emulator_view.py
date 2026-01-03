@@ -17,7 +17,7 @@ class EmulatorController(discord.ui.View):
         await interaction.response.edit_message(attachments=[file], view=self)
 
     @discord.ui.button(emoji="🅰️", style=discord.ButtonStyle.red, row=0, custom_id="A_Button")
-    async def A_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+    async def a_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
         await self.update(interaction, "A", 200)
 
     @discord.ui.button(emoji="🔼", style=discord.ButtonStyle.blurple, row=0, custom_id="Up_Button")
@@ -25,7 +25,7 @@ class EmulatorController(discord.ui.View):
         await self.update(interaction, "up", 80)
 
     @discord.ui.button(emoji="🅱️", style=discord.ButtonStyle.red, row=0, custom_id="B_Button")
-    async def B_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+    async def b_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
         await self.update(interaction, "B", 200)
 
     @discord.ui.button(emoji="◀️", style=discord.ButtonStyle.blurple, row=1, custom_id="Left_Button")

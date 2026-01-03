@@ -1,134 +1,77 @@
+from typing import List
 import discord
-from ast import literal_eval
-import asyncio
 
-from commands.messaging.messaging_c import MessagingInfo
-from commands.messaging.Command import Command
-from utilities.helper_functions import parse_time, format_seconds, validate_numeric, validate_interval, validate_amount
+from commands.messaging.ActiveCommands import ActiveCommands
 
 class MessageSelectDropdown(discord.ui.Select):
-    def __init__(self):
-        options = Command.make_dropdown_options()
+    def __init__(self, active_commands: ActiveCommands):
+        self.active_commands: ActiveCommands = active_commands
+        options: List[discord.SelectOption] = active_commands.make_dropdown_options()
         super().__init__(placeholder="Which command would you like to edit?", min_values=1, max_values=1, options=options)
 
     async def callback(self, interaction: discord.Interaction) -> None:
         selected_command_id = int(self.values[0])
 
-        if selected_command_id in Command.get_ids():
-            await interaction.response.edit_message(
-                embed=Command.get_embed_by_id(selected_command_id),
-                view=ManageCommandsButtons(Command.get_command(selected_command_id)))
-
+        if selected_command_id in self.active_commands.get_ids():
+            embed = self.active_commands.get_command_embed(selected_command_id)
+            view = ManageCommandsButtons(selected_command_id, self.active_commands)
         else:
-            await interaction.response.edit_message(
-                embed=Command.make_overview_embed(),
-                view=ManageCommandsDropDown()
-            )
-
+            embed = self.active_commands.make_overview_embed()
+            view = ManageCommandsDropDown(self.active_commands)
+        await interaction.response.edit_message(embed=embed, view=view)
 
 class ManageCommandsDropDown(discord.ui.View):
-    def __init__(self):
+    def __init__(self, active_commands: ActiveCommands):
         super().__init__()
-        self.add_item(MessageSelectDropdown())
+        self.add_item(MessageSelectDropdown(active_commands))
 
 
 class ManageCommandsButtons(discord.ui.View):
-    def __init__(self, command):
+    def __init__(self, command_id: int, active_commands: ActiveCommands):
         super().__init__()
-        self.command = command
+        self.active_commands: ActiveCommands = active_commands
+        self.command_id: int = command_id
 
     async def make_command_embed(self, interaction: discord.Interaction) -> None:
-        if not Command.is_empty():
-            view = ManageCommandsButtons(self.command)
-            embed = self.command.get_embed()
+        if not self.active_commands.is_empty():
+            view = ManageCommandsButtons(self.command_id, self.active_commands)
+            embed = self.active_commands[self.command_id].make_embed()
         else:
             view = None
             embed = discord.Embed(title="No commands running", color=discord.Color.red())
         await interaction.edit_original_response(embed=embed, view=view)
 
     async def return_to_dropdown(self, interaction: discord.Interaction) -> None:
-        if not Command.is_empty():
-            view = ManageCommandsDropDown()
-            embed = Command.make_overview_embed()
+        if not self.active_commands.is_empty():
+            view = ManageCommandsDropDown(self.active_commands)
+            embed = self.active_commands.make_overview_embed()
         else:
             view = None
             embed = discord.Embed(title="No commands running", color=discord.Color.red())
-        await interaction.response.edit_message(view=view, embed=embed)
+        await interaction.edit_original_response(view=view, embed=embed)
 
-    @staticmethod
     @discord.ui.button(emoji="📄", style=discord.ButtonStyle.blurple)
     async def return_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+        await interaction.response.defer()
+
         await self.return_to_dropdown(interaction)
 
     @discord.ui.button(emoji="💀", style=discord.ButtonStyle.red)
     async def kill_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
-        if await self.silliness_check(interaction):
-            self.command.kill()
-            await self.return_to_dropdown(interaction)
-            await self.command.info.delete_messages()
+        await interaction.response.defer()
+
+        if self.active_commands.check_if_command_exists(self.command_id):
+            await self.active_commands.kill(self.command_id)
+            
+        await self.return_to_dropdown(interaction)
+
 
     @discord.ui.button(emoji="🪶", style=discord.ButtonStyle.green)
     async def edit_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
-        if await self.silliness_check(interaction):
-            modal = EditMessagingCommandWindow(self.command.info)
+
+        if self.active_commands.check_if_command_exists(self.command_id):
+            modal = self.active_commands[self.command_id].get_edit_window(interaction)
             await interaction.response.send_modal(modal)
-            await modal.finished_event.wait()  # Wait for the modal to be closed
+            await modal.wait()  # Wait for the modal to be closed
 
-            await self.make_command_embed(interaction)
-
-    # Check if the command still exists
-    async def silliness_check(self, interaction: discord.Interaction) -> bool:
-        """
-        :param interaction: interaction tied to command management message.
-        :return: True if command exists in the command list. else False
-        """
-        if not Command.check_if_command_exists(self.command.id):
-            await self.return_to_dropdown(interaction)
-            return False
-        return True
-
-
-class EditMessagingCommandWindow(discord.ui.Modal):
-    def __init__(self, command_info: MessagingInfo) -> None:
-        super().__init__(title="Edit")
-        self.command_info = command_info
-
-        self.message_input = discord.ui.TextInput(
-            label="Message:",
-            style=discord.TextStyle.short,
-            default=command_info.message
-        )
-        self.amount_input = discord.ui.TextInput(
-            label="Amount:",
-            style=discord.TextStyle.short,
-            default=str(command_info.remaining)
-        )
-        self.interval_input = discord.ui.TextInput(
-            label="Interval:",
-            style=discord.TextStyle.short,
-            default=format_seconds(command_info.interval)
-        )
-        self.add_item(self.message_input)
-        self.add_item(self.amount_input)
-        self.add_item(self.interval_input)
-
-        self.finished_event = asyncio.Event()
-
-    async def on_submit(self, interaction: discord.Interaction) -> None:
-        if (
-            not await validate_numeric(interaction, self.amount_input.value, "Amount must be numeric") or
-            not await validate_amount(interaction, int(self.amount_input.value)) or
-            not await validate_interval(interaction, parse_time(self.interval_input.value))
-        ):
-            self.stop()
-            self.finished_event.set()
-            return
-        await interaction.response.defer()
-
-        self.command_info.message = self.message_input.value
-        self.command_info.amount = literal_eval(self.amount_input.value)
-        self.command_info.remaining = literal_eval(self.amount_input.value)
-        self.command_info.interval = parse_time(self.interval_input.value)
-
-        self.stop()
-        self.finished_event.set()  # Signal that the modal is closed
+        await self.make_command_embed(interaction)

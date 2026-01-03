@@ -4,8 +4,8 @@ import csv
 from discord import app_commands
 from discord.ext import commands
 
-from utilities.settings import guild_id
-from commands.misc.free_games_c import scheduled_post_free_games
+from utilities.elgatron import Elgatron
+from commands.misc.free_games_commands import scheduled_post_free_games
 
 
 class TestCommands(commands.GroupCog, group_name="test"):
@@ -31,9 +31,9 @@ class TestCommands(commands.GroupCog, group_name="test"):
                     message.created_at,
                     message.clean_content,
                     [reaction.emoji for reaction in message.reactions],
-                    [".".join(attatchment.filename.split(".")[0:-1]) for attatchment in message.attachments],
-                    [attatchment.filename.split(".")[1] for attatchment in message.attachments],
-                    [attatchment.content_type for attatchment in message.attachments]
+                    [".".join(attachment.filename.split(".")[0:-1]) for attachment in message.attachments],
+                    [attachment.filename.split(".")[1] for attachment in message.attachments],
+                    [attachment.content_type for attachment in message.attachments]
                 ] async for message in i.history(limit=10)])
             except:  # TODO specify what kind of error can occur here?
                 continue
@@ -51,8 +51,8 @@ class TestCommands(commands.GroupCog, group_name="test"):
     )
     async def test_epic_games_scheduler(self, ctx):
         await ctx.response.send_message(embed=discord.Embed(title="Testing!"), ephemeral=True, delete_after=10)
-        await scheduled_post_free_games()
+        await scheduled_post_free_games(self.bot)
 
 
-async def setup(bot):
-    await bot.add_cog(TestCommands(bot), guild=bot.get_guild(guild_id))
+async def setup(bot: Elgatron):
+    await bot.add_cog(TestCommands(bot), guild=discord.Object(id=bot.guild_id))

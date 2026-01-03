@@ -1,7 +1,7 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-from utilities.settings import guild_id
+from utilities.elgatron import Elgatron
 from typing import Literal, Optional
 
 
@@ -44,5 +44,5 @@ class CommandSync(commands.Cog):
 
 
 # Set up the cog
-async def setup(bot):
-    await bot.add_cog(CommandSync(bot), guild=bot.get_guild(guild_id))
+async def setup(bot: Elgatron):
+    await bot.add_cog(CommandSync(bot), guild=discord.Object(id=bot.guild_id))

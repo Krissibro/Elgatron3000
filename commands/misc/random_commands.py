@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-from utilities.settings import guild_id
+from utilities.elgatron import Elgatron
 
 
 class StimCommands(commands.GroupCog, group_name="stim"):
@@ -109,5 +109,5 @@ class StimCommands(commands.GroupCog, group_name="stim"):
         selected_gif = random.choice(gifs)
         await ctx.response.send_message(selected_gif)
 
-async def setup(bot):
-    await bot.add_cog(StimCommands(bot), guild=bot.get_guild(guild_id))
+async def setup(bot: Elgatron):
+    await bot.add_cog(StimCommands(bot), guild=discord.Object(id=bot.guild_id))
