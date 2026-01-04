@@ -28,14 +28,17 @@ class Wordle:
         self.bot: Elgatron = bot
         # default state values
         self.daily_word: str = ""
+
         self.guessed_words: List[str] = []
-        self.correct_guess: bool = self.daily_word in self.guessed_words
         self.guess_results: List[List[int]] = []
         self.guesser_ids: List[int] = []
         self.guesser_names: List[str] = []
+        self.correct_guess: bool = self.daily_word in self.guessed_words
+
         self.known_letters: Set[str] = set()
         self.unknown_letters: Set[str] = set(string.ascii_uppercase)
-        self.new_word_time: datetime = datetime.now()
+
+        self.start_time: datetime = datetime.now()
         self.time_taken: Optional[str] = None
 
         self.state_file_path: str = "data/wordle_state.json"
@@ -61,19 +64,18 @@ class Wordle:
 
         random_word = str(random.sample(word_bank, 1)[0])
         self.daily_word = random_word.upper()
-        self.correct_guess: bool = False
         
         self.guessed_words: List[str] = []
         self.guess_results: List[List[int]] = []
-        self.guesser_ids:   List[int] = []
+        self.guesser_ids: List[int] = []
         self.guesser_names: List[str] = []
+        self.correct_guess: bool = False
 
-        self.known_letters:     Set[str] = set()
+        self.known_letters: Set[str] = set()
         self.unknown_letters: Set[str] = set(string.ascii_uppercase)
         
-        self.new_word_time: datetime = datetime.now()
+        self.start_time: datetime = datetime.now()
         self.time_taken: Optional[str] = None
-
 
         self.wordle_stats.increment_games_played()
         self.save_state()
@@ -91,8 +93,12 @@ class Wordle:
         self.guess_results.append(self.wordle_logic(guessed_word))
         self.correct_guess = guessed_word == self.daily_word
 
+        # starts the timer once the first guess is made
+        if len(self.guessed_words) == 1:
+            self.start_time = datetime.now()
+
         if self.correct_guess:
-            time_taken = datetime.now() - self.new_word_time
+            time_taken = datetime.now() - self.start_time
             self.time_taken = timedelta_format(time_taken)
             self.wordle_stats.handle_win(len(self.guessed_words), time_taken)
         self.save_state()
@@ -251,7 +257,7 @@ class Wordle:
             "guessed_words": list(self.guessed_words),
             "guesser_ids": list(self.guesser_ids),
             "guesser_names": list(self.guesser_names),
-            "new_word_time": self.new_word_time.isoformat(),
+            "new_word_time": self.start_time.isoformat(),
             "time_taken": self.time_taken
         }
 
@@ -266,7 +272,7 @@ class Wordle:
         self.guesser_names = data.get("guesser_names", [])
         
         new_word_time_str = data.get("new_word_time", datetime.now().isoformat())
-        self.new_word_time = datetime.fromisoformat(new_word_time_str)
+        self.start_time = datetime.fromisoformat(new_word_time_str)
         self.time_taken = data.get("time_taken", None)
 
     def save_state(self) -> None:
