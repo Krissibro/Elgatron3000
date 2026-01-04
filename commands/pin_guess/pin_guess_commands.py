@@ -6,7 +6,7 @@ from discord.ext import commands
 from utilities.elgatron import Elgatron
 
 from commands.pin_guess.pin_guess_model import PinManager, Pin
-from commands.pin_guess.pin_guess_view import PinView
+from commands.pin_guess.pin_guess_view import PinView, TempPinView
 
 class GuessThatPin(commands.GroupCog, group_name="pin"):
     def __init__(self, bot: Elgatron):
@@ -26,7 +26,7 @@ class GuessThatPin(commands.GroupCog, group_name="pin"):
         view: PinView = PinView(pin)
 
         # show this as soon as possible
-        await ctx.response.send_message(embed=view.make_first_embed())
+        await ctx.response.send_message(embed=view.make_first_embed(), view=TempPinView())
 
         # once the rest of the stuff has loaded, show it
         await pin.load_message(self.bot)

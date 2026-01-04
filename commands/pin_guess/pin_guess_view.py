@@ -11,7 +11,6 @@ class PinView(discord.ui.View):
         self.pin: Pin = pin
         self.original_message: Optional[discord.InteractionMessage] = None
 
-
     def make_first_embed(self) -> discord.Embed:
         """Creates the embed containing the title and the selected pin.
         Also appends the attachments if there are any"""
@@ -30,7 +29,6 @@ class PinView(discord.ui.View):
                         value=self.pin.message.jump_url)
         return embed
 
-
     async def reveal_author(self):
         """Method to reveal the author and edit the original message."""
         if self.original_message is None:
@@ -44,3 +42,12 @@ class PinView(discord.ui.View):
     @discord.ui.button(label="Reveal the sinner!", style=discord.ButtonStyle.success)
     async def reveal_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await self.reveal_author()
+
+# does nothing, is just here to
+class TempPinView(discord.ui.View):
+    def __init__(self, timeout=60):
+        super().__init__(timeout=timeout)
+
+    @discord.ui.button(label="Reveal the sinner!", style=discord.ButtonStyle.success, disabled=True)
+    async def reveal_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        pass
