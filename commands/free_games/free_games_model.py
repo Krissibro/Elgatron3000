@@ -34,13 +34,11 @@ class FreeGame:
 
 class FreeGameManager(commands.Cog):
     def __init__(self):
-        self.previous_free_games = []
         self.free_games: List[FreeGame] = []
         self.path = "./data/free_game_state.json"
         self.load_state()
 
     def update_free_games(self) -> None:
-        self.previous_free_games = self.free_games
         self.free_games = []
 
         api = EpicGamesStoreAPI()
@@ -56,15 +54,13 @@ class FreeGameManager(commands.Cog):
 
             for promotion in nested_promotions:
                 # Check that the current promotion is 0%
-                if promotion["discountSetting"]["discountPercentage"] == 0:
+                if promotion["discountSetting"]["discountPercentage"] != 0:
+                    continue
 
-                    free_game = FreeGame(game["title"], game["description"], self.get_game_url(game), self.get_game_image_url(game))
-                    if free_game not in self.previous_free_games:
-                        self.free_games.append(free_game)
+                free_game = FreeGame(game["title"], game["description"], self.get_game_url(game), self.get_game_image_url(game))
+                self.free_games.append(free_game)
 
-        if not self.free_games:
-            self.free_games = self.previous_free_games
-
+        self.free_games.sort(key=lambda g: g.title)
         self.save_state()
 
     async def send_games_embed(self, channel: discord.abc.Messageable) -> None:
@@ -72,14 +68,14 @@ class FreeGameManager(commands.Cog):
         :param channel: The channel you want to send the Games Embed to
         :return:
         """
-        self.update_free_games()
         for game in self.free_games:
             await channel.send(embed=game.get_embed())
 
     async def scheduled_post_free_games(self, bot: Elgatron) -> None:
-        if self.free_games != self.previous_free_games:
-            self.previous_free_games = self.free_games
+        previous_free_games = self.free_games
+        self.update_free_games()
 
+        if previous_free_games != self.free_games:
             if not bot.testing:
                 channel = bot.get_channel(bot.game_channel_id)
             else:
@@ -118,13 +114,13 @@ class FreeGameManager(commands.Cog):
 
     def get_dict_of_data(self) -> dict:
         return {
-            "previous_free_games": [free_game.to_dict() for free_game in self.previous_free_games],
+            "free_games": [free_game.to_dict() for free_game in self.free_games],
         }
 
     def retrieve_data_from_dict(self, data: dict) -> None:
-        previous_free_games = data.get("previous_free_games", [])
-        for free_game in previous_free_games:
-            self.previous_free_games.append(FreeGame(free_game["title"], free_game["description"], free_game["url"], free_game["imageUrl"]))
+        free_games = data.get("free_games", [])
+        for free_game in free_games:
+            self.free_games.append(FreeGame(free_game["title"], free_game["description"], free_game["url"], free_game["imageUrl"]))
 
 
     def load_state(self):

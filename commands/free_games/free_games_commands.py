@@ -32,6 +32,7 @@ class EpicGames(commands.Cog):
             await ctx.followup.send(embed=channel)
             return
 
+        self.free_games.update_free_games()
         await self.free_games.send_games_embed(channel)
 
 async def setup(bot: Elgatron):
