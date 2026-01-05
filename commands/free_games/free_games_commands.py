@@ -25,7 +25,7 @@ class EpicGames(commands.Cog):
         description="See the currently free games on Epic Games"
     )
     async def free_games_rn(self, ctx: discord.Interaction):
-        await ctx.response.send_message(embed=await self.free_games.make_link_embed())
+        await ctx.response.send_message(embed=self.free_games.make_link_embed())
 
         channel = validate_messageable(ctx.channel)
         if isinstance(channel, discord.Embed):

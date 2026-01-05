@@ -82,6 +82,8 @@ class FreeGameManager(commands.Cog):
 
     async def scheduled_post_free_games(self, bot: Elgatron) -> None:
         if self.free_games != self.previous_free_games:
+            self.previous_free_games = self.free_games
+
             if not bot.testing:
                 channel = bot.get_channel(bot.game_channel_id)
             else:
@@ -92,11 +94,11 @@ class FreeGameManager(commands.Cog):
                 raise ValueError("The channel ID provided does not correspond to a text channel.")
 
             # Send the free games embed
-            await channel.send(embed=await self.make_link_embed())
+            await channel.send(embed=self.make_link_embed())
             await self.send_games_embed(channel)
 
     @staticmethod
-    async def make_link_embed():
+    def make_link_embed():
         embed = discord.Embed(title="Free Games INCOMING!!!!")
         embed.description = ("[**Epic Games**](https://store.epicgames.com/en-US/free-games)\n" +
                              "[**Playstation Games**](https://www.playstation.com/en-us/ps-plus/whats-new/#monthly-games)")
@@ -121,7 +123,6 @@ class FreeGameManager(commands.Cog):
     def get_dict_of_data(self) -> dict:
         return {
             "previous_free_games": [free_game.to_dict() for free_game in self.previous_free_games],
-            "free_games": [free_game.to_dict() for free_game in self.free_games]
         }
 
     def retrieve_data_from_dict(self, data: dict) -> None:
