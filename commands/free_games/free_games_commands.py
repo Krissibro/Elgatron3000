@@ -12,13 +12,14 @@ from utilities.validators import validate_messageable
 class EpicGames(commands.Cog):
     def __init__(self, bot: Elgatron):
         self.bot = bot
-        self.free_games = FreeGameManager()
+        self.free_games = FreeGameManager(bot)
 
         trigger = CronTrigger(hour=18, minute=0, second=0, timezone='Europe/Oslo')
         job_id = "post_free_games"
         if not bot.scheduler.get_job(job_id):
-            bot.scheduler.add_job(self.free_games.scheduled_post_free_games, trigger=trigger, id=job_id, kwargs={"bot": bot}
-)
+            bot.scheduler.add_job(
+                self.free_games.scheduled_post_free_games, trigger=trigger, id=job_id
+            )
 
     @app_commands.command(
         name="free_games_rn",

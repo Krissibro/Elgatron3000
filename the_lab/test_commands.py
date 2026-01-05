@@ -52,8 +52,8 @@ class TestCommands(commands.GroupCog, group_name="test"):
     )
     async def test_epic_games_scheduler(self, ctx):
         await ctx.response.send_message(embed=discord.Embed(title="Testing!"), ephemeral=True, delete_after=10)
-        free_games = FreeGameManager()
-        await free_games.scheduled_post_free_games(self.bot)
+        free_games = FreeGameManager(self.bot)
+        await free_games.scheduled_post_free_games()
 
 
 async def setup(bot: Elgatron):

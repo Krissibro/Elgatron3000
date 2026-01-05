@@ -33,8 +33,10 @@ class FreeGame:
 
 
 class FreeGameManager(commands.Cog):
-    def __init__(self):
+    def __init__(self, bot: Elgatron):
+        self.bot = bot
         self.free_games: List[FreeGame] = []
+
         self.path = "./data/free_game_state.json"
         self.load_state()
 
@@ -71,15 +73,15 @@ class FreeGameManager(commands.Cog):
         for game in self.free_games:
             await channel.send(embed=game.get_embed())
 
-    async def scheduled_post_free_games(self, bot: Elgatron) -> None:
+    async def scheduled_post_free_games(self) -> None:
         previous_free_games = self.free_games
         self.update_free_games()
 
         if previous_free_games != self.free_games:
-            if not bot.testing:
-                channel = bot.get_channel(bot.game_channel_id)
+            if not self.bot.testing:
+                channel = self.bot.get_channel(self.bot.game_channel_id)
             else:
-                channel = bot.get_channel(bot.testing_channel_id)
+                channel = self.bot.get_channel(self.bot.testing_channel_id)
 
             channel = validate_messageable(channel)
             if isinstance(channel, discord.Embed):
