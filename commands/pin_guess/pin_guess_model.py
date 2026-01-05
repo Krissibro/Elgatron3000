@@ -39,9 +39,8 @@ class Pin:
 
 class PinManager:
     def __init__(self):
-        self.path = "./data/pins.pkl"
         self.pins: List[Pin] = []
-        self.state_file_path: str = "data/pins.json"
+        self.state_file_path: str = "./data/pins.json"
         self.load_pins()
 
     async def load_random_pin(self) -> Pin:
