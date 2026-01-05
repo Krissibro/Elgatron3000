@@ -8,13 +8,14 @@ from epicstore_api import EpicGamesStoreAPI
 from utilities.elgatron import Elgatron
 from utilities.validators import validate_messageable
 from typing import List
+from dataclasses import dataclass
 
+@dataclass
 class FreeGame:
-    def __init__(self, title: str, description: str,  url: str, image_url: str) -> None:
-        self.title = title
-        self.description = description
-        self.url = url
-        self.image_url = image_url
+    title: str
+    description: str
+    url: str
+    image_url: str
 
     def get_embed(self) -> discord.Embed:
         embed = discord.Embed(title=f"{self.title}",
@@ -29,11 +30,6 @@ class FreeGame:
             "url": self.url,
             "imageUrl": self.image_url
         }
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, FreeGame):
-            return False
-        return self.title == other.title
 
 
 class FreeGameManager(commands.Cog):
