@@ -30,7 +30,7 @@ class GuessThatPin(commands.GroupCog, group_name="pin"):
 
         # once the rest of the stuff has loaded, show it
         await pin.load_message(self.bot)
-        view.original_message = await ctx.edit_original_response(view=view, attachments=pin.files)
+        view.original_message = await ctx.edit_original_response(view=view, attachments=pin.build_files())
 
     @app_commands.command(
         name="sync",

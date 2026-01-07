@@ -4,7 +4,7 @@ import json
 import os
 import io
 
-from typing import AsyncIterable, List, Optional
+from typing import AsyncIterable, List, Optional, Tuple
 
 from utilities.elgatron import Elgatron
 
@@ -13,7 +13,7 @@ class Pin:
         self.channel_id: int = channel_id
         self.message_id: int = message_id
         self.content: str = content
-        self.files: List[discord.File] = []
+        self.file_data: List[Tuple[str, bytes]] = []
         self.message: Optional[discord.Message] = None
 
     async def _fetch_message(self, bot: Elgatron) -> None:
@@ -23,15 +23,21 @@ class Pin:
         self.message = await channel.fetch_message(self.message_id)
 
     async def _fetch_files(self) -> None:
-        """Sends the attachments of the pin to the channel if there are any.
-        Must be called AFTER the initial response"""
+        self.file_data.clear()
+
         if self.message is None:
             return
 
         for attachment in self.message.attachments:
-            file = io.BytesIO()
-            await attachment.save(file)
-            self.files.append(discord.File(file, attachment.filename))
+            data = await attachment.read()
+            self.file_data.append((attachment.filename, data))
+
+    def build_files(self) -> List[discord.File]:
+        # rebuilding file data each time works for whatever reason
+        return [
+            discord.File(io.BytesIO(data), filename)
+            for filename, data in self.file_data
+        ]
 
     async def load_message(self, bot: Elgatron) -> None:
         await self._fetch_message(bot)
