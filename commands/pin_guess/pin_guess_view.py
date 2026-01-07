@@ -14,19 +14,27 @@ class PinView(discord.ui.View):
     def make_first_embed(self) -> discord.Embed:
         """Creates the embed containing the title and the selected pin.
         Also appends the attachments if there are any"""
-        embed: discord.Embed = discord.Embed(title="Guess the pin!",
-                                             description=self.pin.content if self.pin.content else None)
+        embed: discord.Embed = discord.Embed(title="",
+                                             description=self.pin.content if self.pin.content else None,
+                                             color=discord.Color.yellow())
+        embed.set_author(name="Who dunnit?",
+                         icon_url="https://media.discordapp.net/attachments/1217929494703374416/1458419529624588298/user.png")
         return embed
 
     def make_sinner_embed(self) -> discord.Embed:
         if self.pin.message is None: # should technically never happen
-            return discord.Embed(title="Result has not loaded yet!!",)
+            return discord.Embed(title="Result has not loaded yet.",)
 
-        embed: discord.Embed = self.make_first_embed()
-        embed.add_field(name="By",
-                        value=f"{self.pin.message.author}", inline=True)
-        embed.add_field(name="Context",
-                        value=self.pin.message.jump_url)
+        author = self.pin.message.author
+        date = self.pin.message.created_at
+        icon_url = self.pin.message.author.avatar.url if self.pin.message.author.avatar else None
+        url = self.pin.message.jump_url
+
+        embed: discord.Embed = discord.Embed(title="",
+                                             description=self.pin.content if self.pin.content else None,
+                                             color=discord.Color.green())
+
+        embed.set_author(name=f"{author.name} on {date.strftime("%d/%m/%Y")}", icon_url=icon_url, url=url)
         return embed
 
     async def reveal_author(self):
