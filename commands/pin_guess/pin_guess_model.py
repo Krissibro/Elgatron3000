@@ -13,7 +13,7 @@ class Pin:
         self.channel_id: int = channel_id
         self.message_id: int = message_id
         self.content: str = content
-        self.file_data: List[Tuple[str, bytes]] = []
+        self.file_data: List[Tuple[bytes, str]] = []
         self.message: Optional[discord.Message] = None
 
     async def _fetch_message(self, bot: Elgatron) -> None:
@@ -30,13 +30,13 @@ class Pin:
 
         for attachment in self.message.attachments:
             data = await attachment.read()
-            self.file_data.append((attachment.filename, data))
+            self.file_data.append((data, attachment.filename))
 
     def build_files(self) -> List[discord.File]:
         # rebuilding file data each time works for whatever reason
         return [
             discord.File(io.BytesIO(data), filename)
-            for filename, data in self.file_data
+            for data, filename in self.file_data
         ]
 
     async def load_message(self, bot: Elgatron) -> None:
@@ -51,8 +51,7 @@ class PinManager:
 
     async def load_random_pin(self) -> Pin:
         """Loads a random pin from the stored chunks."""
-        pin = random.choice(self.pins)
-        return pin
+        return random.choice(self.pins)
 
     def add_pin(self, message: discord.Message, save=True) -> None:
         """Adds a pin to the storage."""
@@ -75,9 +74,8 @@ class PinManager:
 
         # Fetch pins from all channels
         for i, channel in enumerate(guild.text_channels):
-            # Epic loading bar for fun
+            # loading bar
             print(f"|{(i * '#'):<{len(guild.text_channels)}}| {len(self.pins):<{4}} | {channel.name}", end="\n")
-
             try:
                 channel_pins: AsyncIterable[discord.Message] = channel.pins()
                 async for message in channel_pins:
@@ -109,4 +107,3 @@ class PinManager:
             with open(self.state_file_path, 'r') as file:
                 data = json.load(file)
                 self.pins = self.retrieve_data_from_dict(data)
-                print(self.pins)
