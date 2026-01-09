@@ -2,10 +2,11 @@ import discord
 import csv
 
 from discord import app_commands
+from discord.audit_logs import F
 from discord.ext import commands
 
 from utilities.elgatron import Elgatron
-from commands.misc.free_games_commands import scheduled_post_free_games
+from commands.free_games.free_games_commands import FreeGameManager
 
 
 class TestCommands(commands.GroupCog, group_name="test"):
@@ -51,7 +52,8 @@ class TestCommands(commands.GroupCog, group_name="test"):
     )
     async def test_epic_games_scheduler(self, ctx):
         await ctx.response.send_message(embed=discord.Embed(title="Testing!"), ephemeral=True, delete_after=10)
-        await scheduled_post_free_games(self.bot)
+        free_games = FreeGameManager(self.bot)
+        await free_games.scheduled_post_free_games()
 
 
 async def setup(bot: Elgatron):
