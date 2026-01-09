@@ -1,4 +1,5 @@
 import discord
+import random
 from typing import Optional
 
 from commands.pin_guess.pin_guess_model import Pin
@@ -17,7 +18,9 @@ class PinView(discord.ui.View):
         embed: discord.Embed = discord.Embed(title="",
                                              description=self.pin.content if self.pin.content else None,
                                              color=discord.Color.yellow())
-        embed.set_author(name="Who dunnit?",
+        # result of deliberation
+        name = random.choices(["Guess the pin!", "who dunnit?"], weights=[0.9, 0.1], k=1)[0]
+        embed.set_author(name=name,
                          icon_url="https://media.discordapp.net/attachments/1217929494703374416/1458419529624588298/user.png")
         return embed
 
