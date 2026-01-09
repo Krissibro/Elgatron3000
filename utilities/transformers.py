@@ -29,11 +29,20 @@ class DateTransformer(app_commands.Transformer):
             result = datetime.strptime(value, "%d.%m.%y", )
             return result
         except ValueError:
-            embed = discord.Embed(
-                title="Invalid date format. Please enter a valid date (dd.mm.yy)."
-            )
-            await interaction.response.send_message(embed=embed, ephemeral=True)
-            return None
+            pass
+
+        try:
+            result = datetime.strptime(value, "%d.%m", )
+            result = result.replace(year=datetime.now().year)
+            return result
+        except ValueError:
+            pass
+
+        embed = discord.Embed(
+            title="Invalid date format. Please enter a valid date (dd.mm.yy) (dd.mm)."
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+        return None
 
     
 class PositiveIntTransformer(app_commands.Transformer):
