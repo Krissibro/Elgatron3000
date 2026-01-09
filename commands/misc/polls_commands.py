@@ -75,7 +75,7 @@ class PollCommands(commands.GroupCog, group_name = "poll"):
         option_dict = {}
 
         for i in range(days):
-            option_dict[emojis[i]] = discord.utils.format_dt(date+timedelta(days=i), "D")
+            option_dict[emojis[i]] = (date + timedelta(days=i)).strftime('%A %d.%m')
 
         await make_poll(ctx, option_dict, title, description, role_mention)
 
