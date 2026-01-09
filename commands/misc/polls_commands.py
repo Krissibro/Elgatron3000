@@ -85,7 +85,7 @@ async def make_poll(ctx: discord.Interaction, options: Dict[str, str], title: st
     emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
 
     embed = discord.Embed(title=title, description=description)
-    content = "\n\n".join([f"{i} {j}" for i, j in options.items()])
+    content = "\n\n".join([f"{i}  {j}" for i, j in options.items()])
     embed.add_field(name=content, value="", inline=False)
 
     await ctx.response.send_message(embed=embed)
