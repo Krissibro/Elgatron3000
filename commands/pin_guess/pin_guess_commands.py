@@ -5,8 +5,8 @@ from discord.ext import commands
 
 from utilities.elgatron import Elgatron
 
-from commands.pin_guess.pin_guess_model import PinManager
-from commands.pin_guess.pin_guess_view import PinView
+from commands.pin_guess.pin_guess_model import PinManager, Pin
+from commands.pin_guess.pin_guess_view import PinView, TempPinView
 
 class GuessThatPin(commands.GroupCog, group_name="pin"):
     def __init__(self, bot: Elgatron):
@@ -22,13 +22,15 @@ class GuessThatPin(commands.GroupCog, group_name="pin"):
             await ctx.response.send_message("No pinned messages found.")
             return
 
-        pin = self.pin_manager.load_random_pin()
+        pin: Pin = await self.pin_manager.load_random_pin()
+        view: PinView = PinView(pin)
 
-        view = PinView(ctx, pin)
-        embed = view.make_first_embed()
+        # show this as soon as possible
+        await ctx.response.send_message(embed=view.make_first_embed(), view=TempPinView())
 
-        await ctx.response.send_message(embed=embed, view=view)
-        await view.send_attachments()
+        # once the rest of the stuff has loaded, show it
+        await pin.load_message(self.bot)
+        view.original_message = await ctx.edit_original_response(view=view, attachments=pin.build_files())
 
     @app_commands.command(
         name="sync",
