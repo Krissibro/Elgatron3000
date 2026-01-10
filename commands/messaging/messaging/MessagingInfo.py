@@ -8,7 +8,7 @@ import discord
 from commands.messaging.ActiveCommands import ActiveCommands
 from commands.messaging.CommandInfo import CommandInfo
 from utilities.helper_functions import char_to_emoji, format_seconds
-from utilities.transformers import IntervalTranfsormer, PositiveIntTransformer
+from utilities.transformers import IntervalTransformer, PositiveIntTransformer
 
 class MessagingInfo(CommandInfo):
     def __init__(self,
@@ -125,7 +125,7 @@ class EditMessagingCommandWindow(discord.ui.Modal):
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
         message: str = self.message_input.value
-        interval: Optional[timedelta] = await IntervalTranfsormer().transform(interaction, self.interval_input.value)
+        interval: Optional[timedelta] = await IntervalTransformer().transform(interaction, self.interval_input.value)
         amount: Optional[int] = await PositiveIntTransformer().transform(interaction, self.amount_input.value)
 
         if interaction.response.is_done() or amount is None or interval is None:

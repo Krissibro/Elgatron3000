@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 from utilities.helper_functions import parse_time
 
-class IntervalTranfsormer(app_commands.Transformer):
+class IntervalTransformer(app_commands.Transformer):
     async def transform(self, interaction: discord.Interaction, value: str) -> Optional[timedelta]:
 
         interval = timedelta(seconds=parse_time(value))
