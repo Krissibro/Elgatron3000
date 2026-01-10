@@ -15,56 +15,51 @@ class Help(commands.Cog):
     )
     async def help_command(self, ctx: discord.Interaction):
         embed = discord.Embed(title="📚 Help")
-        embed.add_field(name="/annoy",
-                        value="Sends a message every given interval", inline=False)
 
-        embed.add_field(name="/dm_spam",
-                        value="Sends a direct message to someone every given interval", inline=False)
-
-        embed.add_field(name="/get_attention",
-                        value="Mention someone X times, every given interval until they react", inline=False)
-
-        embed.add_field(name="/free_games_rn",
-                        value="See free games from Epic Games and Playstation", inline=False)
-
-        embed.add_field(name="/poll start",
-                        value="Start a poll with up to 10 options!", inline=False)
-
-        embed.add_field(name="/wordle current",
-                        value="Show the current wordle game", inline=False)
-
-        embed.add_field(name="/wordle guess",
-                        value="Guess the wordle word", inline=False)
-
-        embed.add_field(name="/wordle stats",
-                        value="Shows the server's stats for all played wordle games", inline=False)
-
-        embed.add_field(name="/guess_the_pin",
-                        value="Guess which one of your friends have sinned!", inline=False)
-
-        embed.add_field(name="/pokemon",
-                        value="Sends pokemon controller and gif",
+        # Messaging Group
+        embed.add_field(name="**Messaging Commands**",
+                        value='''`/annoy` - Spam a message at someone
+`/dm_spam` - Annoy someone in their DMs with a given interval
+`/get_attention` - Ping someone until they react
+`/manage_commands` - See and manage running commands
+`/cleanup` - Clean the current chat for bot messages''',
                         inline=False)
 
-        embed.add_field(name="/cleanup",
-                        value="Deletes the given amount of messages", inline=False)
-
-        embed.add_field(name="/manage_commands",
-                        value="Manage the running commands, see info and edit/kill running commands", inline=False)
-
-        embed.add_field(name="Goofy gifs and videos to stim to",
-                        value='''/stim trout
-                            /stim sus
-                            /stim weave
-                            /stim this_dude
-                            /stim thanos_snapped
-                            /stim pet_elga3
-                            /stim minecraft
-                            /stim help''',
+        # Poll Group
+        embed.add_field(name="**Poll Commands**",
+                        value='''`/poll custom` - Create a custom poll with up to 10 options
+`/poll numbers` - Create a number poll
+`/poll dates` - Create a date poll''',
                         inline=False)
 
-        embed.set_footer(text='''interval is in the format <XdXhXmXs> 
-    Where X is a number and d, h, m, s are days, hours, minutes, seconds respectively''')
+        # Wordle Group
+        embed.add_field(name="**Wordle Commands**",
+                        value='''`/wordle current` - Show the current wordle game
+`/wordle guess` - Guess the wordle word
+`/wordle stats` - Shows the server's stats for all played wordle games''',
+                        inline=False)
+
+        # Pin Group
+        embed.add_field(name="**Pin Commands**",
+                        value='''`/pin guess` - Guess which one of your friends pinned a message!
+`/pin sync` - Re-sync pinned messages''',
+                        inline=False)
+
+        # Stim Group
+        embed.add_field(name="**Stim Commands**",
+                        value='''`/stim trout` `/stim sus` `/stim weave`
+`/stim this_dude` `/stim thanos_snapped`
+`/stim pet_elga3` `/stim minecraft` `/stim help`
+`/stim wassup_beijing` `/stim gn_girl`
+`/stim dr_peppa` `/stim horse`''',
+                        inline=False)
+
+        # Standalone Commands
+        embed.add_field(name="**Other Commands**",
+                        value='''`/free_games_rn` - See currently free games on Epic Games
+`/pokemon` - Play Pokemon with an interactive controller
+`/petting` - Give people pets!''',
+                        inline=False)
 
         await ctx.response.send_message(embed=embed, ephemeral=True)
 
