@@ -38,7 +38,7 @@ class PollCommands(commands.GroupCog, group_name = "poll"):
         option_dict = {}
         for i, j in zip(emojis, options):
             option_dict[i] = j
-        await make_poll(ctx, option_dict, title, description, role_mention)
+        await self.make_poll(ctx, option_dict, title, description, role_mention)
 
 
     @app_commands.command(
@@ -56,7 +56,7 @@ class PollCommands(commands.GroupCog, group_name = "poll"):
         for emoji in emojis[:options]:
             option_dict[emoji] = ""
 
-        await make_poll(ctx, option_dict, title, description, role_mention)
+        await self.make_poll(ctx, option_dict, title, description, role_mention)
 
     @app_commands.command(
         name="dates",
@@ -77,27 +77,30 @@ class PollCommands(commands.GroupCog, group_name = "poll"):
         for i in range(days):
             option_dict[emojis[i]] = (date + timedelta(days=i)).strftime('%A %d.%m')
 
-        await make_poll(ctx, option_dict, title, description, role_mention)
+        await self.make_poll(ctx, option_dict, title, description, role_mention)
+
+    async def cog_app_command_error(self, interaction: discord.Interaction, error: Exception):
+        await Elgatron.handle_command_error(interaction, error)
 
 
+    @staticmethod
+    async def make_poll(ctx: discord.Interaction, options: Dict[str, str], title: str, description: discord.Optional[str] = None, role_mention: discord.Optional[discord.Role] = None) -> None:
+        emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
 
-async def make_poll(ctx: discord.Interaction, options: Dict[str, str], title: str, description: discord.Optional[str] = None, role_mention: discord.Optional[discord.Role] = None) -> None:
-    emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
+        embed = discord.Embed(title=title, description=description)
+        content = "\n\n".join([f"{i}  {j}" for i, j in options.items()])
+        embed.add_field(name=content, value="", inline=False)
 
-    embed = discord.Embed(title=title, description=description)
-    content = "\n\n".join([f"{i}  {j}" for i, j in options.items()])
-    embed.add_field(name=content, value="", inline=False)
+        await ctx.response.send_message(embed=embed)
+        msg = await ctx.original_response()
 
-    await ctx.response.send_message(embed=embed)
-    msg = await ctx.original_response()
+        for emoji in emojis[:len(options)]:
+            await msg.add_reaction(emoji)
+            await asyncio.sleep(0.05)
+        thread = await msg.create_thread(name=title[:100])
 
-    for emoji in emojis[:len(options)]:
-        await msg.add_reaction(emoji)
-        await asyncio.sleep(0.05)
-    thread = await msg.create_thread(name=title[:100])
-
-    if role_mention is not None:
-        await thread.send(content=role_mention.mention + " GET YO ASS IN HERE")
+        if role_mention is not None:
+            await thread.send(content=role_mention.mention + " GET YO ASS IN HERE")
 
 async def setup(bot: Elgatron):
     await bot.add_cog(PollCommands(bot), guild=discord.Object(id=bot.guild_id))

@@ -43,6 +43,9 @@ class CommandManagement(commands.Cog):
                                         ephemeral=True,
                                         delete_after=10)
 
+    async def cog_app_command_error(self, interaction: discord.Interaction, error: Exception):
+        await Elgatron.handle_command_error(interaction, error)
+
 
 async def setup(bot: Elgatron):
     await bot.add_cog(CommandManagement(bot), guild=discord.Object(id=bot.guild_id))

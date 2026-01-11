@@ -9,4 +9,8 @@ bot = Elgatron()
 
 load_dotenv("token.env")
 token: Optional[str] = os.getenv("TOKEN")
+
+if not token:
+    raise ValueError("TOKEN not found in environment")
+
 bot.run(token)

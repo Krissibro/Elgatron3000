@@ -53,6 +53,26 @@ class Elgatron(Bot):
         self.scheduler.start()
         self.scheduler.print_jobs()
 
+    @staticmethod
+    async def handle_command_error(interaction: discord.Interaction, error: Exception) -> None:
+        """
+        Centralized error handler for cog commands.
+        Call this from any cog's cog_app_command_error method.
+        """
+        original_error = getattr(error, 'original', error)
+
+        embed = discord.Embed(title="An error occurred!", description=f"{original_error}", color=discord.Color.red())
+
+        # Send error message (handle if already responded)
+        try:
+            if interaction.response.is_done():
+                await interaction.followup.send(embed=embed, ephemeral=True)
+            else:
+                await interaction.response.send_message(embed=embed, ephemeral=True)
+        except discord.HTTPException:
+            # Silently fail if we can't send the error message
+            pass
+
     async def on_ready(self):
         if self.testing:
             # discord.Object(id=...) is better than bot.get_guild(...) because it works when disconnected

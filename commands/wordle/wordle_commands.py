@@ -69,9 +69,6 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
 
     async def start_new_game(self) -> None:
         channel = validate_messageable(self.bot.get_channel(self.channel_id))
-        if isinstance(channel, discord.Embed):
-            raise ValueError("The channel ID provided does not correspond to a text channel.")
-
         daily_word = self.wordle_model.daily_word.upper()
 
         if not self.wordle_model.correct_guess and daily_word:
@@ -90,6 +87,8 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         if not self.wordle_model.correct_guess:
             await self.wordle_view.send_reminder()
 
+    async def cog_app_command_error(self, interaction: discord.Interaction, error: Exception):
+        await self.bot.handle_command_error(interaction, error)
 
 async def setup(bot: Elgatron):
     await bot.add_cog(WordleCommands(bot), guild=discord.Object(id=bot.guild_id))

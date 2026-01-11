@@ -53,10 +53,7 @@ class WordleView:
 
     async def send_reminder(self) -> None:
         """Send reminder if game is not yet won"""
-
         channel = validate_messageable(self.bot.get_channel(self.channel_id))
-        if isinstance(channel, discord.Embed):
-            raise ValueError("The channel ID provided does not correspond to a text channel.")
 
         embed = discord.Embed(title="Me when the and I and me when is and it",
                               description="Uhhh:sob: :sob:")

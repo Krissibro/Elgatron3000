@@ -42,6 +42,9 @@ class CommandSync(commands.Cog):
             content=f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}"
         )
 
+    async def cog_app_command_error(self, interaction: discord.Interaction, error: Exception):
+        await Elgatron.handle_command_error(interaction, error)
+
 
 # Set up the cog
 async def setup(bot: Elgatron):
