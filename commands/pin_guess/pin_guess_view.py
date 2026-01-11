@@ -26,7 +26,7 @@ class PinView(discord.ui.View):
 
     def make_sinner_embed(self) -> discord.Embed:
         if self.pin.message is None: # should technically never happen
-            return discord.Embed(title="Result has not loaded yet.",)
+            raise RuntimeError("Result has not loaded yet.")
 
         author = self.pin.message.author
         date = self.pin.message.created_at
