@@ -91,7 +91,6 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
             await self.wordle_view.send_reminder()
 
 
-
 async def setup(bot: Elgatron):
     await bot.add_cog(WordleCommands(bot), guild=discord.Object(id=bot.guild_id))
 
