@@ -57,7 +57,7 @@ class GuessThatPin(commands.GroupCog, group_name="pin"):
             self.pin_manager.remove_pin(after)
 
     async def cog_app_command_error(self, interaction: discord.Interaction, error: Exception):
-        await Elgatron.handle_command_error(interaction, error)
+        await self.bot.handle_command_error(interaction, error)
 
 
 async def setup(bot: Elgatron):

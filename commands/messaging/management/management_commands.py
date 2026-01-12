@@ -3,6 +3,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from utilities.Errors import ElgatronError
 from utilities.elgatron import Elgatron
 from commands.messaging.management.management_view import ManageCommandsDropDown
 
@@ -16,7 +17,7 @@ class CommandManagement(commands.Cog):
     )
     async def manage_commands(self, ctx: discord.Interaction):
         if self.bot.active_commands.is_empty():
-            raise ValueError("No commands running")
+            raise ElgatronError("No commands running")
         view = ManageCommandsDropDown(self.bot.active_commands)
         first_embed = self.bot.active_commands.make_overview_embed()
         await ctx.response.send_message(embed=first_embed, view=view, ephemeral=True)
@@ -27,9 +28,9 @@ class CommandManagement(commands.Cog):
     )
     async def cleanup(self, ctx: discord.Interaction, messages_amount: int):
         if messages_amount <= 0:
-            raise ValueError("Cannot delete less than 1 message")
+            raise ElgatronError("Cannot delete less than 1 message")
         if not isinstance(ctx.channel, (discord.TextChannel, discord.Thread)) :
-            raise ValueError("Can only clean up text channels")
+            raise ElgatronError("Can only clean up text channels")
 
         await ctx.response.defer()
         await ctx.channel.purge(limit=messages_amount, check=lambda m: m.author == self.bot.user)
@@ -38,7 +39,7 @@ class CommandManagement(commands.Cog):
                                         delete_after=10)
 
     async def cog_app_command_error(self, interaction: discord.Interaction, error: Exception):
-        await Elgatron.handle_command_error(interaction, error)
+        await self.bot.handle_command_error(interaction, error)
 
 
 async def setup(bot: Elgatron):

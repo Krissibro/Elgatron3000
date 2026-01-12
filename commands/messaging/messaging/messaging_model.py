@@ -2,6 +2,8 @@ import discord
 
 from commands.messaging.messaging.MessagingInfo import MessagingInfo
 
+from utilities.Errors import ElgatronError
+
 
 class ReactButton(discord.ui.View):
     @discord.ui.button(emoji="🤨", style=discord.ButtonStyle.success)
@@ -22,9 +24,9 @@ async def get_attention_internal(messaging_info: MessagingInfo) -> None:
 async def dm_spam_internal(messaging_info: MessagingInfo) -> None:
     # these two should technically never happen
     if isinstance(messaging_info.target, discord.Role):
-        raise ValueError("Target user is invalid.")
+        raise ElgatronError("Target user is invalid.")
     if messaging_info.target is None:
-        raise ValueError("Target user is invalid.")
+        raise ElgatronError("Target user is invalid.")
 
     message = await messaging_info.target.send(messaging_info.message)
     messaging_info.add_message(message)

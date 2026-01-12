@@ -43,7 +43,7 @@ class CommandSync(commands.Cog):
         )
 
     async def cog_app_command_error(self, interaction: discord.Interaction, error: Exception):
-        await Elgatron.handle_command_error(interaction, error)
+        await self.bot.handle_command_error(interaction, error)
 
 
 # Set up the cog

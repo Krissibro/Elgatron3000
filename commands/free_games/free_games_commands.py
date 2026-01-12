@@ -34,7 +34,7 @@ class EpicGames(commands.Cog):
         await self.free_games.send_games_embed(channel)
 
     async def cog_app_command_error(self, interaction: discord.Interaction, error: Exception):
-        await Elgatron.handle_command_error(interaction, error)
+        await self.bot.handle_command_error(interaction, error)
 
 async def setup(bot: Elgatron):
     await bot.add_cog(EpicGames(bot), guild=discord.Object(id=bot.guild_id))

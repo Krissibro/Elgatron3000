@@ -12,6 +12,9 @@ from datetime import datetime, timedelta
 
 
 class PollCommands(commands.GroupCog, group_name = "poll"):
+    def __init__(self, bot: Elgatron):
+        self.bot: Elgatron = bot
+
     @app_commands.command(
         name="custom",
         description="create a custom poll",
@@ -80,7 +83,7 @@ class PollCommands(commands.GroupCog, group_name = "poll"):
         await self.make_poll(ctx, option_dict, title, description, role_mention)
 
     async def cog_app_command_error(self, interaction: discord.Interaction, error: Exception):
-        await Elgatron.handle_command_error(interaction, error)
+        await self.bot.handle_command_error(interaction, error)
 
 
     @staticmethod

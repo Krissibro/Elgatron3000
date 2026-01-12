@@ -8,6 +8,8 @@ from pyboy.utils import AccessError
 from commands.wordle.wordle_model import WordleModel
 from commands.wordle.wordle_stats import WordleStats
 from commands.wordle.wordle_view import WordleView
+
+from utilities.Errors import ElgatronError
 from utilities.elgatron import Elgatron
 from utilities.validators import validate_messageable
 
@@ -57,7 +59,7 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
     )
     async def reset_wordle(self, ctx: discord.Interaction):
         if not await self.bot.is_owner(ctx.user):
-            raise PermissionError("You do not have permission to use this command!")
+            raise ElgatronError("You do not have permission to use this command!")
 
         await self.start_new_game()
         await ctx.response.send_message(embed=discord.Embed(title="Wordle has been reset!"), ephemeral=True, delete_after=10)

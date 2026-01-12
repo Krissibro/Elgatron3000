@@ -6,6 +6,7 @@ import io
 
 from typing import AsyncIterable, List, Optional, Tuple
 
+from utilities.Errors import ElgatronError
 from utilities.elgatron import Elgatron
 
 class Pin:
@@ -19,7 +20,7 @@ class Pin:
     async def _fetch_message(self, bot: Elgatron) -> None:
         channel = await bot.fetch_channel(self.channel_id)
         if not isinstance(channel, discord.TextChannel):
-            raise TypeError("Channel not found!")
+            raise ElgatronError("Channel not found!")
         self.message = await channel.fetch_message(self.message_id)
 
     async def _fetch_files(self) -> None:

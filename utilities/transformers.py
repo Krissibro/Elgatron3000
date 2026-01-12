@@ -3,6 +3,7 @@ from discord import app_commands
 
 from datetime import datetime, timedelta
 
+from utilities.Errors import ElgatronError
 from utilities.helper_functions import parse_time
 
 class IntervalTransformer(app_commands.Transformer):
@@ -13,7 +14,7 @@ class IntervalTransformer(app_commands.Transformer):
             return interval
 
         else: # invalid time format
-            raise ValueError("Invalid interval format. Please use formats like '10s', '5m5s', '2h30m', etc.")
+            raise ElgatronError("Invalid interval format. Please use formats like '10s', '5m5s', '2h30m', etc.")
     
 class DateTransformer(app_commands.Transformer):
     async def transform(self, interaction: discord.Interaction, value: str) -> datetime:
@@ -30,7 +31,7 @@ class DateTransformer(app_commands.Transformer):
         except ValueError :
             pass
 
-        raise ValueError("Invalid date format. Please format as '1.1.21' or '1.1'.")
+        raise ElgatronError("Invalid date format. Please format as '1.1.21' or '1.1'.")
 
     
 class PositiveIntTransformer(app_commands.Transformer):
@@ -38,6 +39,6 @@ class PositiveIntTransformer(app_commands.Transformer):
         int_value = int(value)
 
         if int_value < 0:
-            raise ValueError("Value must be positive.")
+            raise ElgatronError("Value must be positive.")
 
         return int_value

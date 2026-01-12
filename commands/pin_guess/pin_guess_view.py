@@ -4,6 +4,8 @@ from typing import Optional
 
 from commands.pin_guess.pin_guess_model import Pin
 
+from utilities.Errors import ElgatronError
+
 
 # TODO original message should not be .original response, and we should not ctx.response.send_message because that gives an object with limited availability
 class PinView(discord.ui.View):
@@ -43,7 +45,7 @@ class PinView(discord.ui.View):
     async def reveal_author(self):
         """Method to reveal the author and edit the original message."""
         if self.original_message is None:
-            raise ValueError("Original message is undefined")
+            raise ElgatronError("Original message is undefined")
         sinner_embed = self.make_sinner_embed()
         await self.original_message.edit(embed=sinner_embed, view=None)
 

@@ -2,11 +2,14 @@ import discord
 
 import json
 from glob import glob
+from discord.app_commands import TransformerError
 from discord.ext.commands import Bot
+import logging
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from commands.messaging.ActiveCommands import ActiveCommands
+from utilities.Errors import ElgatronError
 
 
 def get_intents():
@@ -32,6 +35,8 @@ class Elgatron(Bot):
 
         self.scheduler: AsyncIOScheduler = AsyncIOScheduler(timezone='Europe/Oslo')
         self.active_commands: ActiveCommands = ActiveCommands()
+
+        self.logger = logging.getLogger("discord")
         
         super().__init__(intents=get_intents(), command_prefix="/")
 
@@ -53,8 +58,7 @@ class Elgatron(Bot):
         self.scheduler.start()
         self.scheduler.print_jobs()
 
-    @staticmethod
-    async def handle_command_error(interaction: discord.Interaction, error: Exception) -> None:
+    async def handle_command_error(self, interaction: discord.Interaction, error: Exception) -> None:
         """
         Centralized error handler for cog commands.
         Call this from any cog's cog_app_command_error method.
@@ -72,6 +76,10 @@ class Elgatron(Bot):
         except discord.HTTPException:
             # Silently fail if we can't send the error message
             pass
+
+        if not isinstance(original_error, (ElgatronError, TransformerError)):
+            self.logger.error("error occurred!", exc_info=original_error)
+            print(type(original_error))
 
     async def on_ready(self):
         if self.testing:

@@ -2,6 +2,8 @@ import re
 
 from datetime import timedelta
 
+from utilities.Errors import ElgatronError
+
 
 def parse_time(time_str: str) -> int:
     regex = re.compile(r'((?P<days>\d+?)d)?((?P<hours>\d+?)h)?((?P<minutes>\d+?)m)?((?P<seconds>\d+?)s)?')
@@ -10,7 +12,7 @@ def parse_time(time_str: str) -> int:
     if matchings is not None:
         parts = matchings.groupdict()
     else:
-        raise ValueError("please enter a valid time format, ex: 1d2h3m4s")
+        raise ElgatronError("please enter a valid time format, ex: 1d2h3m4s")
 
     time_params = {x: int(y) for (x, y) in parts.items() if y}
 

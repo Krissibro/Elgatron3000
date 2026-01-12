@@ -9,6 +9,7 @@ from datetime import datetime
 from typing import List, Optional, Set, Union
 
 from commands.wordle.wordle_stats import WordleStats
+from utilities.Errors import ElgatronError
 from utilities.helper_functions import timedelta_format
 
 class WordleModel:
@@ -89,18 +90,18 @@ class WordleModel:
         :param user: user making the guess.
         """
         if self.correct_guess:
-            raise ValueError("The daily wordle has already been guessed")
+            raise ElgatronError("The daily wordle has already been guessed")
 
         if not self.testing:
             if user.id in self.guesser_ids:
-                raise ValueError(f"{user.display_name} has already guessed")
+                raise ElgatronError(f"{user.display_name} has already guessed")
             if guessed_word not in self.whitelisted_words:
                 if not len(guessed_word) == 5:
-                    raise ValueError("The word must be 5 letters long")
+                    raise ElgatronError("The word must be 5 letters long")
                 if guessed_word.lower() not in self.valid_words:
-                    raise ValueError(f'"{guessed_word}" is not a valid word')
+                    raise ElgatronError(f'"{guessed_word}" is not a valid word')
         if guessed_word in self.guessed_words:
-            raise ValueError(f'"{guessed_word}" has already been guessed')
+            raise ElgatronError(f'"{guessed_word}" has already been guessed')
 
     def wordle_logic(self, guessed_word: str) -> List[int]:
         """

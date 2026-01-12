@@ -64,7 +64,7 @@ class Help(commands.Cog):
         await ctx.response.send_message(embed=embed, ephemeral=True)
 
     async def cog_app_command_error(self, interaction: discord.Interaction, error: Exception):
-        await Elgatron.handle_command_error(interaction, error)
+        await self.bot.handle_command_error(interaction, error)
 
 
 async def setup(bot: Elgatron):
