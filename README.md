@@ -10,7 +10,7 @@ Elgatron3000 is an epic Discord bot designed to provide some fun and useful feat
 - **Epic Games Integration**: The latest free games from the Epic Games Store are sent every day at 18:00 if something new drops!
 - **Attention Grabber**: Ping someone in intervals until they go mad.
 - **Management of Running Commands**: End commands early if someone gets too mad.
-- **Reaction Polls**: Automatically make polls with threads to discuss stuff.
+- **Reaction Polls**: Automatically make polls with threads for discussion.
 - **Built-in Gifs and videos**: A bunch of epic gifs and videos to react with.
 
 
@@ -24,7 +24,7 @@ Elgatron3000 is an epic Discord bot designed to provide some fun and useful feat
     ```
 
 2. **Set Up Environment Variables**: 
-Create a `token.env` file in the root directory and add your Discord bot token:
+Create a `.env` file in the root directory and add your Discord bot token:
     ```
     TOKEN=YOUR_DISCORD_TOKEN_HERE
     ```
