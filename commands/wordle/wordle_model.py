@@ -148,7 +148,7 @@ class WordleModel:
             "guessed_words": list(self.guessed_words),
             "guesser_ids": list(self.guesser_ids),
             "guesser_names": list(self.guesser_names),
-            "new_word_time": self.start_time.isoformat(),
+            "start_time": self.start_time.isoformat(),
             "time_taken": self.time_taken
         }
 
@@ -162,7 +162,7 @@ class WordleModel:
         self.guesser_ids = data.get("guesser_ids", [])
         self.guesser_names = data.get("guesser_names", [])
         
-        new_word_time_str = data.get("new_word_time", datetime.now().isoformat())
+        new_word_time_str = data.get("start_time", datetime.now().isoformat())
         self.start_time = datetime.fromisoformat(new_word_time_str)
         self.time_taken = data.get("time_taken", None)
 
