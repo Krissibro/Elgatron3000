@@ -80,7 +80,6 @@ class Elgatron(Bot):
         if not isinstance(original_error, (ElgatronError, TransformerError)):
             embed.title = "An error occurred!"
             self.logger.error("error occurred!", exc_info=original_error)
-            print(type(original_error))
 
     async def on_ready(self):
         if self.testing:

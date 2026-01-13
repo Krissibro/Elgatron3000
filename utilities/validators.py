@@ -9,17 +9,17 @@ def validate_interval(interval: str) -> int:
     return time
 
 
-def validate_natural_number(amount: str) -> int:
-    integer: int = validate_digit(amount)
+def validate_natural_number(digit: str) -> int:
+    integer: int = validate_digit(digit)
     if integer < 0:
-        raise ElgatronError("a valid number.\nAmount must be a whole number higher than 0.")
+        raise ElgatronError(f"{digit} is not a positive whole number.")
     return integer
 
 
-def validate_digit(amount: str) -> int:
-    if not amount.isdigit():
-        raise ElgatronError(f"{amount} is not a valid number,\nAmount must be a whole number.")
-    return int(amount)
+def validate_digit(digit: str) -> int:
+    if not digit.isdigit():
+        raise ElgatronError(f"{digit} is not a valid whole number.")
+    return int(digit)
 
 
 def validate_messageable(channel: Optional[discord.abc.GuildChannel | discord.abc.PrivateChannel | discord.Thread]) -> discord.abc.Messageable:
