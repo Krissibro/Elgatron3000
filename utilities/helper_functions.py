@@ -2,7 +2,7 @@ import re
 
 from datetime import timedelta
 
-from utilities.Errors import ElgatronError
+from utilities.errors import ElgatronError
 
 
 def parse_time(time_str: str) -> int:

@@ -3,7 +3,7 @@ from discord import app_commands
 
 from datetime import datetime, timedelta
 
-from utilities.Errors import ElgatronError
+from utilities.errors import ElgatronError
 from utilities.helper_functions import parse_time
 
 class IntervalTransformer(app_commands.Transformer):

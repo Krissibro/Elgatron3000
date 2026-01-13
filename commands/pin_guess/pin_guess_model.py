@@ -6,7 +6,7 @@ import io
 
 from typing import AsyncIterable, List, Optional, Tuple
 
-from utilities.Errors import ElgatronError
+from utilities.errors import ElgatronError
 from utilities.elgatron import Elgatron
 
 class Pin:

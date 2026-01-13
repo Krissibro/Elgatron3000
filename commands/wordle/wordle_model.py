@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import List, Optional, Set, Union
 
 from commands.wordle.wordle_stats import WordleStats
-from utilities.Errors import ElgatronError
+from utilities.errors import ElgatronError
 from utilities.helper_functions import timedelta_format
 
 class WordleModel:
@@ -102,6 +102,8 @@ class WordleModel:
                     raise ElgatronError(f'"{guessed_word}" is not a valid word')
         if guessed_word in self.guessed_words:
             raise ElgatronError(f'"{guessed_word}" has already been guessed')
+        if len(guessed_word) > 255:
+            raise ElgatronError("The word must be 255 characters or less")
 
     def wordle_logic(self, guessed_word: str) -> List[int]:
         """

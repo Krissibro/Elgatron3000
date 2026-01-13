@@ -4,7 +4,7 @@ from typing import Optional
 
 from commands.pin_guess.pin_guess_model import Pin
 
-from utilities.Errors import ElgatronError
+from utilities.errors import ElgatronError
 
 
 # TODO original message should not be .original response, and we should not ctx.response.send_message because that gives an object with limited availability

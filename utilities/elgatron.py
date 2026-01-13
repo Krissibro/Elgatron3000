@@ -9,7 +9,7 @@ import logging
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from commands.messaging.ActiveCommands import ActiveCommands
-from utilities.Errors import ElgatronError
+from utilities.errors import ElgatronError
 
 
 def get_intents():
@@ -65,7 +65,7 @@ class Elgatron(Bot):
         """
         original_error = getattr(error, 'original', error)
 
-        embed = discord.Embed(title="An error occurred!", description=f"{original_error}", color=discord.Color.red())
+        embed = discord.Embed(description=f"{original_error}", color=discord.Color.red())
 
         # Send error message (handle if already responded)
         try:
@@ -78,6 +78,7 @@ class Elgatron(Bot):
             pass
 
         if not isinstance(original_error, (ElgatronError, TransformerError)):
+            embed.title = "An error occurred!"
             self.logger.error("error occurred!", exc_info=original_error)
             print(type(original_error))
 

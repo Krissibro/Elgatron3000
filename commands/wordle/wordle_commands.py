@@ -9,7 +9,7 @@ from commands.wordle.wordle_model import WordleModel
 from commands.wordle.wordle_stats import WordleStats
 from commands.wordle.wordle_view import WordleView
 
-from utilities.Errors import ElgatronError
+from utilities.errors import ElgatronError
 from utilities.elgatron import Elgatron
 from utilities.validators import validate_messageable
 

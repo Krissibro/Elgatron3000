@@ -2,7 +2,7 @@ from typing import Optional
 import discord
 
 from utilities.helper_functions import parse_time
-from utilities.Errors import ElgatronError
+from utilities.errors import ElgatronError
 
 def validate_interval(interval: str) -> int:
     time = parse_time(interval)

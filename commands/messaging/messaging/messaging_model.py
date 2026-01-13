@@ -2,7 +2,7 @@ import discord
 
 from commands.messaging.messaging.MessagingInfo import MessagingInfo
 
-from utilities.Errors import ElgatronError
+from utilities.errors import ElgatronError
 
 
 class ReactButton(discord.ui.View):
