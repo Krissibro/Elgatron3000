@@ -2,6 +2,8 @@ import re
 
 from datetime import timedelta
 
+from utilities.errors import ElgatronError
+
 
 def parse_time(time_str: str) -> int:
     regex = re.compile(r'((?P<days>\d+?)d)?((?P<hours>\d+?)h)?((?P<minutes>\d+?)m)?((?P<seconds>\d+?)s)?')
@@ -10,7 +12,7 @@ def parse_time(time_str: str) -> int:
     if matchings is not None:
         parts = matchings.groupdict()
     else:
-        raise ValueError(time_str)
+        raise ElgatronError("please enter a valid time format, ex: 1d2h3m4s")
 
     time_params = {x: int(y) for (x, y) in parts.items() if y}
 
@@ -85,13 +87,3 @@ def timedelta_format(time_diff: timedelta) -> str:
 
     # Zero-pad hours/minutes (2 digits) and seconds_with_ms (width 5, 2 decimals)
     return f"{hours:02} : {minutes:02} : {seconds:02}"
-
-
-if __name__ == "__main__":
-    print(parse_time("1d2h5m56s"))
-    print(format_seconds(parse_time("1d2h5m56s")))
-    print(timedelta_format(timedelta(seconds=3661, milliseconds=234)))
-    print(timedelta(milliseconds=0.2).total_seconds())
-    print(timedelta(seconds=2).microseconds)
-    print(timedelta(microseconds=1000000).total_seconds())
-

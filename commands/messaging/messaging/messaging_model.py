@@ -2,6 +2,8 @@ import discord
 
 from commands.messaging.messaging.MessagingInfo import MessagingInfo
 
+from utilities.errors import ElgatronError
+
 
 class ReactButton(discord.ui.View):
     @discord.ui.button(emoji="🤨", style=discord.ButtonStyle.success)
@@ -20,20 +22,15 @@ async def get_attention_internal(messaging_info: MessagingInfo) -> None:
 
 
 async def dm_spam_internal(messaging_info: MessagingInfo) -> None:
-    try:
-        # these two should technically never happen 
-        if isinstance(messaging_info.target, discord.Role):
-            raise ValueError("Target user is invalid.")
-        if messaging_info.target is None:
-            raise ValueError("Target user is invalid.")
-    
-        message = await messaging_info.target.send(messaging_info.message)
-        messaging_info.add_message(message)
+    # these two should technically never happen
+    if isinstance(messaging_info.target, discord.Role):
+        raise ElgatronError("Target user is invalid.")
+    if messaging_info.target is None:
+        raise ElgatronError("Target user is invalid.")
 
-    except (discord.Forbidden, discord.HTTPException, ValueError):
-        embed = discord.Embed(title="I don't have permission to message that user.")
-        await messaging_info.channel.send(embed=embed)
-        
+    message = await messaging_info.target.send(messaging_info.message)
+    messaging_info.add_message(message)
+
 
 async def annoy_internal(messaging_info: MessagingInfo) -> None:
     message = await messaging_info.channel.send(f"{messaging_info.get_mention()} {messaging_info.message}")

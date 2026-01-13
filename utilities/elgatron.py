@@ -2,11 +2,14 @@ import discord
 
 import json
 from glob import glob
+from discord.app_commands import TransformerError
 from discord.ext.commands import Bot
+import logging
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from commands.messaging.ActiveCommands import ActiveCommands
+from utilities.errors import ElgatronError
 
 
 def get_intents():
@@ -32,6 +35,8 @@ class Elgatron(Bot):
 
         self.scheduler: AsyncIOScheduler = AsyncIOScheduler(timezone='Europe/Oslo')
         self.active_commands: ActiveCommands = ActiveCommands()
+
+        self.logger = logging.getLogger("discord")
         
         super().__init__(intents=get_intents(), command_prefix="/")
 
@@ -52,6 +57,29 @@ class Elgatron(Bot):
 
         self.scheduler.start()
         self.scheduler.print_jobs()
+
+    async def handle_command_error(self, interaction: discord.Interaction, error: Exception) -> None:
+        """
+        Centralized error handler for cog commands.
+        Call this from any cog's cog_app_command_error method.
+        """
+        original_error = getattr(error, 'original', error)
+
+        embed = discord.Embed(description=f"{original_error}", color=discord.Color.red())
+
+        # Send error message (handle if already responded)
+        try:
+            if interaction.response.is_done():
+                await interaction.followup.send(embed=embed, ephemeral=True)
+            else:
+                await interaction.response.send_message(embed=embed, ephemeral=True)
+        except discord.HTTPException:
+            # Silently fail if we can't send the error message
+            pass
+
+        if not isinstance(original_error, (ElgatronError, TransformerError)):
+            embed.title = "An error occurred!"
+            self.logger.error("error occurred!", exc_info=original_error)
 
     async def on_ready(self):
         if self.testing:

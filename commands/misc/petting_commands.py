@@ -28,6 +28,9 @@ class Petting(commands.Cog):
 
             await ctx.response.send_message(file=discord.File(file, filename=file_name))
 
+    async def cog_app_command_error(self, interaction: discord.Interaction, error: Exception):
+        await self.bot.handle_command_error(interaction, error)
+
 
 async def get_profile_avatar(user: discord.User):
     avatar = BytesIO()

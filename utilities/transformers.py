@@ -1,30 +1,23 @@
-from typing import Optional
 import discord
 from discord import app_commands
 
 from datetime import datetime, timedelta
 
+from utilities.errors import ElgatronError
 from utilities.helper_functions import parse_time
 
 class IntervalTransformer(app_commands.Transformer):
-    async def transform(self, interaction: discord.Interaction, value: str) -> Optional[timedelta]:
+    async def transform(self, interaction: discord.Interaction, value: str) -> timedelta:
 
         interval = timedelta(seconds=parse_time(value))
         if interval != 0:
             return interval
 
         else: # invalid time format
-            embed = discord.Embed(
-                title="Invalid interval format. Please use formats like '10s', '5m5s', '2h30m', etc."
-                )
-            await interaction.response.send_message(
-                embed=embed,
-                ephemeral=True
-                )
-            return None
+            raise ElgatronError("Invalid interval format. Please use formats like '10s', '5m5s', '2h30m', etc.")
     
 class DateTransformer(app_commands.Transformer):
-    async def transform(self, interaction: discord.Interaction, value: str) -> Optional[datetime]:
+    async def transform(self, interaction: discord.Interaction, value: str) -> datetime:
         try:
             result = datetime.strptime(value, "%d.%m.%y", )
             return result
@@ -35,29 +28,17 @@ class DateTransformer(app_commands.Transformer):
             result = datetime.strptime(value, "%d.%m", )
             result = result.replace(year=datetime.now().year)
             return result
-        except ValueError:
+        except ValueError :
             pass
 
-        embed = discord.Embed(
-            title="Invalid date format. Please enter a valid date (dd.mm.yy) (dd.mm)."
-        )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
-        return None
+        raise ElgatronError("Invalid date format. Please format as '1.1.21' or '1.1'.")
 
     
 class PositiveIntTransformer(app_commands.Transformer):
-    async def transform(self, interaction: discord.Interaction, value: str) -> Optional[int]:
-        try:
-            int_value = int(value)
-            if int_value < 0:
-                raise ValueError("Value must be positive.")
-            return int_value
-        except ValueError:
-            embed = discord.Embed(
-                title="Invalid number format. Please enter a positive integer."
-                )
-            await interaction.response.send_message(embed=embed, ephemeral=True)
-            return None
+    async def transform(self, interaction: discord.Interaction, value: str) -> int:
+        int_value = int(value)
 
-if "__main__" == __name__:
-    print(datetime.strptime("1.1.21", "%d.%m.%y"))
+        if int_value < 0:
+            raise ElgatronError("Value must be positive.")
+
+        return int_value

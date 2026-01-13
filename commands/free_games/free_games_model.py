@@ -84,8 +84,6 @@ class FreeGameManager(commands.Cog):
                 channel = self.bot.get_channel(self.bot.testing_channel_id)
 
             channel = validate_messageable(channel)
-            if isinstance(channel, discord.Embed):
-                raise ValueError("The channel ID provided does not correspond to a text channel.")
 
             # Send the free games embed
             await channel.send(embed=self.make_link_embed())

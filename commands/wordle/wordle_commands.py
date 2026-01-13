@@ -3,10 +3,13 @@ from discord import app_commands
 from discord.ext import commands
 
 from apscheduler.triggers.cron import CronTrigger
+from pyboy.utils import AccessError
 
 from commands.wordle.wordle_model import WordleModel
 from commands.wordle.wordle_stats import WordleStats
 from commands.wordle.wordle_view import WordleView
+
+from utilities.errors import ElgatronError
 from utilities.elgatron import Elgatron
 from utilities.validators import validate_messageable
 
@@ -56,22 +59,13 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
     )
     async def reset_wordle(self, ctx: discord.Interaction):
         if not await self.bot.is_owner(ctx.user):
-            embed = discord.Embed(title="You do not have permission to use this command!",)
-            await ctx.response.send_message(
-                embed=embed,
-                ephemeral=True,
-                delete_after=15
-            )
-            return
+            raise ElgatronError("You do not have permission to use this command!")
 
         await self.start_new_game()
         await ctx.response.send_message(embed=discord.Embed(title="Wordle has been reset!"), ephemeral=True, delete_after=10)
 
     async def start_new_game(self) -> None:
         channel = validate_messageable(self.bot.get_channel(self.channel_id))
-        if isinstance(channel, discord.Embed):
-            raise ValueError("The channel ID provided does not correspond to a text channel.")
-
         daily_word = self.wordle_model.daily_word.upper()
 
         if not self.wordle_model.correct_guess and daily_word:
@@ -90,6 +84,8 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         if not self.wordle_model.correct_guess:
             await self.wordle_view.send_reminder()
 
+    async def cog_app_command_error(self, interaction: discord.Interaction, error: Exception):
+        await self.bot.handle_command_error(interaction, error)
 
 async def setup(bot: Elgatron):
     await bot.add_cog(WordleCommands(bot), guild=discord.Object(id=bot.guild_id))

@@ -1,16 +1,10 @@
 {
-    "previous_free_games": [
+    "free_games": [
         {
-            "title": "Wildgate",
-            "description": "Wildgate is a crew-based PVP multiplayer shooter that blends tactical ship-to-ship combat with fast-paced first-person action. Evade deadly environmental hazards, search for powerful weapons and ship upgrades, and be the first crew to escape with the Artifact.",
-            "url": "\n[**Link**](https://store.epicgames.com/en-US/p/wildgate-standard-edition-b886b5)",
-            "imageUrl": "https://cdn1.epicgames.com/offer/d5241c76f178492ea1540fce45616757/Jan1-7_Game16_giveaway_2560x1440_2560x1440-22bf2decce1c44e3a49f538de98de940"
-        },
-        {
-            "title": "Total War: THREE KINGDOMS",
-            "description": "Total War: THREE KINGDOMS recreates epic conflict across ancient China in an age of heroes and legends, combining gripping empire-building, statecraft and conquest with stunning real-time battles.",
-            "url": "\n[**Link**](https://store.epicgames.com/en-US/p/total-war-three-kingdoms-d3bb7a)",
-            "imageUrl": "https://cdn1.epicgames.com/offer/d5241c76f178492ea1540fce45616757/Jan1-7_Game17_giveaway_2560x14401_2560x1440-dba68e265f1045f883693b0348cf6ea2"
+            "title": "Bloons TD 6",
+            "description": "The Bloons are back and better than ever! Get ready for a massive 3D tower defense game designed to give you hours and hours of the best strategy gaming available.",
+            "url": "",
+            "imageUrl": "https://cdn1.epicgames.com/spt-assets/764b2d57552c436590f50318bd7587f9/bloons-td-6-offer-1jl6n.jpg"
         }
     ]
 }

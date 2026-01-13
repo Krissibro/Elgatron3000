@@ -109,5 +109,8 @@ class StimCommands(commands.GroupCog, group_name="stim"):
         selected_gif = random.choice(gifs)
         await ctx.response.send_message(selected_gif)
 
+    async def cog_app_command_error(self, interaction: discord.Interaction, error: Exception):
+        await self.bot.handle_command_error(interaction, error)
+
 async def setup(bot: Elgatron):
     await bot.add_cog(StimCommands(bot), guild=discord.Object(id=bot.guild_id))

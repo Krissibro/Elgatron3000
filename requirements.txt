@@ -1,7 +1,7 @@
 python-dotenv~=1.0.0
 discord.py~=2.6.4
-epicstore-api~=0.1.7
-APScheduler~=3.10.4
-numpy~=2.3.0
-pyboy~=2.6.0
-pillow~=10.4.0
+epicstore-api~=0.2.0
+APScheduler~=3.11.2
+numpy~=2.4.1
+pyboy~=2.6.1
+pillow~=12.1.0

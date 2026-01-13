@@ -29,12 +29,12 @@ class EpicGames(commands.Cog):
         await ctx.response.send_message(embed=self.free_games.make_link_embed())
 
         channel = validate_messageable(ctx.channel)
-        if isinstance(channel, discord.Embed):
-            await ctx.followup.send(embed=channel)
-            return
 
         self.free_games.update_free_games()
         await self.free_games.send_games_embed(channel)
+
+    async def cog_app_command_error(self, interaction: discord.Interaction, error: Exception):
+        await self.bot.handle_command_error(interaction, error)
 
 async def setup(bot: Elgatron):
     await bot.add_cog(EpicGames(bot), guild=discord.Object(id=bot.guild_id))

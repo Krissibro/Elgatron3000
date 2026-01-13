@@ -96,6 +96,9 @@ class MessagingCommands(commands.Cog):
         messaging_info.start_job()
         await ctx.response.send_message(embed=messaging_info.make_embed(), ephemeral=True, delete_after=10)
 
+    async def cog_app_command_error(self, interaction: discord.Interaction, error: Exception):
+        await self.bot.handle_command_error(interaction, error)
+
 
 async def setup(bot: Elgatron):
     await bot.add_cog(MessagingCommands(bot), guild=discord.Object(id=bot.guild_id))
