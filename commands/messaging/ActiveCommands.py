@@ -42,13 +42,13 @@ class ActiveCommands:
     def make_dropdown_options(self) -> List[discord.SelectOption]:
         dropdown_options = []
         for index, (command_id, command_info) in enumerate(self.running_commands_dict.items()):
-            option = discord.SelectOption(label=f"{index}:", 
-                                          value=str(command_id), 
+            option = discord.SelectOption(label=f"{index}:",
+                                          value=str(command_id),
                                           description=command_info.get_select_description()
                                           )
             dropdown_options.append(option)
         return dropdown_options
-    
+
     def get_command_embed(self, command_id) -> discord.Embed:
         embed = self[command_id].make_embed()
         return embed

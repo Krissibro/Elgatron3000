@@ -62,7 +62,7 @@ class ManageCommandsButtons(discord.ui.View):
 
         if self.active_commands.check_if_command_exists(self.command_id):
             await self.active_commands.kill(self.command_id)
-            
+
         await self.return_to_dropdown(interaction)
 
 

@@ -5,12 +5,11 @@ from dotenv import load_dotenv
 
 from utilities.elgatron import Elgatron
 
-bot = Elgatron()
-
 load_dotenv(".env")
-token: Optional[str] = os.getenv("TOKEN")
 
+token: Optional[str] = os.getenv("TOKEN")
 if not token:
     raise ValueError("TOKEN not found in environment")
 
+bot = Elgatron()
 bot.run(token)
