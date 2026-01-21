@@ -35,13 +35,13 @@ class PollCommands(commands.GroupCog, group_name="poll"):
         option9: discord.Optional[str] = None,
         option10: discord.Optional[str] = None,
     ):
-        # Make list with valid options
+        # Make a list with valid options
         options = [
             option1, option2, option3, option4, option5, option6, option7, option8, option9, option10,
         ]
         options = [
             option for option in options if option
-        ]  # remove option if it's not defined
+        ]  # remove the options that are undefined
         emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
         option_dict = {}
         for i, j in zip(emojis, options):

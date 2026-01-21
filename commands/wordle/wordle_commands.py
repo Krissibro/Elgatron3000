@@ -3,7 +3,6 @@ from discord import app_commands
 from discord.ext import commands
 
 from apscheduler.triggers.cron import CronTrigger
-from pyboy.utils import AccessError
 
 from commands.wordle.wordle_model import WordleModel
 from commands.wordle.wordle_stats import WordleStats
@@ -80,7 +79,7 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
             await channel.send(embed=self.wordle_view.new_game_embed())
 
     async def send_wordle_reminder(self) -> None:
-        """Send reminder if the daily wordle hasn't been completed"""
+        """Sends the reminder if the daily wordle hasn't been completed"""
         if not self.wordle_model.correct_guess:
             await self.wordle_view.send_reminder()
 

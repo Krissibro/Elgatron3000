@@ -21,14 +21,14 @@ class Emulator(PyBoy):
 
     def sim_button_time(self, button: Optional[str], frames: int) -> None:
         """
-        :param button: Name of the button to press. can be 'up', 'down', 'left', 'right', 'a', 'b', 'start', 'select' or None.
-        :param frames: the amount of frames to simulate.
+        :param button: Name of the button to press. Can be 'up', 'down', 'left', 'right', 'a', 'b', 'start', 'select' or None.
+        :param frames: The number of frames to simulate.
         """
         # press a button if defined
         if button:
             self.button(button, 8)
 
-        # run the select amount of frames
+        # run the select number of frames
         for _ in range(frames // self.skipped_frames):
             self.tick(self.skipped_frames)
 
@@ -38,7 +38,7 @@ class Emulator(PyBoy):
 
     def make_gif(self) -> io.BytesIO:
         """
-        Makes a gif from the simulated frames and empties the frame buffer.
+        Makes a GIF from the simulated frames and empties the frame buffer.
         :return: IO of the GIF that can be used as a file.
         """
         img_byte_arr = io.BytesIO()

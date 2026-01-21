@@ -2,7 +2,6 @@ import discord
 import csv
 
 from discord import app_commands
-from discord.audit_logs import F
 from discord.ext import commands
 
 from utilities.elgatron import Elgatron

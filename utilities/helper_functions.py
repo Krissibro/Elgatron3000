@@ -28,7 +28,6 @@ def format_seconds(seconds: int) -> str:
 
     return formatted_time if formatted_time else "0s"
 
-
 def char_to_emoji(command_id) -> str:
     emoji_dict = {"0": "0️⃣",
                   "1": "1️⃣",

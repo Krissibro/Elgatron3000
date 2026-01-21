@@ -50,7 +50,7 @@ async def petting(avatar_image: Image.Image) -> BytesIO:
         (1.00, 1.00)   # frame 9
     ]
 
-    # Load template hand gif
+    # Load template hand GIF
     with open("data/assets/petting/template.gif", "rb") as f:
         template = Image.open(f)
 
@@ -75,7 +75,7 @@ async def petting(avatar_image: Image.Image) -> BytesIO:
             ax = (canvas_w - resized_avatar.width) // 2 + horizontal_offset
             ay = (canvas_h - resized_avatar.height) // 2 + vertical_offset
 
-            # Prepare final frame
+            # Prepare the final frame
             frame = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
             frame.paste(resized_avatar, (ax, ay), resized_avatar)
 

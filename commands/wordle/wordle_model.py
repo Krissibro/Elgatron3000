@@ -108,10 +108,10 @@ class WordleModel:
         """
         Function to handle wordle logic
         :param guessed_word: The word that is being checked
-        :return: String of red, yellow and red squares depending on the guessed word
+        :return: String of red, yellow, and red squares depending on the guessed word
         :
         """
-        # Initialize result with all red squares
+        # Initialize the result with all red squares
         guess_result = [0] * len(guessed_word)
         yellow_checker = list(self.daily_word)
 

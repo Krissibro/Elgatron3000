@@ -13,7 +13,7 @@ class EmulatorCommands(commands.Cog):
         self.emu = Emulator("./data/pokemon_red.gb", window="null")  # for bot
         self.controller = EmulatorController(self.emu)
 
-        # make view work after bot reset
+        # make the view work after bot reset
         self.bot.add_view(self.controller)
 
     def __del__(self):

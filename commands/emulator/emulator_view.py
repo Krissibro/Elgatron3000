@@ -12,7 +12,7 @@ class EmulatorController(discord.ui.View):
         # do the emulation
         self.emu.sim_button_time(button, frames)
 
-        # get the gif and send it
+        # get the GIF and send it
         file = discord.File(fp=self.emu.make_gif(), filename="emulator.gif")
         await interaction.response.edit_message(attachments=[file], view=self)
 

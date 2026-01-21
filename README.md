@@ -5,13 +5,13 @@ Elgatron3000 is an epic Discord bot designed to provide some fun and useful feat
 ## Features 🌟
 
 - **Wordle but Epic**: Play wordle with your friends, only one guess each! Resets daily at 08:00, now with game stats!
-- **Game Boy Emulator**: Play any Game Boy/Game Boy Colour game you would like in discord!
+- **Game Boy Emulator**: Play any Game Boy/Game Boy Color game you would like in discord!
 - **Guess The Pin**: A fun game where the bot picks a random pin, and you have to guess who wrote it!
 - **Epic Games Integration**: The latest free games from the Epic Games Store are sent every day at 18:00 if something new drops!
 - **Attention Grabber**: Ping someone in intervals until they go mad.
 - **Management of Running Commands**: End commands early if someone gets too mad.
 - **Reaction Polls**: Automatically make polls with threads for discussion.
-- **Built-in Gifs and videos**: A bunch of epic gifs and videos to react with.
+- **Built-in GIFs and videos**: A bunch of epic GIFs and videos to react with.
 
 
 
