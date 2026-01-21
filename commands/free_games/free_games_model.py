@@ -34,10 +34,10 @@ class FreeGame:
 
 class FreeGameManager(commands.Cog):
     def __init__(self, bot: Elgatron):
-        self.bot = bot
+        self.bot: Elgatron = bot
         self.free_games: List[FreeGame] = []
 
-        self.path = "./data/free_game_state.json"
+        self.path: str = "./data/free_game_state.json"
         self.load_state()
 
     def update_free_games(self) -> None:

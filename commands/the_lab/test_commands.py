@@ -9,8 +9,8 @@ from commands.free_games.free_games_commands import FreeGameManager
 
 
 class TestCommands(commands.GroupCog, group_name="test"):
-    def __init__(self, bot):
-        self.bot = bot
+    def __init__(self, bot: Elgatron):
+        self.bot: Elgatron = bot
 
     @app_commands.command(
         name="collect_data",

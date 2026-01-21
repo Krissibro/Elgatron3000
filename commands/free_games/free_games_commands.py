@@ -8,11 +8,11 @@ from commands.free_games.free_games_model import FreeGameManager
 from utilities.elgatron import Elgatron
 from utilities.validators import validate_messageable
 
-# TODO: Clean up everything in this file and move it into a cog
+
 class EpicGames(commands.Cog):
     def __init__(self, bot: Elgatron):
-        self.bot = bot
-        self.free_games = FreeGameManager(bot)
+        self.bot: Elgatron = bot
+        self.free_games: FreeGameManager = FreeGameManager(self.bot)
 
         trigger = CronTrigger(hour=18, minute=0, second=0, timezone='Europe/Oslo')
         job_id = "post_free_games"

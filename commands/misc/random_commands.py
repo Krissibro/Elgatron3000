@@ -18,8 +18,8 @@ async def send_media(ctx: discord.Interaction, media_urls: list[str] | str):
 
 
 class StimCommands(commands.GroupCog, group_name="stim"):
-    def __init__(self, bot):
-        self.bot = bot
+    def __init__(self, bot: Elgatron):
+        self.bot: Elgatron = bot
 
     @app_commands.command(
         name="this_dude",

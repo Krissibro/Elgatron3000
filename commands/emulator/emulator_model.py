@@ -11,8 +11,8 @@ class Emulator(PyBoy):
         super().__init__(rom_path, sound_emulated=False, sound=False, **kwargs)
         self.set_emulation_speed(5)
         self.images: List[Image] = []
-        self.skipped_frames = 4
-        self.state_file = "./data/pokemon.state"
+        self.skipped_frames: int = 4
+        self.state_file: str = "./data/pokemon.state"
 
         #load save state on init
         if os.path.isfile(self.state_file):
