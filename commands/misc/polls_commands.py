@@ -1,5 +1,4 @@
 import asyncio
-import time
 from datetime import datetime, timedelta
 from typing import Dict
 
@@ -101,11 +100,6 @@ class PollCommands(commands.GroupCog, group_name="poll"):
             option_dict[emojis[i]] = (date + timedelta(days=i)).strftime("%A %d.%m")
 
         await self.make_poll(ctx, option_dict, title, description, role_mention)
-
-    async def cog_app_command_error(
-        self, interaction: discord.Interaction, error: Exception
-    ):
-        await self.bot.handle_command_error(interaction, error)
 
     @staticmethod
     async def make_poll(

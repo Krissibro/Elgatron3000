@@ -55,9 +55,6 @@ class TestCommands(commands.GroupCog, group_name="test"):
         free_games = FreeGameManager(self.bot)
         await free_games.scheduled_post_free_games()
 
-    async def cog_app_command_error(self, interaction: discord.Interaction, error: Exception):
-        await self.bot.handle_command_error(interaction, error)
-
 
 async def setup(bot: Elgatron):
     await bot.add_cog(TestCommands(bot), guild=discord.Object(id=bot.guild_id))

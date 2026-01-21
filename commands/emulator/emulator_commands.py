@@ -32,9 +32,6 @@ class EmulatorCommands(commands.Cog):
         msg = await ctx.edit_original_response(attachments=[file], view=self.controller)
         await msg.create_thread(name="Discuss Pokemon!")
 
-    async def cog_app_command_error(self, interaction: discord.Interaction, error: Exception):
-        await self.bot.handle_command_error(interaction, error)
-
 
 async def setup(bot: Elgatron):
     await bot.add_cog(EmulatorCommands(bot), guild=discord.Object(id=bot.guild_id))

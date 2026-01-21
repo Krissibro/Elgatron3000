@@ -84,8 +84,6 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         if not self.wordle_model.correct_guess:
             await self.wordle_view.send_reminder()
 
-    async def cog_app_command_error(self, interaction: discord.Interaction, error: Exception):
-        await self.bot.handle_command_error(interaction, error)
 
 async def setup(bot: Elgatron):
     await bot.add_cog(WordleCommands(bot), guild=discord.Object(id=bot.guild_id))
