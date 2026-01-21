@@ -43,7 +43,6 @@ class WordleModel:
         self.load_state()
     
     def pick_new_word(self) -> None:
-
         random_word = str(random.sample(self.word_bank, 1)[0])
         self.daily_word = random_word.upper()
         
