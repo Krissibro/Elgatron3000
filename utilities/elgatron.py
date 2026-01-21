@@ -1,28 +1,15 @@
-from os import error
-import sys
 from typing import Optional
 
 import discord
 import logging
 import json
-from pathlib import Path
 
-from glob import glob
+from pathlib import Path
 from discord.ext.commands import Bot
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from commands.messaging.ActiveCommands import ActiveCommands
 from utilities.elgaTree import ElgaTree
-
-def get_intents():
-    intents: discord.Intents = discord.Intents.default()
-    intents.members = True
-    intents.messages = True
-    intents.message_content = True
-    intents.guilds = True
-
-    return intents
-
 
 class Elgatron(Bot):
     def __init__(self):
@@ -40,7 +27,7 @@ class Elgatron(Bot):
 
         self.logger = logging.getLogger("discord")
 
-        super().__init__(intents=get_intents(), command_prefix="/", tree_cls=ElgaTree)
+        super().__init__(intents=self.get_intents(), command_prefix="/", tree_cls=ElgaTree)
 
     async def setup_hook(self) -> None:
         self.scheduler.start()
@@ -70,3 +57,11 @@ class Elgatron(Bot):
             await self.tree.sync(guild=discord.Object(id=self.guild_id))
 
         print("Ready!")
+
+    @staticmethod
+    def get_intents():
+        intents: discord.Intents = discord.Intents.default()
+        intents.members = True
+        intents.message_content = True
+
+        return intents
