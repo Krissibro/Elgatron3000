@@ -1,14 +1,17 @@
+from os import error
+import sys
+from typing import Optional
+
 import discord
 import logging
 import json
+from pathlib import Path
 
 from glob import glob
-from discord.app_commands import TransformerError
 from discord.ext.commands import Bot
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from commands.messaging.ActiveCommands import ActiveCommands
-from utilities.errors import ElgatronError
 from utilities.elgaTree import ElgaTree
 
 def get_intents():
@@ -40,25 +43,26 @@ class Elgatron(Bot):
         super().__init__(intents=get_intents(), command_prefix="/", tree_cls=ElgaTree)
 
     async def setup_hook(self) -> None:
-        # TODO do this with pathlib, and maybe move to elgaTree
-        for path in glob("./commands/**/*_commands.py", recursive=True):
-            # files are in the format: "./x/y.py"
-            # this turns it to: "x.y"
-            formatted_path = path[2:-3].replace("/", ".") # linux
-            formatted_path = formatted_path.replace("\\", ".") # windows
-            await self.load_extension(formatted_path)
-
-
-        if self.testing:
-            for path in glob("./the_lab/**/*_commands.py", recursive=True):
-                formatted_path = path[2:-3].replace("/", ".")
-                formatted_path = formatted_path.replace("\\", ".")
-                await self.load_extension(formatted_path)
-
         self.scheduler.start()
         self.scheduler.print_jobs()
 
         # TODO init DB
+
+        await self.load_extension("./commands")
+
+    async def load_extension(self, name: str, *, package: Optional[str] = None) -> None:
+        path = Path(name)
+        for file_path in path.glob("**/*_commands.py"):
+            file_parts = file_path.parts
+
+            if "the_lab" in file_parts and (not self.testing):
+                continue
+
+            formatted_path = ".".join(file_parts).strip(".py")
+            try:
+                await super().load_extension(name=formatted_path, package=package)
+            except Exception as e:
+                self.logger.error(f"Failed to load extension {name}.", exc_info=e)
 
     async def on_ready(self):
         if self.testing:
