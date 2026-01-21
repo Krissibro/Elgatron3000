@@ -18,7 +18,7 @@ class CommandInfo(ABC):
     @abstractmethod
     def add_info_field(self, index: int, embed: discord.Embed) -> None:
         pass
-    
+
     @abstractmethod
     def get_select_description(self) -> str:
         pass
