@@ -29,9 +29,6 @@ class WordleModel:
         self.start_time: datetime = datetime.now()
         self.time_taken: Optional[str] = None
 
-        self.state_file_path: str = "data/wordle_state.json"
-        self.load_state()
-
         self.wordle_stats: WordleStats = wordle_stats
         self.testing: bool = testing
 
@@ -41,6 +38,9 @@ class WordleModel:
         # Apparently I am a potato according to Brian :pensive:
         self.whitelisted_words = set(np.genfromtxt('./data/whitelisted-words.csv', delimiter=',', dtype=str))
         self.word_bank.extend(self.whitelisted_words)
+
+        self.state_file_path: str = "data/wordle_state.json"
+        self.load_state()
     
     def pick_new_word(self) -> None:
 
