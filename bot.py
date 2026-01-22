@@ -3,7 +3,7 @@ from typing import Optional
 
 from dotenv import load_dotenv
 
-from utilities.elgatron import Elgatron
+from app.core.elgatron import Elgatron
 
 load_dotenv(".env")
 

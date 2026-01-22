@@ -15,12 +15,12 @@ venv/
 
 # speciffic files:
 
-utilities/config.json
-data/free_game_state.json
-data/wordle_state.json
-data/wordle_stats.json
-data/messages.csv
-data/pins.json
+app/static/config.json
+app/static/free_game_state.json
+app/static/wordle_state.json
+app/static/wordle_stats.json
+app/static/messages.csv
+app/static/pins.json
 
-data/assets/petting/*
-!data/assets/petting/template.gif
+app/static/assets/petting/*
+!app/static/assets/petting/template.gif
