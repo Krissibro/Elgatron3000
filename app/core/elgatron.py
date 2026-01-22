@@ -28,7 +28,12 @@ class Elgatron(Bot):
 
         self.logger = logging.getLogger("discord")
 
-        super().__init__(intents=self.get_intents(), command_prefix="/", tree_cls=ElgaTree)
+        super().__init__(
+                        intents=self.get_intents(),
+                        command_prefix="/",
+                        tree_cls=ElgaTree,
+                        help_command=None
+                        )
 
     async def setup_hook(self) -> None:
         db_path = Path("app/database/db.sqlite3").resolve()
