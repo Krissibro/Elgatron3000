@@ -31,21 +31,21 @@ class Elgatron(Bot):
         super().__init__(intents=self.get_intents(), command_prefix="/", tree_cls=ElgaTree)
 
     async def setup_hook(self) -> None:
-        path = Path("./app/commands").resolve()
+        db_path = Path("app/database/db.sqlite3").resolve()
+
         await Tortoise.init(
-            db_url=f"sqlite://{path}",
+            db_url=f"sqlite:///{db_path}",
             modules={"models": ["app.models"]}
         )
         await Tortoise.generate_schemas()
 
-        await self.load_extension("./app/commands")
+        await self.load_extension("app.commands")
 
         self.scheduler.start()
         self.scheduler.print_jobs()
 
     async def on_ready(self):
         if self.testing:
-            # discord.Object(id=...) is better than bot.get_guild(...) because it works when disconnected
             await self.tree.sync(guild=discord.Object(id=self.guild_id))
 
         print("Ready!")
