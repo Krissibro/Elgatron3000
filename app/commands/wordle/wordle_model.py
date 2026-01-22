@@ -33,17 +33,17 @@ class WordleModel:
         self.testing: bool = testing
 
         self.valid_words = set(np.genfromtxt('./static/word_lists/valid-words.csv', delimiter=',', dtype=str).flatten())
-        self.word_bank = list(np.genfromtxt('./static/word_lists/word-bank.csv', delimiter=',', dtype=str))
+        self.word_bank = set(np.genfromtxt('./static/word_lists/word-bank.csv', delimiter=',', dtype=str).flatten())
+        whitelisted_words = set(np.genfromtxt('./static/word_lists/whitelisted-words.csv', delimiter=',', dtype=str).flatten())
 
-        # Apparently I am a potato according to Brian :pensive:
-        self.whitelisted_words = set(np.genfromtxt('./static/word_lists/whitelisted-words.csv', delimiter=',', dtype=str))
-        self.word_bank.extend(self.whitelisted_words)
+        self.valid_words |= whitelisted_words
+        self.word_bank |= whitelisted_words
 
         self.state_file_path: str = "static/wordle_state.json"
         self.load_state()
     
     def pick_new_word(self) -> None:
-        random_word = str(random.sample(self.word_bank, 1)[0])
+        random_word = str(random.sample(list(self.word_bank), 1)[0])
         self.daily_word = random_word.upper()
         
         self.guessed_words: List[str] = []
@@ -61,13 +61,13 @@ class WordleModel:
         self.wordle_stats.increment_games_played()
         self.save_state()
 
-    def guess_word(self, ctx: discord.Interaction, word: str) -> None:
+    def guess_word(self, user: Union[discord.User, discord.Member], word: str) -> None:
         guessed_word = word.strip().upper()
 
-        self.check_valid_guess(guessed_word, ctx.user)
+        self.check_valid_guess(guessed_word, user)
 
-        self.guesser_ids.append(ctx.user.id)
-        self.guesser_names.append(ctx.user.name)
+        self.guesser_ids.append(user.id)
+        self.guesser_names.append(user.name)
         self.guessed_words.append(guessed_word)
         self.guess_results.append(self.wordle_logic(guessed_word))
         self.correct_guess = guessed_word == self.daily_word
@@ -94,11 +94,11 @@ class WordleModel:
         if not self.testing:
             if user.id in self.guesser_ids:
                 raise ElgatronError(f"{user.display_name} has already guessed")
-            if guessed_word not in self.whitelisted_words:
-                if not len(guessed_word) == 5:
+            if guessed_word not in self.valid_words:
+                if len(guessed_word) != 5:
                     raise ElgatronError("The word must be 5 letters long")
-                if guessed_word.lower() not in self.valid_words:
-                    raise ElgatronError(f'"{guessed_word}" is not a valid word')
+
+                raise ElgatronError(f'"{guessed_word}" is not a valid word')
         if guessed_word in self.guessed_words:
             raise ElgatronError(f'"{guessed_word}" has already been guessed')
         if len(guessed_word) > 255:
@@ -107,37 +107,33 @@ class WordleModel:
     def wordle_logic(self, guessed_word: str) -> List[int]:
         """
         Function to handle wordle logic
-        :param guessed_word: The word that is being checked
-        :return: String of red, yellow, and red squares depending on the guessed word
+        :param guessed_word: The word that is being checked.
+        :return: String of 0, 1, and 2 corresponding to red, yellow and green.
         :
         """
+        daily_word: str = self.daily_word.upper()
+
         # Initialize the result with all red squares
-        guess_result = [0] * len(guessed_word)
-        yellow_checker = list(self.daily_word)
+        guess_result: List[int] = [0] * len(guessed_word)
+        yellow_checker: List[str | None] = list(daily_word)
 
-        # Check for correct letters
-        for index, letter in enumerate(guessed_word):
-            if index >= len(self.daily_word):
-                break
-            if letter == self.daily_word[index]:
-                guess_result[index] = 2
-                # if a letter is found, we don't want it to be found again
-                yellow_checker.remove(letter)
-                self.known_letters.add(letter)
-
-        # Check for letters that are in the word, but in the wrong place
-        for index, letter in enumerate(guessed_word):
-            if index < len(self.daily_word) and letter == self.daily_word[index]:
-                continue
-            if letter in yellow_checker:
-                guess_result[index] = 1
-                yellow_checker.remove(letter)
-                self.known_letters.add(letter)
-
-        # Remove unused letters from available letters
         for letter in guessed_word:
             if letter in self.unknown_letters:
                 self.unknown_letters.remove(letter)
+
+        # Check for correct letters (green)
+        for i, letter in enumerate(guessed_word):
+            if i < len(daily_word) and letter == daily_word[i]:
+                guess_result[i] = 2
+                yellow_checker[i] = None  # mark as used
+                self.known_letters.add(letter)
+
+        # Check for letters in the word but in wrong place (yellow)
+        for i, letter in enumerate(guessed_word):
+            if guess_result[i] == 0 and letter in yellow_checker:
+                guess_result[i] = 1
+                yellow_checker[yellow_checker.index(letter)] = None  # mark as used
+                self.known_letters.add(letter)
 
         return guess_result
 

@@ -33,7 +33,7 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         description="Attempt to guess the daily wordle!",
     )
     async def guess_word(self, ctx: discord.Interaction, word: str) -> None:
-        self.wordle_model.guess_word(ctx, word)
+        self.wordle_model.guess_word(ctx.user, word)
 
         await ctx.response.send_message(embed=self.wordle_view.make_wordle_embed())
 
