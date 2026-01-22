@@ -39,7 +39,7 @@ class Elgatron(Bot):
         )
         await Tortoise.generate_schemas()
 
-        await self.load_extension("app.commands")
+        await self.load_extension("./app/commands")
 
         self.scheduler.start()
         self.scheduler.print_jobs()
@@ -57,13 +57,12 @@ class Elgatron(Bot):
     async def load_extension(self, name: str, *, package: Optional[str] = None) -> None:
         path = Path(name)
         for file_path in path.glob("**/*_commands.py"):
-            print(file_path)
-            file_parts = file_path.parts
+            file_parts = file_path.with_suffix("").parts
 
             if "the_lab" in file_parts and (not self.testing):
                 continue
 
-            formatted_path = ".".join(file_parts).strip(".py")
+            formatted_path = ".".join(file_parts)
             try:
                 await super().load_extension(name=formatted_path, package=package)
             except Exception as e:
