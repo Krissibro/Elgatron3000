@@ -5,7 +5,7 @@ import random
 import discord
 
 from datetime import datetime
-from typing import Iterable, Union, List, Set
+from typing import Iterable, Union, List, Set, Optional
 
 from app.core.elgatron import Elgatron
 from app.models.wordle_model import WordleGuess, WordleGame
@@ -16,7 +16,7 @@ class WordleModelDB:
     def __init__(self, bot: Elgatron):
         self.bot: Elgatron = bot
 
-        self.current_game: WordleGame = None
+        self.current_game: Optional[WordleGame] = None
         self.correct_guess: bool = False
 
         self.known_letters: Set[str] = set()
@@ -30,7 +30,7 @@ class WordleModelDB:
         self.word_bank |= whitelisted_words
 
     async def new_game(self) -> None:
-        random_word = str(random.sample(list(self.word_bank), 1)[0])
+        random_word = str(random.choice(tuple(self.word_bank)))
         date = datetime.today()
 
         self.current_game = await WordleGame.create(
@@ -47,12 +47,13 @@ class WordleModelDB:
             guesser_id =user.id,
             guesser_name=user.display_name,
             word=guessed_word,
-            time=datetime.now()
+            time=datetime.now(),
+            game=self.current_game
         )
         await self.current_game.fetch_related("guesses")
         guesses = self.current_game.guesses
-
         await self.check_valid_guess(guess, guesses)
+
         await guess.save()
 
         if guess.word == self.current_game.word:
@@ -94,6 +95,9 @@ class WordleModelDB:
         :return: String of 0, 1, and 2 corresponding to red, yellow and green.
         :
         """
+        if self.current_game is None:
+            raise ElgatronError("The game has not yet been created")
+
         daily_word: str = self.current_game.word.upper()
 
         # Initialize the result with all red squares
@@ -121,6 +125,21 @@ class WordleModelDB:
         return guess_result
 
     async def load_game(self):
-        # TODO see if daily game exists, if so load that game.
+        today = datetime.today().date()
+        self.current_game = (
+            await WordleGame
+            .filter(date__date=today)
+            .prefetch_related("guesses")
+            .first()
+        )
 
-        await self.new_game()
+        if self.current_game is None:
+            await self.new_game()
+            return
+
+        self.correct_guess = any(
+            g.word == self.current_game.word
+            for g in self.current_game.guesses
+        )
+
+        [self.wordle_logic(g.word) for g in self.current_game.guesses]
