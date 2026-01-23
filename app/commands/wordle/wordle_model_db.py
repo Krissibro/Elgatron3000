@@ -137,9 +137,6 @@ class WordleModelDB:
             await self.new_game()
             return
 
-        self.correct_guess = any(
-            g.word == self.current_game.word
-            for g in self.current_game.guesses
-        )
-
-        [self.wordle_logic(g.word) for g in self.current_game.guesses]
+        for g in self.current_game.guesses:
+            self.wordle_logic(g.word)
+            self.correct_guess |= g.word == self.current_game.word
