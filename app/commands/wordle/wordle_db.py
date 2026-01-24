@@ -62,7 +62,7 @@ class WordleDB:
         existing_ids = {g.guesser_id for g in game.guesses}
         existing_words = {g.word for g in game.guesses}
 
-        if guess.word == game.word:
+        if game.finished:
             raise ElgatronError("The daily wordle has already been guessed")
 
         if not self.testing:

@@ -13,7 +13,7 @@ from app.utilities.validators import validate_messageable
 
 
 @app_commands.guild_only()
-class WordleCommands(commands.GroupCog, group_name="wordle_db"):
+class WordleCommands(commands.GroupCog, group_name="wordle"):
     def __init__(self, bot: Elgatron):
         self.bot: Elgatron = bot
         self.wordle_db = WordleDB(bot.testing)

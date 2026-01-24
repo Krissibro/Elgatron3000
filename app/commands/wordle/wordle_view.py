@@ -12,7 +12,6 @@ from app.utilities.helper_functions import timedelta_format
 from app.commands.wordle.wordle_logic import wordle_logic
 
 class WordleView:
-
     def __init__(self, bot: Elgatron, wordle_model: WordleDB):
         self.bot: Elgatron = bot
         self.wordle_db: WordleDB = wordle_model
@@ -26,7 +25,7 @@ class WordleView:
             embed = discord.Embed(title=f"Congratulations!", color=discord.Color.green(),
                                   description=f"The word was **[{game.word.upper()}](https://www.merriam-webster.com/dictionary/{game.word})**!")
 
-            time_taken = game.first_guess_time - game.final_guess_time
+            time_taken =  game.final_guess_time - game.first_guess_time
             embed.add_field(name=f"Time spent:   ",
                             value=f"{timedelta_format(time_taken)}", inline=False)
 
