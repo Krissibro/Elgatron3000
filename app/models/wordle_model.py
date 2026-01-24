@@ -11,7 +11,7 @@ class WordleGame(Model):
     guesses:            fields.ReverseRelation["WordleGuess"]
 
     def __str__(self):
-        return f"{self.date.strftime("%d/$M/%y")} - {self.word}"
+        return f"{self.date.strftime('%d/%m/%y')} - {self.word}"
 
 
 class WordleGuess(Model):
@@ -29,3 +29,6 @@ class WordleGuess(Model):
 
     def __str__(self):
         return f"{self.guesser_name} - {self.word}"
+
+    def is_correct(self) -> bool:
+        return self.word == self.game.word

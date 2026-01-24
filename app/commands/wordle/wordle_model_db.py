@@ -30,6 +30,10 @@ class WordleModelDB:
         self.word_bank |= whitelisted_words
 
     async def new_game(self) -> None:
+        self.known_letters: Set[str] = set()
+        self.unknown_letters: Set[str] = set(string.ascii_uppercase)
+        self.correct_guess: bool = False
+
         random_word = str(random.choice(tuple(self.word_bank)))
         date = datetime.today()
 
@@ -42,11 +46,10 @@ class WordleModelDB:
         if self.current_game is None:
             raise ElgatronError("The game has not yet been created")
 
-        guessed_word = guessed_word.strip().upper()
         guess = WordleGuess(
             guesser_id =user.id,
             guesser_name=user.display_name,
-            word=guessed_word,
+            word=guessed_word.strip().upper(),
             time=datetime.now(),
             game=self.current_game
         )
@@ -55,15 +58,54 @@ class WordleModelDB:
         await self.check_valid_guess(guess, guesses)
 
         await guess.save()
+        await guess.fetch_related("game")
+
+        if self.current_game.first_guess_time is None:
+            self.current_game.first_guess_time = guess.time
 
         if guess.word == self.current_game.word:
             self.correct_guess = True
-            # TODO track win timing
+            self.current_game.final_guess_time = guess.time
 
-        result = self.wordle_logic(guessed_word)
+        result = self.wordle_logic(guess.word, self.current_game.word)
+        self.update_letters(guess.word, result)
+
         return result
 
-    async def check_valid_guess(self, guess: WordleGuess, guesses: Iterable[WordleGuess])-> None:
+    def update_letters(self, word, result) -> None:
+        for letter, score in zip(word, result):
+            self.unknown_letters.discard(letter)
+            if score != 0:
+                self.known_letters.add(letter)
+
+    def wordle_logic(self, guess: str, daily_word: str) -> List[int]:
+        """
+        Function to handle wordle logic
+        :return: String of 0, 1, and 2 corresponding to red, yellow and green.
+        :
+        """
+        assert self.current_game is not None
+        answer: str = daily_word.upper()
+
+        # Initialize the result with all red squares
+        guess_result: List[int] = [0] * len(guess)
+        yellow_checker: List[str | None] = list(answer)
+
+        # Check for correct letters (green)
+        for i, letter in enumerate(guess):
+            if i < len(answer) and letter == answer[i]:
+                guess_result[i] = 2
+                yellow_checker[i] = None  # mark as used
+
+        # Check for letters in the word but in the wrong place (yellow)
+        for i, letter in enumerate(guess):
+            if guess_result[i] == 0 and letter in yellow_checker:
+                guess_result[i] = 1
+                yellow_checker[yellow_checker.index(letter)] = None  # mark as used
+
+        return guess_result
+
+    async def check_valid_guess(self, guess: WordleGuess, guesses: Iterable[WordleGuess]) -> None:
         """
         raises error if guessed word is invalid
         :param guess: the guessed word.
@@ -88,43 +130,10 @@ class WordleModelDB:
         if len(guess.word) > 255:
             raise ElgatronError("The word must be 255 characters or less")
 
-    def wordle_logic(self, guessed_word: str) -> List[int]:
-        """
-        Function to handle wordle logic
-        :param guessed_word: The word that is being checked.
-        :return: String of 0, 1, and 2 corresponding to red, yellow and green.
-        :
-        """
-        if self.current_game is None:
-            raise ElgatronError("The game has not yet been created")
+    async def setup(self):
+        await self.load_game()
 
-        daily_word: str = self.current_game.word.upper()
-
-        # Initialize the result with all red squares
-        guess_result: List[int] = [0] * len(guessed_word)
-        yellow_checker: List[str | None] = list(daily_word)
-
-        for letter in guessed_word:
-            if letter in self.unknown_letters:
-                self.unknown_letters.remove(letter)
-
-        # Check for correct letters (green)
-        for i, letter in enumerate(guessed_word):
-            if i < len(daily_word) and letter == daily_word[i]:
-                guess_result[i] = 2
-                yellow_checker[i] = None  # mark as used
-                self.known_letters.add(letter)
-
-        # Check for letters in the word but in wrong place (yellow)
-        for i, letter in enumerate(guessed_word):
-            if guess_result[i] == 0 and letter in yellow_checker:
-                guess_result[i] = 1
-                yellow_checker[yellow_checker.index(letter)] = None  # mark as used
-                self.known_letters.add(letter)
-
-        return guess_result
-
-    async def load_game(self):
+    async def load_game(self) -> None:
         today = datetime.today().date()
         self.current_game = (
             await WordleGame
@@ -138,5 +147,6 @@ class WordleModelDB:
             return
 
         for g in self.current_game.guesses:
-            self.wordle_logic(g.word)
-            self.correct_guess |= g.word == self.current_game.word
+            result = self.wordle_logic(g.word, self.current_game.word)
+            self.update_letters(g.word, result)
+            self.correct_guess |= g.is_correct()
