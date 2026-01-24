@@ -1,10 +1,10 @@
-from datetime import datetime
+from datetime import datetime, date
 from tortoise.models import Model
 from tortoise import fields
 
 class WordleGame(Model):
     id:                 fields.Field[int]       = fields.IntField(primary_key=True)
-    date:               fields.Field[datetime]  = fields.DatetimeField(null=True)
+    game_date:          fields.Field[date]  = fields.DateField(null=True)
     word:               fields.Field[str]       = fields.CharField(max_length=16)
     first_guess_time:   fields.Field[datetime]  = fields.DatetimeField(null=True)
     final_guess_time:   fields.Field[datetime]  = fields.DatetimeField(null=True)
@@ -12,7 +12,7 @@ class WordleGame(Model):
     guesses:            fields.ReverseRelation["WordleGuess"]
 
     def __str__(self):
-        return f"{self.date.strftime('%d/%m/%y')} - {self.word}"
+        return f"{self.game_date.strftime('%d/%m/%y')} - {self.word}"
 
 
 class WordleGuess(Model):

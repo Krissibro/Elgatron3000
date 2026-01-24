@@ -2,7 +2,7 @@ import numpy as np
 import random
 import discord
 
-from datetime import datetime
+from datetime import datetime, date
 from typing import Union
 
 from app.models.wordle_model import WordleGuess, WordleGame
@@ -22,10 +22,12 @@ class WordleDB:
 
     async def new_game(self) -> WordleGame:
         random_word = random.choice(tuple(self.word_bank)).upper()
-        return await WordleGame.create(
+        game =  await WordleGame.create(
             word=random_word,
-            date=datetime.today()
+            game_date=date.today()
         )
+        await game.fetch_related("guesses")
+        return game
 
     async def guess_word(self, guessed_word: str, user: Union[discord.User, discord.Member]) -> None:
         game = await self.get_current_game()
@@ -76,9 +78,9 @@ class WordleDB:
     async def get_current_game(self) -> WordleGame:
         game = (
             await WordleGame
-            .filter(date__date=datetime.today())
+            .filter(game_date=date.today())
             .prefetch_related("guesses")
-            .first()
+            .last()
         )
 
         if game is None:
