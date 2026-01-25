@@ -31,7 +31,6 @@ class WordleDB:
 
     async def guess_word(self, guessed_word: str, user: Union[discord.User, discord.Member]) -> None:
         game = await self.get_current_game()
-        await game.fetch_related("guesses")
 
         guess = WordleGuess(
             guesser_id =user.id,
@@ -85,5 +84,4 @@ class WordleDB:
 
         if game is None:
             game = await self.new_game()
-
         return game

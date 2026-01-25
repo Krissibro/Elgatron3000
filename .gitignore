@@ -5,7 +5,7 @@
 *.env
 *.db
 *.state
-*.sqlite3
+*.sqlite3*
 
 # folders
 
