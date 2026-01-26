@@ -1,13 +1,8 @@
 import discord
 import random
-from typing import Optional
 
 from app.commands.pin_guess.pin_guess_model import Pin
 
-from app.utilities.errors import ElgatronError
-
-
-# TODO original message should not be .original response, and we should not ctx.response.send_message because that gives an object with limited availability
 class PinView(discord.ui.View):
     def __init__(self, pin: Pin):
         super().__init__(timeout=None)
