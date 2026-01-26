@@ -20,11 +20,12 @@ class WordleView:
         self.channel_id = bot.testing_channel_id if bot.testing else bot.wordle_channel_id
 
     async def make_wordle_embed(self, game: WordleGame) -> discord.Embed:
-        if game.finished:
+        if await game.is_finished():
             embed = discord.Embed(title=f"Congratulations!", color=discord.Color.green(),
                                   description=f"The word was **[{game.word.upper()}](https://www.merriam-webster.com/dictionary/{game.word})**!")
-            if game.final_guess_time is not None and game.first_guess_time is not None:
-                time_taken =  game.final_guess_time - game.first_guess_time
+            
+            time_taken = game.time_taken()
+            if time_taken is not None:
                 embed.add_field(name=f"Time spent:   ",
                                 value=f"{timedelta_format(time_taken)}", inline=False)
 
@@ -108,3 +109,37 @@ class WordleView:
                              "[Real Wordle](https://www.nytimes.com/games/wordle/index.html)\n" +
                              "[Pokedoku](https://pokedoku.com/)")
         return embed
+    
+
+
+class WordleFinishedController(discord.ui.View):
+    def __init__(self, game: WordleGame, view: WordleView):
+        self.game: WordleGame = game
+        self.view: WordleView = view
+        super().__init__(timeout=10*60)
+
+    @discord.ui.button(emoji="◀️", style=discord.ButtonStyle.blurple)
+    async def prev_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+        prev_game = await WordleGame.get_previous_game(self.game)
+        if prev_game is None:
+            await interaction.response.defer()
+            return
+        embed = await self.view.make_wordle_embed(prev_game)
+        await interaction.response.edit_message(
+            embed=embed, 
+            view=WordleFinishedController(prev_game, self.view)
+        )
+
+    @discord.ui.button(emoji="▶️", style=discord.ButtonStyle.blurple)
+    async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+        next_game = await WordleGame.get_next_game(self.game)
+        if next_game is None:
+            await interaction.response.defer()
+            return
+
+        embed = await self.view.make_wordle_embed(next_game)
+        await interaction.response.edit_message(
+            embed=embed, 
+            view=WordleFinishedController(next_game, self.view)
+        )
+        

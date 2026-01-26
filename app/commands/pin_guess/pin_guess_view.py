@@ -12,7 +12,6 @@ class PinView(discord.ui.View):
     def __init__(self, pin: Pin):
         super().__init__(timeout=None)
         self.pin: Pin = pin
-        self.original_message: Optional[discord.InteractionMessage] = None
 
     def make_first_embed(self) -> discord.Embed:
         """Creates the embed containing the title and the selected pin.

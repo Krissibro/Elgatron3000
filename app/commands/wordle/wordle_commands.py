@@ -5,7 +5,7 @@ from discord.ext import commands
 from apscheduler.triggers.cron import CronTrigger
 
 from app.commands.wordle.wordle_db import WordleDB
-from app.commands.wordle.wordle_view import WordleView
+from app.commands.wordle.wordle_view import WordleView, WordleFinishedController
 
 from app.utilities.errors import ElgatronError
 from app.core.elgatron import Elgatron
@@ -31,24 +31,36 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         description="Attempt to guess the daily wordle!",
     )
     async def guess_word(self, ctx: discord.Interaction, word: str) -> None:
-        game = await self.wordle_db.guess_word(word, ctx.user)
+        await self.wordle_db.guess_word(word, ctx.user)
+        
+        game = await self.wordle_db.get_current_game()
+        embed = await self.wordle_view.make_wordle_embed(game)
 
-        await ctx.response.send_message(embed=await self.wordle_view.make_wordle_embed(game))
+        if await game.is_finished():
+            await ctx.response.send_message(embed=embed, view=WordleFinishedController(game, self.wordle_view))
+        else:
+            await ctx.response.send_message(embed=embed)
+
 
     @app_commands.command(
         name="current",
         description="See the current progress of the daily wordle!",
     )
-    async def current_game(self, ctx: discord.Interaction):
+    async def current_game(self, ctx: discord.Interaction) -> None:
         game = await self.wordle_db.get_current_game()
-        await ctx.response.send_message(embed=await self.wordle_view.make_wordle_embed(game))
+        embed = await self.wordle_view.make_wordle_embed(game)
+
+        if await game.is_finished():
+            await ctx.response.send_message(embed=embed, view=WordleFinishedController(game, self.wordle_view))
+        else:
+            await ctx.response.send_message(embed=embed)
 
     # @commands.is_owner()
     @app_commands.command(
         name="reset",
         description="Reset the daily wordle",
     )
-    async def reset_wordle(self, ctx: discord.Interaction):
+    async def reset_wordle(self, ctx: discord.Interaction) -> None:
         if not await self.bot.is_owner(ctx.user):
             raise ElgatronError("You do not have permission to use this command!")
 
@@ -60,7 +72,7 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         channel = validate_messageable(self.bot.get_channel(self.channel_id))
         daily_word = game.word.upper()
 
-        if not game.finished and daily_word:
+        if not game.is_finished() and daily_word:
             await channel.send(embed=self.wordle_view.make_game_over_embed(daily_word))
 
         game = await self.wordle_db.new_game()
@@ -73,7 +85,7 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
     async def send_wordle_reminder(self) -> None:
         """Sends the reminder if the daily wordle hasn't been completed"""
         game = await self.wordle_db.get_current_game()
-        if not game.finished:
+        if not game.is_finished():
             await self.wordle_view.send_reminder()
 
 
