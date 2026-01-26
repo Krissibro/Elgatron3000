@@ -21,7 +21,7 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         self.channel_id = bot.testing_channel_id if bot.testing else bot.wordle_channel_id
 
         new_word_trigger = CronTrigger(hour=8, minute=0, second=0, timezone='Europe/Oslo')
-        bot.scheduler.add_job(self.start_new_game, new_word_trigger, id="wordle_pick_new_word")
+        bot.scheduler.add_job(self.scheduled_new_game, new_word_trigger, id="wordle_pick_new_word")
 
         reminder_trigger = CronTrigger(hour=22, minute=0, second=0, timezone='Europe/Oslo')
         bot.scheduler.add_job(self.send_wordle_reminder, reminder_trigger, id="wordle_reminder")
@@ -64,23 +64,23 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         if not await self.bot.is_owner(ctx.user):
             raise ElgatronError("You do not have permission to use this command!")
 
-        await self.start_new_game()
-        await ctx.response.send_message(embed=discord.Embed(title="Wordle has been reset!"), ephemeral=True, delete_after=10)
+        game = await self.wordle_db.new_game()
+        print(game.word)
 
-    async def start_new_game(self) -> None:
+        await ctx.response.send_message(embed=discord.Embed(title="Wordle has been reset!"), ephemeral=True, delete_after=10)
+        
+
+    async def scheduled_new_game(self) -> None:
         game = await self.wordle_db.get_current_game()
         channel = validate_messageable(self.bot.get_channel(self.channel_id))
-        daily_word = game.word.upper()
 
-        if not game.is_finished() and daily_word:
-            await channel.send(embed=self.wordle_view.make_game_over_embed(daily_word))
+        if not game.is_finished():
+            embed = self.wordle_view.make_game_over_embed(game.word)
+            await channel.send(embed=embed)
 
         game = await self.wordle_db.new_game()
 
-        if self.bot.testing:
-            print(game.word)
-        else:
-            await channel.send(embed=self.wordle_view.new_game_embed())
+        await channel.send(embed=self.wordle_view.new_game_embed())
 
     async def send_wordle_reminder(self) -> None:
         """Sends the reminder if the daily wordle hasn't been completed"""

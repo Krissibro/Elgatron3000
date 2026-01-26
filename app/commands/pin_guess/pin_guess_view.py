@@ -31,12 +31,13 @@ class PinView(discord.ui.View):
 
         embed: discord.Embed = discord.Embed(title="",
                                              description=self.pin.content if self.pin.content else None,
-                                             color=discord.Color.green())
+                                             color=discord.Color.green()
+                                             )
 
         embed.set_author(name=f"{author.name} on {date.strftime("%d/%m/%Y")}", icon_url=icon_url, url=url)
         return embed
 
-    async def reveal_author(self, interaction: discord.Interaction):
+    async def reveal_author(self, interaction: discord.Interaction) -> None:
         """Method to reveal the author and edit the original message."""
         sinner_embed = self.make_sinner_embed()
         await interaction.response.edit_message(embed=sinner_embed, view=None)
@@ -47,7 +48,7 @@ class PinView(discord.ui.View):
 
 # does nothing, is just here to
 class TempPinView(discord.ui.View):
-    def __init__(self, timeout=60):
+    def __init__(self, timeout=60) -> None:
         super().__init__(timeout=timeout)
 
     @discord.ui.button(label="Reveal the sinner!", style=discord.ButtonStyle.success, disabled=True)

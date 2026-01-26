@@ -40,6 +40,7 @@ class WordleGame(Model):
         return any([guess.word == self.word for guess in self.guesses])
     
     def time_taken(self) -> Optional[timedelta]:
+        """measure time between first and latest guess, or None if not guesses is undefined or empty"""
         # make sure guesses are already prefetched
         if not self.guesses:
             return None
