@@ -1,6 +1,7 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
+from app.core.elgaTree import ElgatronError
 from app.core.elgatron import Elgatron
 from typing import Literal, Optional
 
@@ -23,19 +24,23 @@ class CommandSync(commands.Cog):
                 content="You do not have permission to use this command."
             )
             return
+        
+        guild = ctx.guild
+        if guild is None:
+            raise ElgatronError("The discord server is undefined (HOW???)")
 
         # Sync logic based on the 'spec' parameter
         if spec == "~":
-            synced = await self.bot.tree.sync(guild=ctx.guild)
+            synced = await self.bot.tree.sync(guild=guild)
         elif spec == "*":
-            self.bot.tree.copy_global_to(guild=ctx.guild)
-            synced = await self.bot.tree.sync(guild=ctx.guild)
+            self.bot.tree.copy_global_to(guild=guild)
+            synced = await self.bot.tree.sync(guild=guild)
         elif spec == "^":
-            self.bot.tree.clear_commands(guild=ctx.guild)
-            await self.bot.tree.sync(guild=ctx.guild)
+            self.bot.tree.clear_commands(guild=guild)
+            await self.bot.tree.sync(guild=guild)
             synced = []
         else:
-            synced = await self.bot.tree.sync(guild=ctx.guild)
+            synced = await self.bot.tree.sync(guild=guild)
 
         # Final response to indicate how many commands were synced
         await ctx.edit_original_response(

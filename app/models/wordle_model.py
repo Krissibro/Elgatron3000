@@ -1,34 +1,39 @@
+from __future__ import annotations
+
 from datetime import datetime, date
-from tortoise.models import Model
+from typing import Optional
+
 from tortoise import fields
+from tortoise.models import Model
+
 
 class WordleGame(Model):
-    id:                 fields.Field[int]       = fields.IntField(primary_key=True)
-    game_date:          fields.Field[date]  = fields.DateField(null=True)
-    word:               fields.Field[str]       = fields.CharField(max_length=16)
-    first_guess_time:   fields.Field[datetime]  = fields.DatetimeField(null=True)
-    final_guess_time:   fields.Field[datetime]  = fields.DatetimeField(null=True)
-    finished:           fields.Field[bool]      = fields.BooleanField(default=False)
-    guesses:            fields.ReverseRelation["WordleGuess"]
+    id:                 int                 = fields.IntField(primary_key=True)     # type: ignore[assignment]
 
-    def __str__(self):
-        return f"{self.game_date.strftime('%d/%m/%y')} - {self.word}"
+    game_date:          Optional[date]      = fields.DateField(null=True)           # type: ignore[assignment]
+    word:               str                 = fields.CharField(max_length=16)       # type: ignore[assignment]
+    first_guess_time:   Optional[datetime]  = fields.DatetimeField(null=True)       # type: ignore[assignment]
+    final_guess_time:   Optional[datetime]  = fields.DatetimeField(null=True)       # type: ignore[assignment]
+    finished:           bool                = fields.BooleanField(default=False)    # type: ignore[assignment]
+
+    guesses: fields.ReverseRelation[WordleGuess]
 
 
 class WordleGuess(Model):
-    id:             fields.Field[int]                       = fields.IntField(primary_key=True)
-    word:           fields.Field[str]                       = fields.CharField(max_length=16)
-    guesser_id:     fields.Field[int]                       = fields.IntField()
-    guesser_name:   fields.Field[str]                       = fields.CharField(max_length=64)
-    time:           fields.Field[datetime]                  = fields.DatetimeField(null=True)
+    id:             int                 = fields.IntField(primary_key=True) # type: ignore[assignment]
 
-    game:       fields.ForeignKeyRelation["WordleGame"]     = fields.ForeignKeyField(
+    word:           str                 = fields.CharField(max_length=16)   # type: ignore[assignment]
+    guesser_id:     int                 = fields.IntField()                 # type: ignore[assignment]
+    guesser_name:   str                 = fields.CharField(max_length=64)   # type: ignore[assignment]
+    time:           Optional[datetime]  = fields.DatetimeField(null=True)   # type: ignore[assignment]
+
+    game: fields.ForeignKeyRelation[WordleGame] = fields.ForeignKeyField(
         model_name="models.WordleGame",
         related_name="guesses",
-        on_delete=fields.CASCADE
+        on_delete=fields.CASCADE,
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.guesser_name} - {self.word}"
 
     def is_correct(self) -> bool:

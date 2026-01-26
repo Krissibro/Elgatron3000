@@ -2,11 +2,12 @@ import string
 
 import discord
 
-from typing import List, Set
+from typing import List, Set, Iterable, Tuple
 
 from app.commands.wordle.wordle_db import WordleDB
 from app.core.elgatron import Elgatron
 
+from app.models import WordleGame, WordleGuess
 from app.utilities.validators import validate_messageable
 from app.utilities.helper_functions import timedelta_format
 from app.commands.wordle.wordle_logic import wordle_logic
@@ -24,10 +25,10 @@ class WordleView:
         if game.finished:
             embed = discord.Embed(title=f"Congratulations!", color=discord.Color.green(),
                                   description=f"The word was **[{game.word.upper()}](https://www.merriam-webster.com/dictionary/{game.word})**!")
-
-            time_taken =  game.final_guess_time - game.first_guess_time
-            embed.add_field(name=f"Time spent:   ",
-                            value=f"{timedelta_format(time_taken)}", inline=False)
+            if game.final_guess_time is not None and game.first_guess_time is not None:
+                time_taken =  game.final_guess_time - game.first_guess_time
+                embed.add_field(name=f"Time spent:   ",
+                                value=f"{timedelta_format(time_taken)}", inline=False)
 
             embed.add_field(name="", value="", inline=False)
         else:
@@ -54,10 +55,10 @@ class WordleView:
                               description="Uhhh:sob: :sob:")
         await channel.send(embed=embed)
 
-    def process_guesses(self, guesses, solution):
-        known_letters = set()
+    def process_guesses(self, guesses: Iterable[WordleGuess], solution: str) -> Tuple[List[Tuple[str, str]], Set[str], Set[str]]:
+        known_letters: Set[str] = set()
         unknown_letters = set(string.ascii_uppercase)
-        fields = []
+        fields: List[Tuple[str, str]] = []
 
         separator = "\u00A0\u00A0\u00A0\u00A0"
 
@@ -73,7 +74,7 @@ class WordleView:
             # Build embed field
             formatted_word = separator.join(guess.word)
             fields.append((
-                f"‎ **{formatted_word}**     <-  {guess.guesser_name}",
+                f" **{formatted_word}**     <-  {guess.guesser_name}",
                 self.format_word(result)
             ))
         return fields, known_letters, unknown_letters
