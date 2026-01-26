@@ -9,8 +9,8 @@ from app.utilities.errors import ElgatronError
 
 # TODO original message should not be .original response, and we should not ctx.response.send_message because that gives an object with limited availability
 class PinView(discord.ui.View):
-    def __init__(self, pin: Pin, timeout=14*60):
-        super().__init__(timeout=timeout)
+    def __init__(self, pin: Pin):
+        super().__init__(timeout=None)
         self.pin: Pin = pin
         self.original_message: Optional[discord.InteractionMessage] = None
 
@@ -42,19 +42,14 @@ class PinView(discord.ui.View):
         embed.set_author(name=f"{author.name} on {date.strftime("%d/%m/%Y")}", icon_url=icon_url, url=url)
         return embed
 
-    async def reveal_author(self):
+    async def reveal_author(self, interaction: discord.Interaction):
         """Method to reveal the author and edit the original message."""
-        if self.original_message is None:
-            raise ElgatronError("Original message is undefined")
         sinner_embed = self.make_sinner_embed()
-        await self.original_message.edit(embed=sinner_embed, view=None)
-
-    async def on_timeout(self):
-        await self.reveal_author()
+        await interaction.response.edit_message(embed=sinner_embed, view=None)
 
     @discord.ui.button(label="Reveal the sinner!", style=discord.ButtonStyle.success)
     async def reveal_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await self.reveal_author()
+        await self.reveal_author(interaction)
 
 # does nothing, is just here to
 class TempPinView(discord.ui.View):
