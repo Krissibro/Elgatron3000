@@ -31,16 +31,17 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         description="Attempt to guess the daily wordle!",
     )
     async def guess_word(self, ctx: discord.Interaction, word: str) -> None:
-        await self.wordle_db.guess_word(word, ctx.user)
+        game = await self.wordle_db.guess_word(word, ctx.user)
 
-        await ctx.response.send_message(embed=await self.wordle_view.make_wordle_embed())
+        await ctx.response.send_message(embed=await self.wordle_view.make_wordle_embed(game))
 
     @app_commands.command(
         name="current",
         description="See the current progress of the daily wordle!",
     )
     async def current_game(self, ctx: discord.Interaction):
-        await ctx.response.send_message(embed=await self.wordle_view.make_wordle_embed())
+        game = await self.wordle_db.get_current_game()
+        await ctx.response.send_message(embed=await self.wordle_view.make_wordle_embed(game))
 
     # @commands.is_owner()
     @app_commands.command(

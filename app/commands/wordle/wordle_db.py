@@ -3,7 +3,7 @@ import random
 import discord
 
 from datetime import datetime, date
-from typing import Union
+from typing import Union, Optional
 
 from app.models.wordle_model import WordleGuess, WordleGame
 from app.utilities.errors import ElgatronError
@@ -29,7 +29,7 @@ class WordleDB:
         await game.fetch_related("guesses")
         return game
 
-    async def guess_word(self, guessed_word: str, user: Union[discord.User, discord.Member]) -> None:
+    async def guess_word(self, guessed_word: str, user: Union[discord.User, discord.Member]) -> WordleGame:
         game = await self.get_current_game()
 
         guess = WordleGuess(
@@ -51,6 +51,7 @@ class WordleDB:
             game.final_guess_time = guess.time
 
         await game.save()
+        return game
 
     def validate_wordle_guess(self, guess: WordleGuess, game: WordleGame) -> None:
         """
@@ -85,3 +86,14 @@ class WordleDB:
         if game is None:
             game = await self.new_game()
         return game
+    
+    async def get_previous_game(self, game: WordleGame) -> Optional[WordleGame]:
+        previous_game = (
+            await WordleGame
+            .filter(id__lt < game.id) 
+            .prefetch_related("guesses")
+            .last()
+        ) 
+
+        return previous_game
+    

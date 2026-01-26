@@ -19,9 +19,7 @@ class WordleView:
 
         self.channel_id = bot.testing_channel_id if bot.testing else bot.wordle_channel_id
 
-    async def make_wordle_embed(self) -> discord.Embed:
-        game = await self.wordle_db.get_current_game()
-
+    async def make_wordle_embed(self, game: WordleGame) -> discord.Embed:
         if game.finished:
             embed = discord.Embed(title=f"Congratulations!", color=discord.Color.green(),
                                   description=f"The word was **[{game.word.upper()}](https://www.merriam-webster.com/dictionary/{game.word})**!")
