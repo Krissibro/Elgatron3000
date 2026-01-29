@@ -2,10 +2,13 @@ import numpy as np
 import random
 import discord
 
-from datetime import datetime, date
-from typing import Union
+from datetime import datetime, date, timedelta
+from typing import Optional, Union
 
-from app.models.wordle_model import WordleGuess, WordleGame
+from tortoise import BaseDBAsyncClient
+from tortoise.transactions import in_transaction
+
+from app.models.wordle_model import WordleGuess, WordleGame, WordleStats
 from app.utilities.errors import ElgatronError
 
 
@@ -20,26 +23,38 @@ class WordleDB:
         self.valid_words |= whitelisted_words
         self.word_bank |= whitelisted_words
 
-    async def new_game(self) -> WordleGame:
+    async def new_game(self, connection: Optional[BaseDBAsyncClient] = None) -> WordleGame:
+        if connection is None:
+            async with in_transaction() as conn:
+                return await self.new_game(connection=conn)
+            
         random_word = random.choice(tuple(self.word_bank)).upper()
         game =  await WordleGame.create(
             word=random_word,
-            game_date=date.today()
+            game_date=date.today(),
+            using_db=connection
         )
-        await game.fetch_related("guesses")
+
+        await game.fetch_related("guesses", using_db=connection)
         return game
 
-    async def guess_word(self, guessed_word: str, user: Union[discord.User, discord.Member]) -> None:
-        game = await self.get_current_game()
-
+    async def guess_word(self, guessed_word: str, user: Union[discord.User, discord.Member], connection: Optional[BaseDBAsyncClient] = None) -> None:
+        if connection is None:
+            async with in_transaction() as conn:
+                return await self.guess_word(guessed_word, user, connection=conn)
+        
+        game = await self.get_current_game(connection=connection)
+        
+        guessed_word = guessed_word.strip().upper()
         self.validate_wordle_guess(guessed_word, user, game)
 
         await WordleGuess.create(
             guesser_id =user.id,
             guesser_name=user.display_name,
-            word=guessed_word.strip().upper(),
+            word=guessed_word,
             time=datetime.now(),
-            game=game
+            game=game,
+            using_db=connection
         )
 
     def validate_wordle_guess(self, guess: str, user: Union[discord.User, discord.Member], game: WordleGame) -> None:
@@ -64,14 +79,54 @@ class WordleDB:
         if guess in existing_words:
             raise ElgatronError(f'"{guess}" has already been guessed')
 
-    async def get_current_game(self) -> WordleGame:
+    async def get_current_game(self, connection: Optional[BaseDBAsyncClient] = None) -> WordleGame:
+        if connection is None:
+            async with in_transaction() as conn:
+                return await self.get_current_game(connection=conn)
+            
         game = (
             await WordleGame
             .filter(game_date=date.today())
+            .using_db(connection)
             .prefetch_related("guesses")
             .last()
         )
 
         if game is None:
-            game = await self.new_game()
+            game = await self.new_game(connection=connection)
         return game
+    
+    async def handle_win(self, server_id: int, game: WordleGame, connection: Optional[BaseDBAsyncClient] = None) -> None:
+        if connection is None:
+            async with in_transaction() as conn:
+                return await self.handle_win(server_id, game, connection=conn)
+
+        stats = await self.get_wordle_stats(server_id, connection=connection)
+
+        if (time_taken := game.time_taken()) is None:
+            time_taken = timedelta(hours=23, minutes=59, seconds=59)
+
+        stats.total_games += 1
+        stats.total_guesses += game.guess_count()
+        stats.win_streak += 1
+        stats.longest_win_streak = max(stats.longest_win_streak, stats.win_streak)
+        stats.total_wins += 1
+        stats.fastest_win = min(stats.fastest_win, time_taken)
+        
+        await stats.save(using_db=connection)
+
+    async def handle_loss(self, server_id: int, game: WordleGame, connection: Optional[BaseDBAsyncClient] = None) -> None:
+        if connection is None:
+            async with in_transaction() as conn:
+                return await self.handle_loss(server_id, game, connection=conn)
+
+        stats = await self.get_wordle_stats(server_id, connection=connection)
+
+        stats.total_games += 1
+        stats.total_guesses += game.guess_count()
+        stats.win_streak = 0
+        await stats.save(using_db=connection)
+
+    async def get_wordle_stats(self, server_id: int, connection: Optional[BaseDBAsyncClient] = None) -> WordleStats:
+        stats, _ = await WordleStats.get_or_create(server_id=server_id, using_db=connection)
+        return stats

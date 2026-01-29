@@ -31,13 +31,17 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         description="Attempt to guess the daily wordle!",
     )
     async def guess_word(self, ctx: discord.Interaction, word: str) -> None:
+        if ctx.guild is None:
+            raise ElgatronError("This command can only be used in a server.")
+        
         await self.wordle_db.guess_word(word, ctx.user)
         
         game = await self.wordle_db.get_current_game()
         embed = await self.wordle_view.make_wordle_embed(game)
 
-        if await game.is_finished():
-            await ctx.response.send_message(embed=embed, view=WordleFinishedController(game, self.wordle_view))
+        if game.is_finished():
+            await ctx.response.send_message(embed=embed, view=WordleFinishedController(game, self.wordle_view))            
+            await self.wordle_db.handle_win(ctx.guild.id, game)
         else:
             await ctx.response.send_message(embed=embed)
 
@@ -50,7 +54,7 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         game = await self.wordle_db.get_current_game()
         embed = await self.wordle_view.make_wordle_embed(game)
 
-        if await game.is_finished():
+        if game.is_finished():
             await ctx.response.send_message(embed=embed, view=WordleFinishedController(game, self.wordle_view))
         else:
             await ctx.response.send_message(embed=embed)
@@ -63,8 +67,12 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
     async def reset_wordle(self, ctx: discord.Interaction) -> None:
         if not await self.bot.is_owner(ctx.user):
             raise ElgatronError("You do not have permission to use this command!")
+        if ctx.guild is None:
+            raise ElgatronError("This command can only be used in a server.")
 
         game = await self.wordle_db.new_game()
+        
+        await self.wordle_db.handle_loss(ctx.guild.id, game)
         print(game.word)
 
         await ctx.response.send_message(embed=discord.Embed(title="Wordle has been reset!"), ephemeral=True, delete_after=10)
@@ -75,10 +83,13 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         channel = validate_messageable(self.bot.get_channel(self.channel_id))
 
         if not game.is_finished():
+            server = self.bot.get_guild(self.bot.guild_id)
+            if server is None:
+                raise ElgatronError("Guild not found")
+
+            await self.wordle_db.handle_loss(server.id, game)
             embed = self.wordle_view.make_game_over_embed(game.word)
             await channel.send(embed=embed)
-
-        game = await self.wordle_db.new_game()
 
         await channel.send(embed=self.wordle_view.new_game_embed())
 

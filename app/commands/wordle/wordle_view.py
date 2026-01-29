@@ -20,7 +20,7 @@ class WordleView:
         self.channel_id = bot.testing_channel_id if bot.testing else bot.wordle_channel_id
 
     async def make_wordle_embed(self, game: WordleGame) -> discord.Embed:
-        if await game.is_finished():
+        if game.is_finished():
             embed = discord.Embed(title=f"Congratulations!", color=discord.Color.green(),
                                   description=f"The word was **[{game.word.upper()}](https://www.merriam-webster.com/dictionary/{game.word})**!")
             
@@ -33,7 +33,7 @@ class WordleView:
         else:
             embed = discord.Embed(title="Daily Wordle")
 
-        if not any([True for _ in game.guesses]):
+        if not game.guesses:
             embed.description = "No guesses yet"
             return embed
 

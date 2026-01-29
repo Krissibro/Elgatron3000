@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, date, timedelta
+from email.policy import default
 from typing import Optional
 
 from tortoise import fields
@@ -35,7 +36,7 @@ class WordleGame(Model):
         )
         return next_game
 
-    async def is_finished(self) -> bool:
+    def is_finished(self) -> bool:
         """Check if the game is finished."""
         return any([guess.word == self.word for guess in self.guesses])
     
@@ -49,6 +50,10 @@ class WordleGame(Model):
         first_guess = guesses_sorted[0]
         last_guess = guesses_sorted[-1]
         return last_guess.time - first_guess.time
+    
+    def guess_count(self) -> int:
+        """Return the number of guesses made in this game."""
+        return len(self.guesses)
 
 
 class WordleGuess(Model):
@@ -68,3 +73,22 @@ class WordleGuess(Model):
     def __str__(self) -> str:
         return f"{self.guesser_name} - {self.word}"
     
+class WordleStats(Model):
+    id:                 int             = fields.IntField(primary_key=True) # type: ignore[assignment]
+    server_id:          int             = fields.IntField(unique=True)      # type: ignore[assignment]
+
+    total_games:        int             = fields.IntField(default=0)        # type: ignore[assignment]
+    total_wins:         int             = fields.IntField(default=0)        # type: ignore[assignment]
+    total_guesses:      int             = fields.IntField(default=0)        # type: ignore[assignment]
+
+    win_streak:         int             = fields.IntField(default=0)        # type: ignore[assignment]
+    longest_win_streak: int             = fields.IntField(default=0)        # type: ignore[assignment]
+    fastest_win:        timedelta       = fields.TimeDeltaField(default=timedelta(hours=23, minutes=59, seconds=59))    # type: ignore[assignment]
+
+    guess_distribution: fields.JSONField = fields.JSONField(default=dict)  # type: ignore[assignment]
+
+
+    def overall_win_percentage(self) -> float:
+        if self.total_games == 0:
+            return 0.0
+        return (self.total_wins / self.total_games) * 100

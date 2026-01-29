@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 def wordle_logic(guess: str, daily_word: str) -> List[int]:
     """
@@ -10,7 +10,7 @@ def wordle_logic(guess: str, daily_word: str) -> List[int]:
 
     # Initialize the result with all red squares
     guess_result: List[int] = [0] * len(guess)
-    yellow_checker: List[str | None] = list(answer)
+    yellow_checker: List[Optional[str]] = list(answer)
 
     # Check for correct letters (green)
     for i, letter in enumerate(guess):
