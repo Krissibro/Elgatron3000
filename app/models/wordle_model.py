@@ -85,10 +85,15 @@ class WordleStats(Model):
     longest_win_streak: int             = fields.IntField(default=0)        # type: ignore[assignment]
     fastest_win:        timedelta       = fields.TimeDeltaField(default=timedelta(hours=23, minutes=59, seconds=59))    # type: ignore[assignment]
 
-    guess_distribution: fields.JSONField = fields.JSONField(default=dict)  # type: ignore[assignment]
+    guess_distribution: dict            = fields.JSONField(default=dict)  # type: ignore[assignment]
 
 
     def overall_win_percentage(self) -> float:
         if self.total_games == 0:
             return 0.0
         return (self.total_wins / self.total_games) * 100
+    
+    def average_guesses_per_win(self) -> float:
+        if self.total_wins == 0:
+            return 0.0
+        return self.total_guesses / self.total_wins

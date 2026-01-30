@@ -1,1 +1,1 @@
-from app.models.wordle_model import WordleGame, WordleGuess
+from app.models.wordle_model import WordleGame, WordleGuess, WordleStats

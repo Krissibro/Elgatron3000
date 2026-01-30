@@ -8,6 +8,7 @@ from app.commands.wordle.wordle_db import WordleDB
 from app.core.elgatron import Elgatron
 
 from app.models import WordleGame, WordleGuess
+from app.models.wordle_model import WordleStats
 from app.utilities.validators import validate_messageable
 from app.utilities.helper_functions import timedelta_format
 from app.commands.wordle.wordle_logic import wordle_logic
@@ -78,6 +79,50 @@ class WordleView:
             ))
         return fields, known_letters, unknown_letters
 
+    def make_stats_embed(self, stats: WordleStats)-> discord.Embed:
+        percentage_wins = stats.overall_win_percentage()
+        average_guesses = stats.average_guesses_per_win()
+
+        embed = discord.Embed(title="Wordle Stats", colour=discord.Colour.blue())
+
+        embed.add_field(name="Games played", value=stats.total_games, inline=True)
+        embed.add_field(name="Wins", value=f"{stats.total_wins} ({percentage_wins:.2f}%)", inline=True)
+        embed.add_field(name="\t Number of guesses", value=stats.total_guesses, inline=True)
+        embed.add_field(name="Average guesses", value=f"{average_guesses:.3f}", inline=True)
+        embed.add_field(name="Current streak", value=stats.win_streak, inline=True)
+        embed.add_field(name="Longest streak", value=stats.longest_win_streak, inline=True)
+        embed.add_field(name="Fastest win", value=f"{timedelta_format(stats.fastest_win)}", inline=True)
+
+        # if wins are less than or equal than 0, there is no reason to show the rest, it also breaks the math
+        if stats.total_wins <= 0:
+            return embed
+
+        embed.add_field(name="", value="", inline=False)
+
+        embed = self.add_guess_hist(embed, stats)
+
+        return embed
+    
+    def add_guess_hist(self, embed: discord.Embed, stats: WordleStats) -> discord.Embed:
+        highest_guess_count = max(stats.guess_distribution.values())
+        highest_guess_percentage = (highest_guess_count / stats.total_wins) * 100
+
+        sorted_guess_distribution = sorted(stats.guess_distribution.items(), key=lambda key: int(key[0]))
+        for guess_amount, guess_count in sorted_guess_distribution:
+            if guess_count == 0:
+                continue
+            percentage = (guess_count / stats.total_wins) * 100
+            # Scale percentage to fit in max 14 squares per line, 14 is max that can fit on mobile
+            square_count = int(percentage / highest_guess_percentage * 14 + 0.5)
+
+            embed.add_field(
+                name=f"{guess_amount} guesses:      {guess_count}   ({percentage:.2f}%)",
+                value=square_count * ":blue_square:" if square_count > 0 else ":black_large_square:",
+                inline=False
+            )
+        return embed
+
+
     @staticmethod
     def format_available_letters(known_letters: Set[str], unknown_letters: Set[str]) -> str:
         sorted_known_letters = sorted(list(known_letters))
@@ -110,7 +155,6 @@ class WordleView:
                              "[Pokedoku](https://pokedoku.com/)")
         return embed
     
-
 
 class WordleFinishedController(discord.ui.View):
     def __init__(self, game: WordleGame, view: WordleView):

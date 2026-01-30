@@ -45,7 +45,6 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         else:
             await ctx.response.send_message(embed=embed)
 
-
     @app_commands.command(
         name="current",
         description="See the current progress of the daily wordle!",
@@ -59,6 +58,33 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         else:
             await ctx.response.send_message(embed=embed)
 
+    @app_commands.command(
+        name="stats",
+        description="View Wordle statistics for this server",
+    )
+    async def wordle_stats(self, ctx: discord.Interaction) -> None:
+        if ctx.guild is None:
+            raise ElgatronError("This command can only be used in a server.")
+
+        stats = await self.wordle_db.get_wordle_stats(ctx.guild.id)
+        embed = self.wordle_view.make_stats_embed(stats)
+
+        await ctx.response.send_message(embed=embed)    
+
+
+    @app_commands.command(
+        name="recalculate_stats",
+        description="Recalculate Wordle statistics for this server",
+    )
+    async def recalculate_wordle_stats(self, ctx: discord.Interaction) -> None:
+        if not await self.bot.is_owner(ctx.user):
+            raise ElgatronError("You do not have permission to use this command!")
+        if ctx.guild is None:
+            raise ElgatronError("This command can only be used in a server.")
+
+        await self.wordle_db.recalculate_stats(ctx.guild.id)
+        await ctx.response.send_message(embed=discord.Embed(title="Wordle statistics recalculated!"), ephemeral=True, delete_after=10)
+
     # @commands.is_owner()
     @app_commands.command(
         name="reset",
@@ -69,14 +95,15 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
             raise ElgatronError("You do not have permission to use this command!")
         if ctx.guild is None:
             raise ElgatronError("This command can only be used in a server.")
+        game = await self.wordle_db.get_current_game()
 
-        game = await self.wordle_db.new_game()
+        if not game.is_finished():
+            await self.wordle_db.handle_loss(ctx.guild.id, game)
         
-        await self.wordle_db.handle_loss(ctx.guild.id, game)
-        print(game.word)
+        await self.wordle_db.new_game()
+        self.bot.logger.info(f"Wordle reset by {ctx.user} ({ctx.user.id}). Word is: {game.word}")
 
         await ctx.response.send_message(embed=discord.Embed(title="Wordle has been reset!"), ephemeral=True, delete_after=10)
-        
 
     async def scheduled_new_game(self) -> None:
         game = await self.wordle_db.get_current_game()
@@ -91,6 +118,7 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
             embed = self.wordle_view.make_game_over_embed(game.word)
             await channel.send(embed=embed)
 
+        await self.wordle_db.new_game()
         await channel.send(embed=self.wordle_view.new_game_embed())
 
     async def send_wordle_reminder(self) -> None:
