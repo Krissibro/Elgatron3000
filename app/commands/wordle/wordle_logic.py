@@ -6,15 +6,13 @@ def wordle_logic(guess: str, daily_word: str) -> List[int]:
     :return: String of 0, 1, and 2 corresponding to red, yellow, and green.
     :
     """
-    answer: str = daily_word.upper()
-
     # Initialize the result with all red squares
     guess_result: List[int] = [0] * len(guess)
-    yellow_checker: List[Optional[str]] = list(answer)
+    yellow_checker: List[Optional[str]] = list(daily_word)
 
     # Check for correct letters (green)
     for i, letter in enumerate(guess):
-        if i < len(answer) and letter == answer[i]:
+        if i < len(daily_word) and letter == daily_word[i]:
             guess_result[i] = 2
             yellow_checker[i] = None  # mark as used
 

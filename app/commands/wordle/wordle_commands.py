@@ -16,9 +16,10 @@ from app.utilities.validators import validate_messageable
 class WordleCommands(commands.GroupCog, group_name="wordle"):
     def __init__(self, bot: Elgatron):
         self.bot: Elgatron = bot
+        self.channel_id = bot.testing_channel_id if bot.testing else bot.wordle_channel_id
+        
         self.wordle_db = WordleDB(bot.testing)
         self.wordle_view: WordleView = WordleView(bot, self.wordle_db)
-        self.channel_id = bot.testing_channel_id if bot.testing else bot.wordle_channel_id
 
         new_word_trigger = CronTrigger(hour=8, minute=0, second=0, timezone='Europe/Oslo')
         bot.scheduler.add_job(self.scheduled_new_game, new_word_trigger, id="wordle_pick_new_word")
@@ -71,7 +72,6 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
 
         await ctx.response.send_message(embed=embed)    
 
-
     @app_commands.command(
         name="recalculate_stats",
         description="Recalculate Wordle statistics for this server",
@@ -82,10 +82,10 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         if ctx.guild is None:
             raise ElgatronError("This command can only be used in a server.")
 
+        await ctx.response.defer(thinking=True, ephemeral=True)
         await self.wordle_db.recalculate_stats(ctx.guild.id)
-        await ctx.response.send_message(embed=discord.Embed(title="Wordle statistics recalculated!"), ephemeral=True, delete_after=10)
+        await ctx.edit_original_response(embed=discord.Embed(title="Wordle statistics recalculated!"))
 
-    # @commands.is_owner()
     @app_commands.command(
         name="reset",
         description="Reset the daily wordle",
@@ -100,7 +100,7 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         if not game.is_finished():
             await self.wordle_db.handle_loss(ctx.guild.id, game)
         
-        await self.wordle_db.new_game()
+        game = await self.wordle_db.new_game()
         self.bot.logger.info(f"Wordle reset by {ctx.user} ({ctx.user.id}). Word is: {game.word}")
 
         await ctx.response.send_message(embed=discord.Embed(title="Wordle has been reset!"), ephemeral=True, delete_after=10)

@@ -1,5 +1,4 @@
 import string
-
 import discord
 
 from typing import List, Set, Iterable, Tuple
@@ -60,7 +59,7 @@ class WordleView:
         unknown_letters = set(string.ascii_uppercase)
         fields: List[Tuple[str, str]] = []
 
-        separator = "\u00A0\u00A0\u00A0\u00A0"
+        separator = "  "
 
         for guess in guesses:
             result = wordle_logic(guess.word, solution)
@@ -74,7 +73,7 @@ class WordleView:
             # Build embed field
             formatted_word = separator.join(guess.word)
             fields.append((
-                f" **{formatted_word}**     <-  {guess.guesser_name}",
+                f"` {formatted_word} `     <-  {guess.guesser_name}",
                 self.format_word(result)
             ))
         return fields, known_letters, unknown_letters
@@ -134,7 +133,7 @@ class WordleView:
     @staticmethod
     def format_word(result: List[int]) -> str:
         result_map = {0: ":red_square:", 1:":yellow_square:", 2:":green_square:"}
-        return " ".join([result_map[result] for result in result])
+        return "\u2004".join([result_map[result] for result in result])
 
     @staticmethod
     def make_game_over_embed(daily_word: str) -> discord.Embed:

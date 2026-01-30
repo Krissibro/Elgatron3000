@@ -154,14 +154,14 @@ class WordleDB:
         existing_words = {g.word for g in game.guesses}
 
         if game.word in existing_words:
-            raise ElgatronError("The daily wordle has already been guessed")
+            raise ElgatronError("The daily wordle has already been solved!")
 
         if not self.testing:
             if user.id in existing_ids:
-                raise ElgatronError(f"{user.display_name} has already guessed")
+                raise ElgatronError(f"{user.display_name} has already guessed.")
             if len(guess) != 5:
-                raise ElgatronError("The word must be 5 letters long")
+                raise ElgatronError("The word must be 5 letters long.")
             if guess not in self.valid_words:
-                raise ElgatronError(f'"{guess}" is not a valid word')
+                raise ElgatronError(f'"{guess}" is not a valid word.')
         if guess in existing_words:
-            raise ElgatronError(f'"{guess}" has already been guessed')
+            raise ElgatronError(f'"{guess}" has already been guessed.')
