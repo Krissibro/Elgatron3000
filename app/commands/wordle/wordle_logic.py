@@ -23,3 +23,44 @@ def wordle_logic(guess: str, daily_word: str) -> List[int]:
             yellow_checker[yellow_checker.index(letter)] = None  # mark as used
 
     return guess_result
+
+
+NBSP = "\u00A0"   # non-breaking space
+THIN = "\u2009"   # thin space
+HAIR = "\u200A"   # hair space
+
+LETTER_PAD = {
+    "A": THIN,
+    "B": THIN+HAIR,
+    "C": THIN,
+    "D": HAIR + HAIR,
+    "E": HAIR + HAIR + HAIR,
+    "F": THIN + HAIR,
+    "G": THIN,
+    "H": THIN,
+    "I": NBSP + THIN + HAIR + HAIR,
+    "J": THIN + HAIR,
+    "K": THIN,
+    "L": THIN + HAIR,
+    "M": "",
+    "N": HAIR + HAIR,
+    "O": THIN + HAIR,
+    "P": HAIR + HAIR + HAIR,
+    "Q": HAIR + HAIR,
+    "R": THIN,
+    "S": THIN + HAIR,
+    "T": HAIR + HAIR + HAIR,
+    "U": THIN,
+    "V": THIN,
+    "W": "",
+    "X": THIN,
+    "Y": HAIR + HAIR + HAIR,
+    "Z": NBSP + HAIR,
+}
+
+def pad_wordle_letters(word: str) -> str:
+    out = []
+    for c in word.upper():
+        pad = LETTER_PAD.get(c, NBSP + THIN)
+        out.append(c + pad)
+    return "   ".join(out)

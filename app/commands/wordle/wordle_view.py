@@ -4,12 +4,12 @@ import discord
 from typing import List, Set, Iterable, Tuple
 
 from app.commands.wordle.wordle_db import WordleDB
+from app.commands.wordle.wordle_logic import NBSP, THIN, HAIR, pad_wordle_letters
 from app.core.elgatron import Elgatron
 
-from app.models import WordleGame, WordleGuess
-from app.models.wordle_model import WordleStats
+from app.models.wordle_model import WordleGame, WordleGuess, WordleStats
 from app.utilities.validators import validate_messageable
-from app.utilities.helper_functions import timedelta_format, char_to_emoji
+from app.utilities.helper_functions import timedelta_format
 from app.commands.wordle.wordle_logic import wordle_logic
 
 class WordleView:
@@ -70,7 +70,7 @@ class WordleView:
 
             # Build embed field
             fields.append((
-                f"{char_to_emoji(guess.word)}     <-  {guess.guesser_name}",
+                f"**{THIN+HAIR}{pad_wordle_letters(guess.word)}**     <-  {guess.guesser_name}",
                 self.format_word(result)
             ))
         return fields, known_letters, unknown_letters
