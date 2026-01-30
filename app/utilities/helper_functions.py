@@ -48,11 +48,8 @@ def char_to_emoji(command_id) -> str:
                   "y": "🇾",
                   "z": "🇿"
                   }
-    temp = ""
-    for i in str(command_id).lower():
-        temp += emoji_dict[str(i)]
-    return temp
-
+    
+    return " ".join([emoji_dict[i] for i in str(command_id).lower()])
 
 def timedelta_format(time_diff: timedelta) -> str:
     """
