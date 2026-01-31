@@ -1,7 +1,7 @@
 import discord
 import random
 
-from app.commands.pin_guess.pin_guess_model import Pin
+from app.models.pin_model import Pin
 
 class PinView(discord.ui.View):
     def __init__(self, pin: Pin):
@@ -12,29 +12,25 @@ class PinView(discord.ui.View):
         """Creates the embed containing the title and the selected pin.
         Also appends the attachments if there are any"""
         embed: discord.Embed = discord.Embed(title="",
-                                             description=self.pin.content if self.pin.content else None,
+                                             description=self.pin.message_content,
                                              color=discord.Color.yellow())
         # result of deliberation
-        name = random.choices(["Guess the pin!", "who dunnit?"], weights=[0.9, 0.1], k=1)[0]
-        embed.set_author(name=name,
+        title = random.choices(["Guess the pin!", "who dunnit?"], weights=[0.9, 0.1], k=1)[0]
+        embed.set_author(name=title,
                          icon_url="https://media.discordapp.net/attachments/1217929494703374416/1458419529624588298/user.png")
         return embed
 
     def make_sinner_embed(self) -> discord.Embed:
-        if self.pin.message is None: # should technically never happen
-            raise RuntimeError("Result has not loaded yet.")
-
-        author = self.pin.message.author
-        date = self.pin.message.created_at
-        icon_url = self.pin.message.author.avatar.url if self.pin.message.author.avatar else None
-        url = self.pin.message.jump_url
+        date = self.pin.created_at
+        icon_url = self.pin.get_icon_link()
+        url = self.pin.get_message_link()
 
         embed: discord.Embed = discord.Embed(title="",
-                                             description=self.pin.content if self.pin.content else None,
+                                             description=self.pin.message_content,
                                              color=discord.Color.green()
                                              )
 
-        embed.set_author(name=f"{author.name} on {date.strftime("%d/%m/%Y")}", icon_url=icon_url, url=url)
+        embed.set_author(name=f"{self.pin.user_name} on {date.strftime('%d/%m/%Y')}", icon_url=icon_url, url=url)
         return embed
 
     async def reveal_author(self, interaction: discord.Interaction) -> None:
