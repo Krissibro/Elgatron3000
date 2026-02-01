@@ -7,8 +7,6 @@ from app.core.elgatron import Elgatron
 from app.core.elgaTree import ElgatronError
 from app.models.pin_model import Pin
 
-
-
 class PinDB:
     async def load_random_pin(self) -> Pin:
         """Loads a random pin from the stored chunks."""

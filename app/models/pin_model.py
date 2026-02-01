@@ -5,6 +5,8 @@ from typing import Optional
 from tortoise import fields
 from tortoise.models import Model
 
+from app.utilities.validators import validate_messageable
+
 class Pin(Model):
     id: int = fields.IntField(primary_key=True)             # type: ignore[assignment]
 
@@ -30,8 +32,7 @@ class Pin(Model):
         if guild is None:
             return
         channel = guild.get_channel(self.channel_id)
-        if channel is None:
-            return
+        channel = validate_messageable(channel)
         try:
             message = await channel.fetch_message(self.message_id)
         except Exception:

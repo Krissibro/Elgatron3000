@@ -76,7 +76,9 @@ class Elgatron(Bot):
     @staticmethod
     def get_intents():
         intents: discord.Intents = discord.Intents.default()
-        intents.members = True
         intents.message_content = True
+        intents.messages = True
+        intents.guilds = True
+        intents.members = True
 
         return intents
