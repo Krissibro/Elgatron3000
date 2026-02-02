@@ -6,7 +6,6 @@ from discord.ext import commands
 
 from app.core.elgaTree import ElgatronError
 from app.core.elgatron import Elgatron
-from app.commands.free_games.free_games_commands import FreeGameManager
 
 
 class TestCommands(commands.GroupCog, group_name="test"):
@@ -49,16 +48,6 @@ class TestCommands(commands.GroupCog, group_name="test"):
 
         embed = discord.Embed(title=f"Collected {len(messages)} messages")
         await ctx.edit_original_response(embed=embed)
-
-    @app_commands.command(
-        name="test_epic_games_scheduler",
-        description="testing"
-    )
-    async def test_epic_games_scheduler(self, ctx):
-        await ctx.response.send_message(embed=discord.Embed(title="Testing!"), ephemeral=True, delete_after=10)
-        free_games = FreeGameManager(self.bot)
-        await free_games.scheduled_post_free_games()
-
 
 async def setup(bot: Elgatron):
     await bot.add_cog(TestCommands(bot), guild=discord.Object(id=bot.guild_id))
