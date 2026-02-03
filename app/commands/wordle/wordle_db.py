@@ -10,6 +10,7 @@ from tortoise.transactions import in_transaction
 
 from app.models.wordle_model import WordleGuess, WordleGame, WordleStats
 from app.utilities.errors import ElgatronError
+from app.utilities.decorators import transaction
 
 
 class WordleDB:
@@ -23,11 +24,8 @@ class WordleDB:
         self.valid_words |= whitelisted_words
         self.word_bank |= whitelisted_words
 
-    async def new_game(self, connection: Optional[BaseDBAsyncClient] = None) -> WordleGame:
-        if connection is None:
-            async with in_transaction() as conn:
-                return await self.new_game(connection=conn)
-            
+    @transaction
+    async def new_game(self, connection: Optional[BaseDBAsyncClient] = None) -> WordleGame:            
         random_word = random.choice(tuple(self.word_bank)).upper()
         game =  await WordleGame.create(
             word=random_word,
@@ -38,11 +36,8 @@ class WordleDB:
         await game.fetch_related("guesses", using_db=connection)
         return game
 
+    @transaction
     async def guess_word(self, guessed_word: str, user: Union[discord.User, discord.Member], connection: Optional[BaseDBAsyncClient] = None) -> None:
-        if connection is None:
-            async with in_transaction() as conn:
-                return await self.guess_word(guessed_word, user, connection=conn)
-        
         game = await self.get_current_game(connection=connection)
         
         guessed_word = guessed_word.strip().upper()
@@ -57,11 +52,8 @@ class WordleDB:
             using_db=connection
         )
     
+    @transaction
     async def handle_win(self, server_id: int, game: WordleGame, connection: Optional[BaseDBAsyncClient] = None) -> None:
-        if connection is None:
-            async with in_transaction() as conn:
-                return await self.handle_win(server_id, game, connection=conn)
-
         stats = await self.get_wordle_stats(server_id, connection=connection)
 
         if (time_taken := game.time_taken()) is None:
@@ -78,17 +70,15 @@ class WordleDB:
         
         await stats.save(using_db=connection)
 
+    @transaction
     async def handle_loss(self, server_id: int, game: WordleGame, connection: Optional[BaseDBAsyncClient] = None) -> None:
-        if connection is None:
-            async with in_transaction() as conn:
-                return await self.handle_loss(server_id, game, connection=conn)
-
         stats = await self.get_wordle_stats(server_id, connection=connection)
 
         stats.total_games += 1
         stats.win_streak = 0
         await stats.save(using_db=connection)
     
+    @transaction
     async def recalculate_stats(self, server_id: int, connection: Optional[BaseDBAsyncClient] = None) -> None:
         if connection is None:
             async with in_transaction() as conn:
@@ -119,11 +109,8 @@ class WordleDB:
             else:
                 await self.handle_loss(server_id, game, connection=connection)
 
-    async def get_current_game(self, connection: Optional[BaseDBAsyncClient] = None) -> WordleGame:
-        if connection is None:
-            async with in_transaction() as conn:
-                return await self.get_current_game(connection=conn)
-            
+    @transaction
+    async def get_current_game(self, connection: Optional[BaseDBAsyncClient] = None) -> WordleGame:            
         game = (
             await WordleGame
             .filter(game_date=date.today())
@@ -136,11 +123,8 @@ class WordleDB:
             game = await self.new_game(connection=connection)
         return game
 
-    async def get_wordle_stats(self, server_id: int, connection: Optional[BaseDBAsyncClient] = None) -> WordleStats:
-        if connection is None:
-            async with in_transaction() as conn:
-                return await self.get_wordle_stats(server_id, connection=conn)
-            
+    @transaction
+    async def get_wordle_stats(self, server_id: int, connection: Optional[BaseDBAsyncClient] = None) -> WordleStats:            
         stats, _ = await WordleStats.get_or_create(server_id=server_id, using_db=connection)
         return stats
 

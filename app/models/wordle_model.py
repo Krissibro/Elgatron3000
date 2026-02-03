@@ -1,7 +1,4 @@
-from __future__ import annotations
-
 from datetime import datetime, date, timedelta
-from email.policy import default
 from typing import Optional
 
 from tortoise import fields
