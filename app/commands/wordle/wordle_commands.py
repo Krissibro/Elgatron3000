@@ -91,7 +91,7 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         description="Reset the daily wordle",
     )
     async def reset_wordle(self, ctx: discord.Interaction) -> None:
-        if not await self.bot.is_owner(ctx.user):
+        if not await self.bot.is_owner(ctx.user) and not self.bot.testing:
             raise ElgatronError("You do not have permission to use this command!")
         if ctx.guild is None:
             raise ElgatronError("This command can only be used in a server.")
