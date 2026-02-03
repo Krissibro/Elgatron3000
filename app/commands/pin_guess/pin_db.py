@@ -4,10 +4,8 @@ from typing import AsyncIterable, Optional
 from tortoise.expressions import RawSQL
 from tortoise import BaseDBAsyncClient
 
-
-
 from app.core.elgatron import Elgatron
-from app.core.elgaTree import ElgatronError
+from app.utilities.errors import ElgatronError
 from app.models.pin_model import Pin
 from app.utilities.decorators import transaction
 

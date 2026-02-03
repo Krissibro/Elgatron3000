@@ -1,4 +1,3 @@
-from discord.ext import commands
 from datetime import datetime, timezone
 from typing import List, Optional
 
@@ -6,11 +5,11 @@ from epicstore_api import EpicGamesStoreAPI
 from tortoise import BaseDBAsyncClient
 from tortoise.transactions import in_transaction
 
-from app.commands.pin_guess.pin_db import transaction
+from app.utilities.decorators import transaction
 from app.models.free_games import FreeGame
 
 
-class FreeGameDB(commands.Cog):
+class FreeGameDB:
     def __init__(self):
         self.api = EpicGamesStoreAPI()
     
@@ -37,7 +36,7 @@ class FreeGameDB(commands.Cog):
             for new_free_game in new_free_games:
                 if new_free_game["title"] not in current_free_titles:
                     free_game = await FreeGame.create(
-                        title=new_free_game["title"],
+                        title=new_free_game["title"][:128], # ensure max length
                         description=new_free_game["description"],
                         url=self.get_game_url(new_free_game),
                         image_url=self.get_game_image_url(new_free_game),

@@ -1,4 +1,3 @@
-from hmac import new
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -35,14 +34,14 @@ class EpicGames(commands.Cog):
         await self.free_game_view.send_games_embeds(currently_free_games, channel)
         
     async def scheduled_post_free_games(self) -> None:
-        new_free_games = await self.free_games_db.update_free_games()
+        new_games = await self.free_games_db.update_free_games()
         
         channel = self.bot.get_channel(self.channel_id)
         channel = validate_messageable(channel)
 
-        if new_free_games:
+        if new_games:
             await channel.send(embed=self.free_game_view.make_link_embed())
-        for game in new_free_games:
+        for game in new_games:
             await channel.send(embed=self.free_game_view.make_game_embed(game))
 
 async def setup(bot: Elgatron):

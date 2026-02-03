@@ -16,8 +16,9 @@ class EmulatorCommands(commands.Cog):
         # make the view work after bot reset
         self.bot.add_view(self.controller)
 
-    def __del__(self):
+    async def cog_unload(self):
         self.emu.stop()
+        await super().cog_unload()
 
     @app_commands.command(
         name="pokemon",
@@ -31,7 +32,7 @@ class EmulatorCommands(commands.Cog):
 
         msg = await ctx.edit_original_response(attachments=[file], view=self.controller)
         await msg.create_thread(name="Discuss Pokemon!")
-
+    
 
 async def setup(bot: Elgatron):
     await bot.add_cog(EmulatorCommands(bot), guild=discord.Object(id=bot.guild_id))
