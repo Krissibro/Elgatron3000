@@ -143,5 +143,7 @@ class WordleDB:
                 raise ElgatronError("The word must be 5 letters long.")
             if guess not in self.valid_words:
                 raise ElgatronError(f'"{guess}" is not a valid word.')
+        if len(guess) > 16: # error can only occur in testing mode
+            raise ElgatronError("The guessed word is too long.")
         if guess in existing_words:
             raise ElgatronError(f'"{guess}" has already been guessed.')
