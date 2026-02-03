@@ -2,6 +2,7 @@ import numpy as np
 import random
 import discord
 
+from pathlib import Path
 from datetime import datetime, date, timedelta
 from typing import List, Optional, Union, Set
 
@@ -13,12 +14,12 @@ from app.utilities.decorators import transaction
 
 
 class WordleDB:
-    def __init__(self, testing: bool=False):
+    def __init__(self, word_path: Path, testing: bool=False):
         self.testing: bool = testing
 
-        self.valid_words: Set[str] = set(np.genfromtxt('./static/word_lists/valid-words.csv', delimiter=',', dtype=str).flatten()) # all words
-        word_bank: Set[str] = set(np.genfromtxt('./static/word_lists/word-bank.csv', delimiter=',', dtype=str).flatten()) # words that can be chosen
-        whitelisted_words: Set[str] = set(np.genfromtxt('./static/word_lists/whitelisted-words.csv', delimiter=',', dtype=str).flatten()) # custom words
+        self.valid_words: Set[str] = set(np.genfromtxt(word_path / 'valid-words.csv', delimiter=',', dtype=str).flatten()) # all words
+        word_bank: Set[str] = set(np.genfromtxt(word_path / 'word-bank.csv', delimiter=',', dtype=str).flatten()) # words that can be chosen
+        whitelisted_words: Set[str] = set(np.genfromtxt(word_path / 'whitelisted-words.csv', delimiter=',', dtype=str).flatten()) # custom words
 
         self.word_bank: List[str] = list(word_bank | whitelisted_words)
         self.valid_words |= whitelisted_words

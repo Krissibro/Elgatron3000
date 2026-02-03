@@ -9,14 +9,14 @@ from app.commands.emulator.emulator_view import EmulatorController
 class EmulatorCommands(commands.Cog):
     def __init__(self, bot: Elgatron):
         self.bot: Elgatron = bot
-        # emu = Emulator("./static/game_roms/pokemon_red.gb")  # for debug
-        self.emu: Emulator = Emulator("./static/game_roms/pokemon_red.gb", window="null")  # for bot
+        # emu = Emulator(bot.emulator_path/"pokemon_red.gb")  # for debug
+        self.emu: Emulator = Emulator(bot.emulator_path/"pokemon_red.gb", window="null")  # for bot
         self.controller: EmulatorController = EmulatorController(self.emu)
 
         # make the view work after bot reset
         self.bot.add_view(self.controller)
 
-    async def cog_unload(self):
+    async def cog_unload(self) -> None:
         self.emu.stop()
         await super().cog_unload()
 

@@ -28,6 +28,11 @@ class Elgatron(Bot):
 
         self.logger = logging.getLogger("discord")
 
+        self.db_path = Path("app/database/db.sqlite3").resolve()
+        self.command_paths = Path("app/commands")
+        self.emulator_path = Path("static/game_roms").resolve()
+        self.wordle_path = Path("static/word_lists").resolve()
+
         super().__init__(
                         intents=self.get_intents(),
                         command_prefix="/",
@@ -36,15 +41,13 @@ class Elgatron(Bot):
                         )
 
     async def setup_hook(self) -> None:
-        db_path = Path("app/database/db.sqlite3").resolve()
-
         await Tortoise.init(
-            db_url=f"sqlite:///{db_path}",
+            db_url=f"sqlite:///{self.db_path}",
             modules={"models": ["app.models"]}
         )
         await Tortoise.generate_schemas()
 
-        await self.load_extension("./app/commands")
+        await self.load_extension(str(self.command_paths))
 
         self.scheduler.start()
         self.scheduler.print_jobs()

@@ -3,7 +3,6 @@ from app.commands.emulator.emulator_model import Emulator
 from typing import Optional
 
 class EmulatorController(discord.ui.View):
-
     def __init__(self, emu):
         super().__init__(timeout=None)
         self.emu: Emulator = emu

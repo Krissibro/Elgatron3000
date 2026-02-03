@@ -1,7 +1,7 @@
 import io
-import os.path
 
 from PIL.Image import Image
+from pathlib import Path
 from pyboy import PyBoy
 from typing import List, Optional
 
@@ -12,12 +12,14 @@ class Emulator(PyBoy):
         self.set_emulation_speed(5)
         self.images: List[Image] = []
         self.skipped_frames: int = 4
-        self.state_file: str = "./static/game_roms/pokemon.state"
+        self.state_file: Path = rom_path.with_suffix(".state")
 
         #load save state on init
-        if os.path.isfile(self.state_file):
+        try:
             with open(self.state_file, "rb") as f:
                 self.load_state(f)
+        except FileNotFoundError:
+            pass
 
     def sim_button_time(self, button: Optional[str], frames: int) -> None:
         """

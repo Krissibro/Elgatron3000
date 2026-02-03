@@ -7,10 +7,9 @@ from apscheduler.triggers.cron import CronTrigger
 from app.commands.wordle.wordle_db import WordleDB
 from app.commands.wordle.wordle_view import WordleView, WordleFinishedController
 
-from app.utilities.errors import ElgatronError
 from app.core.elgatron import Elgatron
+from app.utilities.errors import ElgatronError
 from app.utilities.validators import validate_messageable
-
 
 @app_commands.guild_only()
 class WordleCommands(commands.GroupCog, group_name="wordle"):
@@ -18,7 +17,7 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         self.bot: Elgatron = bot
         self.channel_id = bot.testing_channel_id if bot.testing else bot.wordle_channel_id
         
-        self.wordle_db = WordleDB(bot.testing)
+        self.wordle_db = WordleDB(bot.wordle_path, bot.testing)
         self.wordle_view: WordleView = WordleView(bot, self.wordle_db)
 
         new_word_trigger = CronTrigger(hour=8, minute=0, second=0, timezone='Europe/Oslo')
