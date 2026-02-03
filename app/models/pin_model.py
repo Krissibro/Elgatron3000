@@ -18,14 +18,14 @@ class Pin(Model):
     created_at: datetime = fields.DatetimeField()           # type: ignore[assignment]
 
     user_name: str = fields.CharField(max_length=32)        # type: ignore[assignment]
-    user_icon: str = fields.CharField(max_length=128)       # type: ignore[assignment]
+    user_icon: str = fields.CharField(max_length=256)       # type: ignore[assignment]
     has_files: bool = fields.BooleanField(default=False)    # type: ignore[assignment]
 
     def get_message_link(self) -> str:
         return f"https://discord.com/channels/{self.server_id}/{self.channel_id}/{self.message_id}"
     
     def get_icon_link(self) -> str:
-        return f"https://cdn.discordapp.com/avatars/{self.user_name}/{self.user_icon}"
+        return f"{self.user_icon}"
     
     async def _fetch_message(self, bot) -> Optional[discord.Message]:
         guild: Optional[discord.Guild] = bot.get_guild(self.server_id)
