@@ -25,14 +25,17 @@ class FreeGameDB(commands.Cog):
                 .all()
             )
             
+            current_free_titles = [game.title for game in current_free_games]
+            new_free_titles = [game["title"] for game in new_free_games]
+
             for known_free_game in current_free_games:
-                if known_free_game.title not in [game["title"] for game in new_free_games]:
+                if known_free_game.title not in new_free_titles:
                     known_free_game.end_free_date = datetime.now(tz=timezone.utc)
                     await known_free_game.save()
 
             new_games = []
             for new_free_game in new_free_games:
-                if new_free_game["title"] not in [game.title for game in current_free_games]:
+                if new_free_game["title"] not in current_free_titles:
                     free_game = await FreeGame.create(
                         title=new_free_game["title"],
                         description=new_free_game["description"],
