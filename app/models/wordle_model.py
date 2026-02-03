@@ -11,7 +11,7 @@ class WordleGame(Model):
     game_date:          Optional[date]      = fields.DateField(null=True)           # type: ignore[assignment]
     word:               str                 = fields.CharField(max_length=16)       # type: ignore[assignment]
 
-    guesses: fields.ReverseRelation[WordleGuess]
+    guesses: fields.ReverseRelation['WordleGuess']
 
     async def get_previous_game(self) -> Optional["WordleGame"]:
         """Get the game before the given game."""
