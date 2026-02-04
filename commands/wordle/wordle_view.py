@@ -111,8 +111,8 @@ class WordleView:
     def format_available_letters(known_letters: Set[str], unknown_letters: Set[str]) -> str:
         sorted_known_letters = sorted(list(known_letters))
         sorted_available_letters = sorted(list(unknown_letters))
-        formatted_known_letters = f"Known letters:\n{" ".join(sorted_known_letters)}"
-        formatted_unknown_letters = f"Available letters:\n{" ".join(sorted_available_letters)}"
+        formatted_known_letters = f"Known letters:\n{' '.join(sorted_known_letters)}"
+        formatted_unknown_letters = f"Available letters:\n{' '.join(sorted_available_letters)}"
         return f"{formatted_known_letters}\n{formatted_unknown_letters}"
 
     @staticmethod

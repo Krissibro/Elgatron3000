@@ -39,7 +39,7 @@ class PinView(discord.ui.View):
                                              description=self.pin.content if self.pin.content else None,
                                              color=discord.Color.green())
 
-        embed.set_author(name=f"{author.name} on {date.strftime("%d/%m/%Y")}", icon_url=icon_url, url=url)
+        embed.set_author(name=f"{author.name} on {date.strftime('%d/%m/%Y')}", icon_url=icon_url, url=url)
         return embed
 
     async def reveal_author(self):
