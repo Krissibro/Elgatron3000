@@ -95,7 +95,7 @@ class StimCommands(commands.GroupCog, group_name="stim"):
         name="im_losing_it",
         description="DU DU DU, babababaaaaa babababa baba baba baaa baba ba baaa baaa baba ba ba babababa bababa baba",
     )
-    async def help(self, ctx: discord.Interaction):
+    async def im_losing_it(self, ctx: discord.Interaction):
         await send_media(ctx, "https://cdn.discordapp.com/attachments/839100318893211669/1463529639015354451/im_losing_it.mp4?ex=697229b1&is=6970d831&hm=f196b15a2310458bfe65b3837b61092e600d6eef0d9fd2f39e4b09f372af9421&")
 
 
