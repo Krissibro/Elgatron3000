@@ -16,7 +16,7 @@ class EpicGames(commands.Cog):
         self.bot: Elgatron = bot
         self.free_games_db: FreeGameDB = FreeGameDB()
         self.free_game_view: FreeGamesView = FreeGamesView()
-        self.channel_id = bot.testing_channel_id if bot.testing else bot.wordle_channel_id
+        self.channel_id = bot.testing_channel_id if bot.testing else bot.game_channel_id
 
         trigger = CronTrigger(hour=18, minute=0, second=0, timezone='Europe/Oslo')
         bot.scheduler.add_job(self.scheduled_post_free_games, trigger=trigger, id="post_free_games")
