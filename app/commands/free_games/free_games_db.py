@@ -33,7 +33,7 @@ class FreeGameDB:
                     await known_free_game.save()
 
             new_games = []
-            for new_free_game in new_free_games:
+            for new_free_game in sorted(new_free_games, key=lambda x: x["title"]):
                 if new_free_game["title"] not in current_free_titles:
                     free_game = await FreeGame.create(
                         title=new_free_game["title"][:128], # ensure max length
@@ -71,6 +71,7 @@ class FreeGameDB:
         return (
             await FreeGame.filter(end_free_date=None)
             .using_db(connection)
+            .order_by("title")
             .all()
         )
 
