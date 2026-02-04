@@ -5,9 +5,9 @@ from discord import app_commands
 from discord.ext import commands
 
 from app.core.elgatron import Elgatron
+from app.models.pin_model import Pin
 
 from app.commands.pin_guess.pin_db import PinDB
-from app.models.pin_model import Pin
 from app.commands.pin_guess.pin_guess_view import PinView, TempPinView
 
 class GuessThatPin(commands.GroupCog, group_name="pin"):

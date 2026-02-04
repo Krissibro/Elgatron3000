@@ -6,6 +6,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 from app.commands.free_games.free_games_db import FreeGameDB
 from app.commands.free_games.free_games_view import FreeGamesView
+
 from app.core.elgatron import Elgatron
 from app.utilities.validators import validate_messageable
 

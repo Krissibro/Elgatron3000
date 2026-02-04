@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from typing import List, Optional
-
 from epicstore_api import EpicGamesStoreAPI
+
 from tortoise import BaseDBAsyncClient
 from tortoise.transactions import in_transaction
 

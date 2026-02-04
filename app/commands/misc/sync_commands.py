@@ -1,10 +1,11 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-from app.core.elgaTree import ElgatronError
-from app.core.elgatron import Elgatron
+
 from typing import Literal, Optional
 
+from app.core.elgaTree import ElgatronError
+from app.core.elgatron import Elgatron
 
 class CommandSync(commands.Cog):
     def __init__(self, bot: Elgatron):

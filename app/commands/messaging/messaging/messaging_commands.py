@@ -1,10 +1,9 @@
-from datetime import datetime, timedelta
-from typing import Union
-
 import discord
-
 from discord import app_commands
 from discord.ext import commands
+
+from datetime import datetime, timedelta
+from typing import Union
 
 from app.commands.messaging.messaging.MessagingInfo import MessagingInfo
 from app.commands.messaging.messaging.messaging_model import get_attention_internal, annoy_internal, dm_spam_internal

@@ -1,4 +1,5 @@
 import discord
+
 from io import BytesIO
 from PIL import Image, ImageSequence
 from discord import app_commands

@@ -1,6 +1,7 @@
-from inspect import iscoroutinefunction, signature
 from typing import Callable
+
 from functools import wraps
+from inspect import iscoroutinefunction, signature
 
 from tortoise.transactions import in_transaction
 

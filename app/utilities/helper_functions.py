@@ -1,6 +1,5 @@
 from datetime import timedelta
 
-
 def format_seconds(seconds: int) -> str:
     formatted_time = ""
     for unit, divisor in [('d', 60*60*24), ('h', 60*60), ('m', 60), ('s', 1)]:

@@ -1,6 +1,8 @@
 import discord
-from app.commands.emulator.emulator_model import Emulator
+
 from typing import Optional
+
+from app.commands.emulator.emulator_model import Emulator
 
 class EmulatorController(discord.ui.View):
     def __init__(self, emu):

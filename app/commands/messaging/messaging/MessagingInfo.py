@@ -1,9 +1,9 @@
+import discord
+
 from datetime import datetime, timedelta
 from typing import Awaitable, Callable, Optional, Union, List
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.date import DateTrigger
-
-import discord
 
 from app.commands.messaging.ActiveCommands import ActiveCommands
 from app.commands.messaging.CommandInfo import CommandInfo
