@@ -8,7 +8,7 @@ from typing import List, Optional, Union, Set
 
 from tortoise import BaseDBAsyncClient
 
-from app.models.wordle_model import WordleGuess, WordleGame, WordleStats
+from app.models.wordle import WordleGuess, WordleGame, WordleStats
 from app.utilities.errors import ElgatronError
 from app.utilities.decorators import transaction
 
@@ -131,7 +131,7 @@ class WordleDB:
         :param guess: the guessed word.
         :param game: the game object.
         """
-        existing_ids = {g.guesser_id for g in game.guesses}
+        existing_ids = {g.user_id for g in game.guesses}
         existing_words = {g.word for g in game.guesses}
 
         if game.word in existing_words:

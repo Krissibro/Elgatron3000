@@ -16,7 +16,7 @@ class Petting(commands.Cog):
         name="petting",
         description="give people pets!"
     )
-    async def petting(self, ctx, user: discord.User):
+    async def petting(self, ctx: discord.Interaction, user: discord.User):
         file_name = f"{user.id}.gif"
         try:
             await ctx.response.send_message(file=discord.File(f"static/assets/petting/{file_name}"))
