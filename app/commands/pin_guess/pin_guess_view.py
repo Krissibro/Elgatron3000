@@ -1,7 +1,7 @@
 import discord
 import random
 
-from app.models.pin_model import Pin
+from app.models.pin import Pin
 
 class PinView(discord.ui.View):
     def __init__(self, pin: Pin):

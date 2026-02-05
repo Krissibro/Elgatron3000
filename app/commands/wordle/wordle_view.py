@@ -7,7 +7,7 @@ from app.commands.wordle.wordle_db import WordleDB
 from app.commands.wordle.wordle_logic import NBSP, THIN, HAIR, pad_wordle_letters
 from app.core.elgatron import Elgatron
 
-from app.models.wordle_model import WordleGame, WordleGuess, WordleStats
+from app.models.wordle import WordleGame, WordleGuess, WordleStats
 from app.utilities.validators import validate_messageable
 from app.utilities.helper_functions import timedelta_format
 from app.commands.wordle.wordle_logic import wordle_logic

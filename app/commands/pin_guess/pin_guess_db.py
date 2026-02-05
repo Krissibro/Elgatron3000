@@ -6,7 +6,7 @@ from tortoise import BaseDBAsyncClient
 
 from app.core.elgatron import Elgatron
 from app.utilities.errors import ElgatronError
-from app.models.pin_model import Pin
+from app.models.pin import Pin
 from app.utilities.decorators import transaction
 
 class PinDB:
@@ -59,8 +59,7 @@ class PinDB:
         self.pins = []
         guild = bot.get_guild(bot.guild_id)
         if guild is None:
-            print("Guild not found!")
-            return
+            raise ElgatronError("Guild not found")
 
         # Fetch pins from all channels
         for i, channel in enumerate(guild.text_channels):
