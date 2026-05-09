@@ -131,7 +131,7 @@ class WordleDB:
         :param guess: the guessed word.
         :param game: the game object.
         """
-        existing_ids = {g.user_id for g in game.guesses}
+        existing_ids = {g.guesser_id for g in game.guesses}
         existing_words = {g.word for g in game.guesses}
 
         if game.word in existing_words:
