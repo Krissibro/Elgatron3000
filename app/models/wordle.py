@@ -1,11 +1,8 @@
 from datetime import datetime, date, timedelta
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 from tortoise import fields
 from tortoise.models import Model
-
-if TYPE_CHECKING:
-    from app.models.user import User
 
 
 class WordleGame(Model):
@@ -62,11 +59,7 @@ class WordleGuess(Model):
     word:           str         = fields.CharField(max_length=16)   # type: ignore[assignment]
     guesser_name:   str         = fields.CharField(max_length=64)   # type: ignore[assignment]
     time:           datetime    = fields.DatetimeField(null=False)  # type: ignore[assignment]
-    user:           User        = fields.ForeignKeyField(           # type: ignore[assignment]
-        model_name="models.User",
-        related_name="guesses",
-        on_delete=fields.NO_ACTION
-    )
+    guesser_id:           str         = fields.CharField(max_length=64)   # type: ignore[assignment]
     game: WordleGame            = fields.ForeignKeyField(   # type: ignore[assignment]
         model_name="models.WordleGame",
         related_name="guesses",
