@@ -34,7 +34,7 @@ LETTER_PAD = {
     "B": THIN+HAIR,
     "C": THIN,
     "D": HAIR + HAIR,
-    "E": HAIR + HAIR + HAIR,
+    "E": NBSP + HAIR,
     "F": THIN + HAIR,
     "G": THIN,
     "H": THIN,
@@ -44,7 +44,7 @@ LETTER_PAD = {
     "L": THIN + HAIR,
     "M": "",
     "N": HAIR + HAIR,
-    "O": THIN + HAIR,
+    "O": HAIR + HAIR,
     "P": HAIR + HAIR + HAIR,
     "Q": HAIR + HAIR,
     "R": THIN,
@@ -62,5 +62,5 @@ def pad_wordle_letters(word: str) -> str:
     out = []
     for c in word.upper():
         pad = LETTER_PAD.get(c, NBSP + THIN)
-        out.append(c + pad)
+        out.append(f"{c}{pad}")
     return "   ".join(out)
