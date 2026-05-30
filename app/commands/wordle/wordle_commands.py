@@ -96,13 +96,17 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
             raise ElgatronError("This command can only be used in a server.")
         game = await self.wordle_db.get_current_game()
 
-        if not game.is_finished():
+        if self.bot.testing:
             await self.wordle_db.handle_loss(ctx.guild.id, game)
-        
+        else:
+            game = await self.wordle_db.get_current_game()
+            await game.delete()
+            await self.wordle_db.recalculate_stats(ctx.guild.id)
+            
         game = await self.wordle_db.new_game()
-        self.bot.logger.info(f"Wordle reset by {ctx.user} ({ctx.user.id}). Word is: {game.word}")
 
-        await ctx.response.send_message(embed=discord.Embed(title="Wordle has been reset!"), ephemeral=True, delete_after=10)
+        self.bot.logger.info(f"Wordle reset by {ctx.user} ({ctx.user.id}). Word is: {game.word}")
+        await ctx.response.send_message(embed=discord.Embed(title="Wordle has been reset!"), ephemeral=True)
 
     async def scheduled_new_game(self) -> None:
         game = await self.wordle_db.get_current_game()
