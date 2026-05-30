@@ -38,9 +38,9 @@ class GuessThatPin(commands.GroupCog, group_name="pin"):
     async def sync_pins(self, ctx: discord.Interaction) -> None:
         # remove all puns and re-fetch them.
         await self.pin_db.delete_all_server_pins(ctx.guild_id)
-        await self.pin_db.fetch_pins(ctx.guild)
+        pin_count = await self.pin_db.fetch_pins(ctx.guild)
 
-        embed = discord.Embed(title=f"{len(self.pin_db.pins)} pins were loaded!",)
+        embed = discord.Embed(title=f"{pin_count} pins were loaded!",)
         await ctx.response.send_message(embed=embed)
 
     @commands.Cog.listener()

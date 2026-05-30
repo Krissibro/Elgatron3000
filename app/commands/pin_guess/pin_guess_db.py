@@ -64,16 +64,18 @@ class PinDB:
         )
 
     @transaction
-    async def fetch_pins(self, guild: discord.Guild, connection: Optional[BaseDBAsyncClient] = None) -> None:
-        self.pins = []
-
+    async def fetch_pins(self, guild: discord.Guild, connection: Optional[BaseDBAsyncClient] = None) -> int:
+        total_pins = 0
         # Fetch pins from all channels
         for i, channel in enumerate(guild.text_channels):
             # loading bar
-            print(f"|{(i * '#'):<{len(guild.text_channels)}}| {len(self.pins):<{4}} | {channel.name}", end="\n")
+            print(f"|{(i * '#'):<{len(guild.text_channels)}}| {total_pins:<{4}} | {channel.name}", end="\n")
             try:
                 channel_pins: AsyncIterable[discord.Message] = channel.pins()
                 async for message in channel_pins:
                     await self.add_pin(message, connection=connection)
+                    total_pins += 1
             except Exception as e:
                 print(f"Failed to fetch pins from {channel.name}: {e}")
+        
+        return total_pins
