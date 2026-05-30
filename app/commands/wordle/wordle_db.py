@@ -80,24 +80,16 @@ class WordleDB:
     
     @transaction
     async def recalculate_stats(self, server_id: int, connection: Optional[BaseDBAsyncClient] = None) -> None:
+        # delete the row
         stats = await self.get_wordle_stats(server_id, connection=connection)
-
+        await stats.delete()
+        
         games = (
             await WordleGame
             .all()
             .prefetch_related("guesses")
             .using_db(connection)
         )
-
-        # reset stats
-        stats.total_games = 0
-        stats.total_wins = 0
-        stats.total_guesses = 0
-        stats.win_streak = 0
-        stats.longest_win_streak = 0
-        stats.fastest_win = timedelta(hours=23, minutes=59, seconds=59)
-        stats.guess_distribution.clear()
-        await stats.save(using_db=connection)
 
         # replay history in order
         for game in sorted(games, key=lambda g: g.game_date or date.min):
