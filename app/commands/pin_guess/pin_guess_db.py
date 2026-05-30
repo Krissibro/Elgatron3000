@@ -11,10 +11,11 @@ from app.utilities.decorators import transaction
 
 class PinDB:
     @transaction
-    async def load_random_pin(self, connection: Optional[BaseDBAsyncClient] = None) -> Pin:
+    async def load_random_pin(self, guild_id: int,connection: Optional[BaseDBAsyncClient] = None) -> Pin:
         """Loads a random pin from the stored chunks."""
         pin = (
             await Pin.annotate(order=RawSQL("RANDOM()"))
+            .filter(server_id=guild_id)
             .using_db(connection)
             .order_by("order")
             .first()
@@ -55,11 +56,16 @@ class PinDB:
         await Pin.filter(server_id=guild.id, channel_id=channel.id, message_id=message.id).using_db(connection).delete()
 
     @transaction
-    async def fetch_pins(self, bot: Elgatron, connection: Optional[BaseDBAsyncClient] = None) -> None:
+    async def delete_all_server_pins(self, guild_id: int, connection: Optional[BaseDBAsyncClient] = None) -> None:
+        await (
+            Pin.filter(server_id=guild_id)
+            .using_db(connection)
+            .delete()
+        )
+
+    @transaction
+    async def fetch_pins(self, guild: discord.Guild, connection: Optional[BaseDBAsyncClient] = None) -> None:
         self.pins = []
-        guild = bot.get_guild(bot.guild_id)
-        if guild is None:
-            raise ElgatronError("Guild not found")
 
         # Fetch pins from all channels
         for i, channel in enumerate(guild.text_channels):
