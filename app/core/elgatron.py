@@ -56,7 +56,7 @@ class Elgatron(Bot):
         if self.testing:
             await self.tree.sync(guild=discord.Object(id=self.guild_id))
 
-        print("Ready!")
+        self.logger.info("Ready!")
 
     async def close(self) -> None:
         await Tortoise.close_connections()
@@ -75,6 +75,7 @@ class Elgatron(Bot):
                 await super().load_extension(name=formatted_path, package=package)
             except Exception as e:
                 self.logger.error(f"Failed to load extension {name}.", exc_info=e)
+                continue
 
     @staticmethod
     def get_intents():

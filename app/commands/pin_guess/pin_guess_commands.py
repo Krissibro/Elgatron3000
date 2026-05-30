@@ -20,7 +20,7 @@ class GuessThatPin(commands.GroupCog, group_name="pin"):
         description="Guess the pin!",
     )
     async def guess_that_pin(self, ctx: discord.Interaction):
-        pin: Pin = await self.pin_db.load_random_pin()
+        pin: Pin = await self.pin_db.load_random_pin(ctx.guild_id)
         view: PinView = PinView(pin)
 
         if not pin.has_files:
@@ -36,7 +36,9 @@ class GuessThatPin(commands.GroupCog, group_name="pin"):
         description="re-sync pins!",
     )
     async def sync_pins(self, ctx: discord.Interaction) -> None:
-        await self.pin_db.fetch_pins(self.bot)
+        # remove all puns and re-fetch them.
+        await self.pin_db.delete_all_server_pins(ctx.guild_id)
+        await self.pin_db.fetch_pins(ctx.guild)
 
         embed = discord.Embed(title=f"{len(self.pin_db.pins)} pins were loaded!",)
         await ctx.response.send_message(embed=embed)
