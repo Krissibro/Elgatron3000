@@ -18,7 +18,7 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         self.channel_id = bot.testing_channel_id if bot.testing else bot.wordle_channel_id
         
         self.wordle_db = WordleDB(bot.wordle_path, bot.testing)
-        self.wordle_view: WordleView = WordleView(bot, self.wordle_db)
+        self.wordle_view: WordleView = WordleView()
 
         new_word_trigger = CronTrigger(hour=8, minute=0, second=0, timezone='Europe/Oslo')
         bot.scheduler.add_job(self.scheduled_new_game, new_word_trigger, id="wordle_pick_new_word")
@@ -124,7 +124,10 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         """Sends the reminder if the daily wordle hasn't been completed"""
         game = await self.wordle_db.get_current_game()
         if not game.is_finished():
-            await self.wordle_view.send_reminder()
+            channel = validate_messageable(self.bot.get_channel(self.channel_id))
+            embed = discord.Embed(title="Me when the and I and me when is and it",
+                                description="Uhhh:sob: :sob:")
+            await channel.send(embed=embed)
 
 
 async def setup(bot: Elgatron):

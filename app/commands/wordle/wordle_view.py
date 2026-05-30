@@ -13,12 +13,7 @@ from app.utilities.helper_functions import timedelta_format
 from app.commands.wordle.wordle_logic import wordle_logic
 
 class WordleView:
-    def __init__(self, bot: Elgatron, wordle_model: WordleDB):
-        self.bot: Elgatron = bot
-        self.wordle_db: WordleDB = wordle_model
-
-        self.channel_id = bot.testing_channel_id if bot.testing else bot.wordle_channel_id
-
+    
     async def make_wordle_embed(self, game: WordleGame) -> discord.Embed:
         if game.is_finished():
             embed = discord.Embed(title=f"Congratulations!", color=discord.Color.green(),
@@ -45,14 +40,6 @@ class WordleView:
             text=self.format_available_letters(known_letters, unknown_letters)
         )
         return embed
-
-    async def send_reminder(self) -> None:
-        """Sends the reminder if game is not yet won"""
-        channel = validate_messageable(self.bot.get_channel(self.channel_id))
-
-        embed = discord.Embed(title="Me when the and I and me when is and it",
-                              description="Uhhh:sob: :sob:")
-        await channel.send(embed=embed)
 
     def process_guesses(self, guesses: Iterable[WordleGuess], solution: str) -> Tuple[List[Tuple[str, str]], Set[str], Set[str]]:
         known_letters: Set[str] = set()
