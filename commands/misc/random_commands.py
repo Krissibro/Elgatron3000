@@ -165,6 +165,20 @@ class StimCommands(commands.GroupCog, group_name="stim"):
     async def skeleton(self, ctx: discord.Interaction):
         await send_media(ctx, "https://cdn.discordapp.com/attachments/839100318893211669/1510762628455071784/skeleton.mp4?ex=6a1dfed7&is=6a1cad57&hm=3f0cb0950f3bcde9bb7cd46cb3b79f6d003fb9db95108d9f525dd1f9ec4c3813&")
 
+    @app_commands.command(
+        name="dunk",
+        description="peak",
+    )
+    async def dunk(self, ctx: discord.Interaction):
+        await send_media(ctx, "https://klipy.com/gifs/skating-basketball")
+
+    @app_commands.command(
+        name="fumble",
+        description=":pensive:",
+    )
+    async def fumble(self, ctx: discord.Interaction):
+        await send_media(ctx, "https://tenor.com/view/basketball-miss-failure-fail-gif-24912602")
+
     def pick_random_horse_gif(self):
         gifs = [
             "https://media.discordapp.net/attachments/1217933367849386004/1377728074438803566/AWARE.gif?ex=683a04c1&is=6838b341&hm=0a57f01e1253027e8a9b8c0bafd03cafe842f2f5a006f0e6cbf46611cf87ae50&=&width=704&height=704",
@@ -179,6 +193,7 @@ class StimCommands(commands.GroupCog, group_name="stim"):
             "https://media.discordapp.net/attachments/1217933367849386004/1377728078788296774/yeeeeeesssss.gif?ex=683a04c2&is=6838b342&hm=1875126d84f1c2ea82c9a499e486ed3ba7faed0a8e6ed088298cdb448c92e8c6&=&width=310&height=548",
             "https://cdn.discordapp.com/attachments/839100318893211669/1502603641616470116/20260508_181838.jpg?ex=6a1d5131&is=6a1bffb1&hm=0724c9e318d5e1bdaf40e5f08444cee78038af2988df4ece07b42a5b0f042cb9&",
             "https://tenor.com/view/horse-derp-tongue-lick-beffen-gif-16516227",
+            "https://tenor.com/view/horse-in-wind-horse-sad-horse-yeat-melancholy-gif-26693609"
         ]
         return random.choice(gifs)
 
