@@ -137,12 +137,7 @@ class StimCommands(commands.GroupCog, group_name="stim"):
     async def game_pitch(self, ctx: discord.Interaction):
         await send_media(ctx, "https://cdn.discordapp.com/attachments/839100318893211669/1463529572115939454/games_pitch.mp4?ex=697229a1&is=6970d821&hm=d80a2a59907c67d132756addcfb51e251ba49104412afc0dc25453ce0a98d37a&")
 
-
-    @app_commands.command(
-        name="horse",
-        description="is this real?",
-    )
-    async def at_horse_is_this_real(self, ctx: discord.Interaction):
+    def pick_random_horse_gif(self):
         gifs = [
             "https://media.discordapp.net/attachments/1217933367849386004/1377728074438803566/AWARE.gif?ex=683a04c1&is=6838b341&hm=0a57f01e1253027e8a9b8c0bafd03cafe842f2f5a006f0e6cbf46611cf87ae50&=&width=704&height=704",
             "https://media.discordapp.net/attachments/1217933367849386004/1377728074849718272/horse-nod.gif?ex=683a04c1&is=6838b341&hm=88ae5035ea75b1c677bddda393f7610744e84eeb26005c4c86d4b0778c6458e5&=&width=264&height=469",
@@ -153,9 +148,26 @@ class StimCommands(commands.GroupCog, group_name="stim"):
             "https://media.discordapp.net/attachments/1217933367849386004/1377728077177688185/RUN.gif?ex=683a04c2&is=6838b342&hm=6fa81c547c0076b4e1b89d9b95d24d852c66364c17f00753e35e324d28901957&=&width=548&height=405",
             "https://media.discordapp.net/attachments/1217933367849386004/1377728077718884513/uhhhhh.gif?ex=683a04c2&is=6838b342&hm=a8feb2a95aa152981327b335197e9fd0bd65645bf6c1c0cc75015bcd5afb1b1e&=&width=310&height=548",
             "https://media.discordapp.net/attachments/1217933367849386004/1377728078360608778/yapyapyap.gif?ex=683a04c2&is=6838b342&hm=a9c96acfe2fe48f2da22273f329e0d33e85ab26afafac50b805ded7310aa3c09&=&width=411&height=411",
-            "https://media.discordapp.net/attachments/1217933367849386004/1377728078788296774/yeeeeeesssss.gif?ex=683a04c2&is=6838b342&hm=1875126d84f1c2ea82c9a499e486ed3ba7faed0a8e6ed088298cdb448c92e8c6&=&width=310&height=548"
+            "https://media.discordapp.net/attachments/1217933367849386004/1377728078788296774/yeeeeeesssss.gif?ex=683a04c2&is=6838b342&hm=1875126d84f1c2ea82c9a499e486ed3ba7faed0a8e6ed088298cdb448c92e8c6&=&width=310&height=548",
+            "https://cdn.discordapp.com/attachments/839100318893211669/1502603641616470116/20260508_181838.jpg?ex=6a1d5131&is=6a1bffb1&hm=0724c9e318d5e1bdaf40e5f08444cee78038af2988df4ece07b42a5b0f042cb9&"
         ]
-        await send_media(ctx, gifs)
+        return random.choice(gifs)
+
+    @commands.Cog.listener('on_message')
+    async def on_message(self, message: discord.Message):
+        if message.author.bot:
+            return
+
+        if message.content.lower() == "@horse is this real?":
+            picked_horse = self.pick_random_horse_gif()
+            await message.reply(picked_horse)
+
+    @app_commands.command(
+        name="horse",
+        description="is this real?",
+    )
+    async def at_horse_is_this_real(self, ctx: discord.Interaction):
+        await send_media(ctx, self.pick_random_horse_gif())
 
 
 class SteamAPICommands(commands.Cog):
