@@ -1,7 +1,6 @@
 import discord
 
 from typing import List, Dict
-from asyncio import Task
 
 from commands.messaging.CommandInfo import CommandInfo
 

@@ -7,13 +7,13 @@ from commands.emulator.emulator_model import Emulator
 from commands.emulator.emulator_view import EmulatorController
 
 class EmulatorCommands(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
+    def __init__(self, bot: Elgatron):
+        self.bot: Elgatron = bot
         # emu = Emulator("./data/pokemon_red.gb")  # for debug
-        self.emu = Emulator("./data/pokemon_red.gb", window="null")  # for bot
-        self.controller = EmulatorController(self.emu)
+        self.emu: Emulator = Emulator("./data/pokemon_red.gb", window="null")  # for bot
+        self.controller: EmulatorController = EmulatorController(self.emu)
 
-        # make view work after bot reset
+        # make the view work after bot reset
         self.bot.add_view(self.controller)
 
     def __del__(self):

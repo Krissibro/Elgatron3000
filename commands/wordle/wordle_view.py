@@ -52,7 +52,7 @@ class WordleView:
         return embed
 
     async def send_reminder(self) -> None:
-        """Send reminder if game is not yet won"""
+        """Sends the reminder if game is not yet won"""
         channel = validate_messageable(self.bot.get_channel(self.channel_id))
 
         embed = discord.Embed(title="Me when the and I and me when is and it",
@@ -97,7 +97,7 @@ class WordleView:
             if guess_count == 0:
                 continue
             percentage = (guess_count / self.wordle_stats.wins) * 100
-            # Scale percentage to fit in max 14 squares per line, 14 is max that can fit on mobile
+            # Scale percentage to fit in max 14 squares per line, 14 is the max that can fit on mobile
             square_count = int(percentage / highest_guess_percentage * 14 + 0.5)
 
             embed.add_field(
@@ -121,7 +121,7 @@ class WordleView:
         return " ".join([result_map[result] for result in result])
 
     def make_game_over_embed(self, daily_word: str) -> discord.Embed:
-        """Create embed for when no one guessed the word"""
+        """Create the embed for when no one guessed the word"""
         description = f"The word was **[{daily_word}](https://www.merriam-webster.com/dictionary/{daily_word})**"
         if self.wordle_stats.win_streak > 0:
             description += f"\n\nWin streak of   **{self.wordle_stats.win_streak}**   has been reset"

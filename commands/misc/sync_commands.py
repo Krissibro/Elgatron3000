@@ -6,8 +6,8 @@ from typing import Literal, Optional
 
 
 class CommandSync(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
+    def __init__(self, bot: Elgatron):
+        self.bot: Elgatron = bot
 
     @commands.is_owner()
     @app_commands.command(

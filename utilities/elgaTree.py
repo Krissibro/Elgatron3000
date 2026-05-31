@@ -15,7 +15,7 @@ class ElgaTree(CommandTree):
 
         embed = discord.Embed(description=f"{original_error}", color=discord.Color.red())
 
-        # Send error message (handle if already responded)
+        # Send an error message (handle if already responded)
         try:
             if interaction.response.is_done():
                 await interaction.followup.send(embed=embed, ephemeral=True)

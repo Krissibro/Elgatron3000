@@ -5,9 +5,10 @@ from discord import app_commands
 from utilities.elgatron import Elgatron
 
 
+# TODO: Could maybe just auto-generate this from the commands and their descriptions? Would be based
 class Help(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
+    def __init__(self, bot: Elgatron):
+        self.bot: Elgatron = bot
 
     @app_commands.command(
         name="help",

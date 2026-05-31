@@ -35,22 +35,13 @@ class PollCommands(commands.GroupCog, group_name="poll"):
         option9: discord.Optional[str] = None,
         option10: discord.Optional[str] = None,
     ):
-        # Make list with valid options
+        # Make a list with valid options
         options = [
-            option1,
-            option2,
-            option3,
-            option4,
-            option5,
-            option6,
-            option7,
-            option8,
-            option9,
-            option10,
+            option1, option2, option3, option4, option5, option6, option7, option8, option9, option10,
         ]
         options = [
             option for option in options if option
-        ]  # remove option if it's not defined
+        ]  # remove the options that are undefined
         emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
         option_dict = {}
         for i, j in zip(emojis, options):
@@ -75,7 +66,7 @@ class PollCommands(commands.GroupCog, group_name="poll"):
         for emoji in emojis[:options]:
             option_dict[emoji] = ""
 
-        await self.make_poll(ctx, option_dict, title, description, role_mention)
+        await self.make_poll(ctx, option_dict, title, description, role_mention, write_options=False)
 
     @app_commands.command(
         name="dates",
@@ -108,12 +99,14 @@ class PollCommands(commands.GroupCog, group_name="poll"):
         title: str,
         description: discord.Optional[str] = None,
         role_mention: discord.Optional[discord.Role] = None,
+        write_options: bool = True,
     ) -> None:
         emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
 
         embed = discord.Embed(title=title, description=description)
-        content = "\n\n".join([f"{i}  {j}" for i, j in options.items()])
-        embed.add_field(name=content, value="", inline=False)
+        if write_options:
+            content = "\n\n".join([f"{i}  {j}" for i, j in options.items()])
+            embed.add_field(name=content, value="", inline=False)
 
         await ctx.response.send_message(embed=embed)
         msg = await ctx.original_response()

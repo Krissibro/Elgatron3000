@@ -1,13 +1,7 @@
 from typing import Optional
 import discord
 
-from utilities.helper_functions import parse_time
 from utilities.errors import ElgatronError
-
-def validate_interval(interval: str) -> int:
-    time = parse_time(interval)
-    return time
-
 
 def validate_natural_number(digit: str) -> int:
     integer: int = validate_digit(digit)

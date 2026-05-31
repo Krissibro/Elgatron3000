@@ -29,9 +29,6 @@ class WordleModel:
         self.start_time: datetime = datetime.now()
         self.time_taken: Optional[str] = None
 
-        self.state_file_path: str = "data/wordle_state.json"
-        self.load_state()
-
         self.wordle_stats: WordleStats = wordle_stats
         self.testing: bool = testing
 
@@ -41,9 +38,11 @@ class WordleModel:
         # Apparently I am a potato according to Brian :pensive:
         self.whitelisted_words = set(np.genfromtxt('./data/whitelisted-words.csv', delimiter=',', dtype=str))
         self.word_bank.extend(self.whitelisted_words)
+
+        self.state_file_path: str = "data/wordle_state.json"
+        self.load_state()
     
     def pick_new_word(self) -> None:
-
         random_word = str(random.sample(self.word_bank, 1)[0])
         self.daily_word = random_word.upper()
         
@@ -109,10 +108,10 @@ class WordleModel:
         """
         Function to handle wordle logic
         :param guessed_word: The word that is being checked
-        :return: String of red, yellow and red squares depending on the guessed word
+        :return: String of red, yellow, and red squares depending on the guessed word
         :
         """
-        # Initialize result with all red squares
+        # Initialize the result with all red squares
         guess_result = [0] * len(guessed_word)
         yellow_checker = list(self.daily_word)
 

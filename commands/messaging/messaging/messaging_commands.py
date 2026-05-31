@@ -27,9 +27,6 @@ class MessagingCommands(commands.Cog):
                       amount: discord.app_commands.Range[int, 1, None], 
                       interval: app_commands.Transform[timedelta, IntervalTransformer]
                     ):
-        if ctx.response.is_done():
-            return
-        
         messaging_info = MessagingInfo(dm_spam_internal, 
                                        user, 
                                        message, 
@@ -53,9 +50,6 @@ class MessagingCommands(commands.Cog):
                             amount: app_commands.Range[int, 1, None] = 100, 
                             interval: app_commands.Transform[timedelta, IntervalTransformer] = timedelta(seconds=10)
                             ):
-        if ctx.response.is_done(): # if input is invalid, then the ctx has been responded to
-            return
-        
         messaging_info = MessagingInfo(get_attention_internal, 
                                        target, 
                                        message, 
@@ -80,9 +74,6 @@ class MessagingCommands(commands.Cog):
                     interval: app_commands.Transform[timedelta, IntervalTransformer],
                     target: Union[discord.User, discord.Role, None] = None
                     ):
-        if ctx.response.is_done():
-            return
-
         messaging_info = MessagingInfo(annoy_internal,
                                        target,
                                        message,

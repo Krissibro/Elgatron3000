@@ -4,17 +4,24 @@ from discord import app_commands
 from datetime import datetime, timedelta
 
 from utilities.errors import ElgatronError
-from utilities.helper_functions import parse_time
+import re
 
 class IntervalTransformer(app_commands.Transformer):
     async def transform(self, interaction: discord.Interaction, value: str) -> timedelta:
+        regex = re.compile(r'((?P<days>\d+?)d)?((?P<hours>\d+?)h)?((?P<minutes>\d+?)m)?((?P<seconds>\d+?)s)?')
+        matchings = regex.match(value)
 
-        interval = timedelta(seconds=parse_time(value))
-        if interval != 0:
-            return interval
+        if matchings is not None:
+            parts = matchings.groupdict()
+        else:
+            raise ElgatronError("please enter a valid time format, ex: 1d2h3m4s")
 
-        else: # invalid time format
+        time_params = {x: int(y) for (x, y) in parts.items() if y}
+
+        if not time_params:
             raise ElgatronError("Invalid interval format. Please use formats like '10s', '5m5s', '2h30m', etc.")
+
+        return timedelta(**time_params)
     
 class DateTransformer(app_commands.Transformer):
     async def transform(self, interaction: discord.Interaction, value: str) -> datetime:

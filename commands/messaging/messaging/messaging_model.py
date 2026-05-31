@@ -18,7 +18,7 @@ async def get_attention_internal(messaging_info: MessagingInfo) -> None:
     embed = discord.Embed(title=f"{messaging_info.message}")
 
     message = await messaging_info.channel.send(mention, embed=embed, view=button)
-    messaging_info.add_message(message) # message added to list so that it can be deleted in the future.
+    messaging_info.add_message(message) # message added to the list so that it can be deleted in the future.
 
 
 async def dm_spam_internal(messaging_info: MessagingInfo) -> None:
