@@ -4,6 +4,9 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
+import os
+import requests
+
 from utilities.elgatron import Elgatron
 
 # Helper function to send media
@@ -155,5 +158,87 @@ class StimCommands(commands.GroupCog, group_name="stim"):
         await send_media(ctx, gifs)
 
 
+class SteamAPICommands(commands.Cog):
+    def __init__(self, bot: Elgatron):
+        self.bot: Elgatron = bot
+        self.steam_api_key = os.getenv("STEAM_WEB_API_KEY")
+
+
+    def get_steam_game_hours_played(self, steam_user_id: int, steam_game_id: int):
+        if not self.steam_api_key:
+            raise RuntimeError("Missing STEAM_WEB_API_KEY in environment variables.")
+
+        url = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/"
+
+        params = {
+            "key": self.steam_api_key,
+            "steamid": steam_user_id,
+            "include_appinfo": True,
+            "include_played_free_games": True,
+            "appids_filter[0]": steam_game_id,
+            "format": "json",
+        }
+
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+
+        games = response.json().get("response", {}).get("games", [])
+
+        if not games:
+            return None
+
+        minutes = games[0].get("playtime_forever", 0)
+        return minutes / 60
+
+
+    def is_playing_game(self, steam_user_id: int, game_id: int) -> bool:
+        url = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/"
+
+        params = {
+            "key": self.steam_api_key,
+            "steamids": steam_user_id,
+        }
+
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+
+        players = response.json()["response"]["players"]
+
+        if not players:
+            return False
+
+        player = players[0]
+
+        return player.get("gameid") == str(game_id)
+
+
+    @app_commands.command(
+        name="tobias_nuke",
+        description="Tobias acting up? Actually just kill him",
+    )
+    async def tobias_nuke(self, ctx: discord.Interaction):
+        FFXIV_APP_ID = 39210
+        TOBIAS_STEAM_ID = 76561198141333649
+
+        try:
+            total_game_hours = self.get_steam_game_hours_played(TOBIAS_STEAM_ID, FFXIV_APP_ID)
+            is_playing_right_now = self.is_playing_game(TOBIAS_STEAM_ID, FFXIV_APP_ID)
+
+            if total_game_hours is None:
+                await ctx.response.send_message( embed=discord.Embed( title=f"Couldn't find playtime", color=discord.Color.dark_red() ) )
+            elif is_playing_right_now:
+                await ctx.response.send_message(embed=discord.Embed(
+                    title=f":rotating_light: Tobias is currently playing Final Fantasy XIV Online :rotating_light:",
+                    description=f"He has a total of  **{total_game_hours:.0f}**  hours in the game",
+                    color=discord.Color.red()
+                ))
+            else:
+                await ctx.response.send_message( embed=discord.Embed( title=f"Tobias currently has  **{total_game_hours:.0f}**  hours played in Final Fantasy XIV Online", color=discord.Color.red() ) )
+
+        except Exception as error:
+            print(error)
+
+
 async def setup(bot: Elgatron):
     await bot.add_cog(StimCommands(bot), guild=discord.Object(id=bot.guild_id))
+    await bot.add_cog(SteamAPICommands(bot), guild=discord.Object(id=bot.guild_id))
