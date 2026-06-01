@@ -115,6 +115,10 @@ class PollCommands(commands.GroupCog, group_name="poll"):
         for emoji in emojis[: len(options)]:
             await msg.add_reaction(emoji)
             await asyncio.sleep(0.05)
+        
+        if isinstance(ctx.channel, discord.Thread):
+            return
+        
         thread = await msg.create_thread(name=title[:100])
 
         if role_mention is not None:
