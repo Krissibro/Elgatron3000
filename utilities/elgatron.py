@@ -13,7 +13,7 @@ from utilities.elgaTree import ElgaTree
 
 class Elgatron(Bot):
     def __init__(self):
-        with open("utilities/config.json", "r") as f:
+        with open("static/config.json", "r") as f:
             contents = json.load(f)
 
         self.guild_id = contents["guild"]

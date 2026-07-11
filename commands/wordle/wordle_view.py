@@ -21,13 +21,13 @@ class WordleView:
 
     def make_wordle_embed(self) -> discord.Embed:
         if self.wordle_model.correct_guess:
-            embed = discord.Embed(title=f"Congratulations!", color=discord.Color.green(),
+            embed = discord.Embed(title="Congratulations!", color=discord.Color.green(),
                                   description=f"The word was **[{self.wordle_model.daily_word.upper()}](https://www.merriam-webster.com/dictionary/{self.wordle_model.daily_word})**!")
-            embed.add_field(name=f"Win streak:   ",
+            embed.add_field(name="Win streak:   ",
                             value=f"{self.wordle_stats.win_streak} days")
 
             if self.wordle_model.time_taken:
-                embed.add_field(name=f"Time spent:   ",
+                embed.add_field(name="Time spent:   ",
                                 value=f"{self.wordle_model.time_taken}", inline=False)
 
             embed.add_field(name="", value="", inline=False)
@@ -127,7 +127,7 @@ class WordleView:
             description += f"\n\nWin streak of   **{self.wordle_stats.win_streak}**   has been reset"
 
         return discord.Embed(
-            title=f"No one guessed the word! :sob:",
+            title="No one guessed the word! :sob:",
             description=description,
             color=discord.Color.red()
         )

@@ -281,10 +281,10 @@ class SteamAPICommands(commands.Cog):
             is_playing_right_now = self.is_playing_game(TOBIAS_STEAM_ID, FFXIV_APP_ID)
 
             if total_game_hours is None:
-                await ctx.response.send_message( embed=discord.Embed( title=f"Couldn't find playtime", color=discord.Color.dark_red() ) )
+                await ctx.response.send_message( embed=discord.Embed( title="Couldn't find playtime", color=discord.Color.dark_red() ) )
             elif is_playing_right_now:
                 await ctx.response.send_message(embed=discord.Embed(
-                    title=f":rotating_light: Tobias is currently playing Final Fantasy XIV Online :rotating_light:",
+                    title=":rotating_light: Tobias is currently playing Final Fantasy XIV Online :rotating_light:",
                     description=f"He has a total of  **{total_game_hours:.0f}**  hours in the game",
                     color=discord.Color.red()
                 ))
