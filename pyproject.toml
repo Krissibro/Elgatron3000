@@ -18,6 +18,7 @@ dependencies = [
     "pyboy>=2.7.0",
     "python-dotenv>=1.2.2",
     "ruff>=0.15.21",
+    "tortoise-orm>=1.1.7",
     "ty>=0.0.58",
 ]
 
@@ -25,7 +26,7 @@ dependencies = [
 "Homepage" = "https://github.com/Krissibro/Elgatron3000"
 
 [tool.uv]
-package = false
+package = true
 
 [tool.uv.workspace]
 members = [

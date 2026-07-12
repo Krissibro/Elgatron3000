@@ -31,7 +31,7 @@ class PinDB:
         channel = message.channel
         if guild is None:
             raise ElgatronError("Can only add pins in a server")
-        
+
         await Pin.create(
             server_id=guild.id,
             channel_id=channel.id,
@@ -51,7 +51,7 @@ class PinDB:
         channel = message.channel
         if guild is None:
             raise ElgatronError("Can only remove pins in a server")
-        
+
         await Pin.filter(server_id=guild.id, channel_id=channel.id, message_id=message.id).using_db(connection).delete()
 
     @transaction
@@ -76,5 +76,5 @@ class PinDB:
                     total_pins += 1
             except Exception as e:
                 print(f"Failed to fetch pins from {channel.name}: {e}")
-        
+
         return total_pins

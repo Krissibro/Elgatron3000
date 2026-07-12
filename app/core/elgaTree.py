@@ -6,8 +6,15 @@ from discord.app_commands.errors import AppCommandError, TransformerError
 
 from app.utilities.errors import ElgatronError
 
+
 class ElgaTree(CommandTree):
-    async def on_error(self, interaction: Interaction, error: AppCommandError) -> None:
+    async def on_error(
+        self,
+        interaction: Interaction[discord.Client],
+        error: AppCommandError,
+        /,
+    ) -> None:  # ty:ignore[invalid-method-override]
+        ...
         """
         Centralized error handler for cog commands.
         Call this from any cog's cog_app_command_error method.

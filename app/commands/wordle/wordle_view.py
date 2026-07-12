@@ -3,25 +3,20 @@ import discord
 
 from typing import List, Set, Iterable, Tuple
 
-from app.commands.wordle.wordle_db import WordleDB
-from app.commands.wordle.wordle_logic import NBSP, THIN, HAIR, pad_wordle_letters
-from app.core.elgatron import Elgatron
-
 from app.models.wordle import WordleGame, WordleGuess, WordleStats
-from app.utilities.validators import validate_messageable
 from app.utilities.helper_functions import timedelta_format
-from app.commands.wordle.wordle_logic import wordle_logic
+from app.commands.wordle.wordle_logic import wordle_logic, THIN, HAIR, pad_wordle_letters
 
 class WordleView:
-    
+
     async def make_wordle_embed(self, game: WordleGame) -> discord.Embed:
         if game.is_finished():
-            embed = discord.Embed(title=f"Congratulations!", color=discord.Color.green(),
+            embed = discord.Embed(title="Congratulations!", color=discord.Color.green(),
                                   description=f"The word was **[{game.word.upper()}](https://www.merriam-webster.com/dictionary/{game.word})**!")
-            
+
             time_taken = game.time_taken()
             if time_taken is not None:
-                embed.add_field(name=f"Time spent:   ",
+                embed.add_field(name="Time spent:   ",
                                 value=f"{timedelta_format(time_taken)}", inline=False)
 
             embed.add_field(name="", value="", inline=False)
@@ -85,7 +80,7 @@ class WordleView:
         embed = self.add_guess_hist(embed, stats)
 
         return embed
-    
+
     def add_guess_hist(self, embed: discord.Embed, stats: WordleStats) -> discord.Embed:
         highest_guess_count = max(stats.guess_distribution.values())
         highest_guess_percentage = (highest_guess_count / stats.total_wins) * 100
@@ -110,8 +105,8 @@ class WordleView:
     def format_available_letters(known_letters: Set[str], unknown_letters: Set[str]) -> str:
         sorted_known_letters = sorted(list(known_letters))
         sorted_available_letters = sorted(list(unknown_letters))
-        formatted_known_letters = f"Known letters:\n{" ".join(sorted_known_letters)}"
-        formatted_unknown_letters = f"Available letters:\n{" ".join(sorted_available_letters)}"
+        formatted_known_letters = f"Known letters:\n{' '.join(sorted_known_letters)}"
+        formatted_unknown_letters = f"Available letters:\n{' '.join(sorted_available_letters)}"
         return f"{formatted_known_letters}\n{formatted_unknown_letters}"
 
     @staticmethod
@@ -125,7 +120,7 @@ class WordleView:
         description = f"The word was **[{daily_word}](https://www.merriam-webster.com/dictionary/{daily_word})**"
 
         return discord.Embed(
-            title=f"No one guessed the word! :sob:",
+            title="No one guessed the word! :sob:",
             description=description,
             color=discord.Color.red()
         )
@@ -137,7 +132,7 @@ class WordleView:
                              "[Real Wordle](https://www.nytimes.com/games/wordle/index.html)\n" +
                              "[Pokedoku](https://pokedoku.com/)")
         return embed
-    
+
 
 class WordleFinishedController(discord.ui.View):
     def __init__(self, game: WordleGame, view: WordleView):
@@ -153,7 +148,7 @@ class WordleFinishedController(discord.ui.View):
             return
         embed = await self.view.make_wordle_embed(prev_game)
         await interaction.response.edit_message(
-            embed=embed, 
+            embed=embed,
             view=WordleFinishedController(prev_game, self.view)
         )
 
@@ -166,7 +161,6 @@ class WordleFinishedController(discord.ui.View):
 
         embed = await self.view.make_wordle_embed(next_game)
         await interaction.response.edit_message(
-            embed=embed, 
+            embed=embed,
             view=WordleFinishedController(next_game, self.view)
         )
-        

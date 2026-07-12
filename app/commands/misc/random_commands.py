@@ -1,10 +1,13 @@
+import os
 import random
 
 import discord
-from discord.ext import commands
+import requests
 from discord import app_commands
+from discord.ext import commands
 
 from app.core.elgatron import Elgatron
+
 
 # Helper function to send media
 # Takes either a single URL (str) or a list of URLs (list[str]) and sends one of them
