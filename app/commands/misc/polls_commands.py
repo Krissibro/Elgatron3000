@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from typing import Dict
 
 import discord
+from typing import Optional
 from discord import app_commands
 from discord.ext import commands
 
@@ -25,16 +26,16 @@ class PollCommands(commands.GroupCog, group_name="poll"):
         title: str,
         option1: str,
         option2: str,
-        description: discord.Optional[str] = None,
-        role_mention: discord.Optional[discord.Role] = None,
-        option3: discord.Optional[str] = None,
-        option4: discord.Optional[str] = None,
-        option5: discord.Optional[str] = None,
-        option6: discord.Optional[str] = None,
-        option7: discord.Optional[str] = None,
-        option8: discord.Optional[str] = None,
-        option9: discord.Optional[str] = None,
-        option10: discord.Optional[str] = None,
+        description: Optional[str] = None,
+        role_mention: Optional[discord.Role] = None,
+        option3: Optional[str] = None,
+        option4: Optional[str] = None,
+        option5: Optional[str] = None,
+        option6: Optional[str] = None,
+        option7: Optional[str] = None,
+        option8: Optional[str] = None,
+        option9: Optional[str] = None,
+        option10: Optional[str] = None,
     ):
         # Make a list with valid options
         options = [
@@ -58,8 +59,8 @@ class PollCommands(commands.GroupCog, group_name="poll"):
         ctx: discord.Interaction,
         title: str,
         options: app_commands.Range[int, 2, 10],
-        description: discord.Optional[str] = None,
-        role_mention: discord.Optional[discord.Role] = None,
+        description: Optional[str] = None,
+        role_mention: Optional[discord.Role] = None,
     ):
         emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
         option_dict = {}
@@ -79,8 +80,8 @@ class PollCommands(commands.GroupCog, group_name="poll"):
         title: str,
         date: app_commands.Transform[datetime, DateTransformer],
         days: app_commands.Range[int, 2, 10],
-        description: discord.Optional[str] = None,
-        role_mention: discord.Optional[discord.Role] = None,
+        description: Optional[str] = None,
+        role_mention: Optional[discord.Role] = None,
     ):
         if ctx.response.is_done():
             return
@@ -98,8 +99,8 @@ class PollCommands(commands.GroupCog, group_name="poll"):
         ctx: discord.Interaction,
         options: Dict[str, str],
         title: str,
-        description: discord.Optional[str] = None,
-        role_mention: discord.Optional[discord.Role] = None,
+        description: Optional[str] = None,
+        role_mention: Optional[discord.Role] = None,
         write_options: bool = True,
     ) -> None:
         emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
