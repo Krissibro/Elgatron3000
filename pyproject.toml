@@ -38,4 +38,4 @@ root = ["."]
 
 
 [project.scripts]
-elgatron = "bot:main"
+elgatron = "main:main"

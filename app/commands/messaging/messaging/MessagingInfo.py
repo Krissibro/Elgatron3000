@@ -1,7 +1,8 @@
-import discord
-
+from collections.abc import Awaitable, Callable
 from datetime import datetime, timedelta
-from typing import Awaitable, Callable, Optional, Union, List
+from types import FunctionType
+
+import discord
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.date import DateTrigger
 
@@ -10,44 +11,48 @@ from app.commands.messaging.CommandInfo import CommandInfo
 from app.utilities.helper_functions import char_to_emoji, format_seconds
 from app.utilities.transformers import IntervalTransformer, PositiveIntTransformer
 
+
 class MessagingInfo(CommandInfo):
-    def __init__(self,
-                 internal_function: Callable[["MessagingInfo"], Awaitable[None]],
-                 target: Union[discord.User, discord.Role, None], 
-                 message: str, 
-                 amount: int, 
-                 channel: discord.TextChannel, 
-                 start_time: datetime,  
-                 interval: timedelta,
-                 scheduler: AsyncIOScheduler,
-                 active_commands: ActiveCommands
-                 ):
-        command_name = " ".join(internal_function.__name__.split('_')[:-1])
+    def __init__(
+        self,
+        internal_function: Callable[["MessagingInfo"], Awaitable[None]],
+        target: discord.User | discord.Role | None,
+        message: str,
+        amount: int,
+        channel: discord.TextChannel,
+        start_time: datetime,
+        interval: timedelta,
+        scheduler: AsyncIOScheduler,
+        active_commands: ActiveCommands,
+    ):
+        if not isinstance(internal_function, FunctionType):
+            raise TypeError(
+                "internal_function must be a function"
+            )  # should never happen
+        command_name = " ".join(internal_function.__name__.split("_")[:-1])
         super().__init__(command_name, channel, active_commands)
 
         self.message: str = message
         self.remaining: int = amount
-        self.target: Union[discord.User, discord.Role, None] = target
-        self.messages: List[discord.Message] = []
+        self.target: discord.User | discord.Role | None = target
+        self.messages: list[discord.Message] = []
 
-        self.internal_function: Callable[["MessagingInfo"], Awaitable[None]] = internal_function
+        self.internal_function: Callable[[MessagingInfo], Awaitable[None]] = (
+            internal_function
+        )
         self.current_trigger = start_time
         self.interval: timedelta = interval
         self.scheduler = scheduler
         self.job_id = f"message_scheduler_{self.command_id}"
 
     def start_job(self) -> None:
-        trigger = DateTrigger(self.current_trigger, timezone='Europe/Oslo')
-        self.scheduler.add_job(
-            self.run_command, 
-            trigger=trigger, 
-            id=self.job_id
-        )
+        trigger = DateTrigger(self.current_trigger, timezone="Europe/Oslo")
+        self.scheduler.add_job(self.run_command, trigger=trigger, id=self.job_id)
 
     async def run_command(self) -> None:
         await self.internal_function(self)
         self.remaining -= 1
-        
+
         if self.remaining <= 0:
             await self.kill()
             return
@@ -57,12 +62,12 @@ class MessagingInfo(CommandInfo):
             self.run_command,
             trigger=DateTrigger(self.current_trigger, timezone="Europe/Oslo"),
             id=self.job_id,
-            replace_existing=True
+            replace_existing=True,
         )
 
     def get_mention(self) -> str:
         return self.target.mention if self.target else ""
-    
+
     def add_message(self, message: discord.Message) -> None:
         self.messages.append(message)
 
@@ -72,7 +77,7 @@ class MessagingInfo(CommandInfo):
     def make_embed(self) -> discord.Embed:
         embed = discord.Embed(
             title=f"Command: {self.command_name}",
-            description=f"Message: {self.message}"
+            description=f"Message: {self.message}",
         )
         if self.target is not None:
             embed.add_field(name="User:", value=f"{self.get_mention()}", inline=False)
@@ -81,10 +86,12 @@ class MessagingInfo(CommandInfo):
         return embed
 
     def add_info_field(self, index: int, embed: discord.Embed) -> None:
-        embed.add_field(name=f"{char_to_emoji(index)}: {self.command_name}",
-                        value=f"{self.get_mention()}\n{self.message}",
-                        inline=False)
-    
+        embed.add_field(
+            name=f"{char_to_emoji(index)}: {self.command_name}",
+            value=f"{self.get_mention()}\n{self.message}",
+            inline=False,
+        )
+
     def get_select_description(self) -> str:
         return self.message
 
@@ -97,9 +104,12 @@ class MessagingInfo(CommandInfo):
             self.scheduler.remove_job(job_id=self.job_id)
 
         await self.delete_messages()
-        
+
+
 class EditMessagingCommandWindow(discord.ui.Modal):
-    def __init__(self, interaction: discord.Interaction, messaging_info: MessagingInfo) -> None:
+    def __init__(
+        self, interaction: discord.Interaction, messaging_info: MessagingInfo
+    ) -> None:
         super().__init__(title="Edit")
         self.messaging_info: MessagingInfo = messaging_info
         self.original_response = interaction
@@ -107,17 +117,17 @@ class EditMessagingCommandWindow(discord.ui.Modal):
         self.message_input = discord.ui.TextInput(
             label="Message:",
             style=discord.TextStyle.short,
-            default=messaging_info.message
+            default=messaging_info.message,
         )
         self.amount_input = discord.ui.TextInput(
             label="Amount:",
             style=discord.TextStyle.short,
-            default=str(messaging_info.remaining)
+            default=str(messaging_info.remaining),
         )
         self.interval_input = discord.ui.TextInput(
             label="Interval:",
             style=discord.TextStyle.short,
-            default=format_seconds(messaging_info.interval.seconds)
+            default=format_seconds(messaging_info.interval.seconds),
         )
         self.add_item(self.message_input)
         self.add_item(self.amount_input)
@@ -125,14 +135,20 @@ class EditMessagingCommandWindow(discord.ui.Modal):
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
         message: str = self.message_input.value
-        interval: Optional[timedelta] = await IntervalTransformer().transform(interaction, self.interval_input.value)
-        amount: Optional[int] = await PositiveIntTransformer().transform(interaction, self.amount_input.value)
+        interval: timedelta | None = await IntervalTransformer().transform(
+            interaction, self.interval_input.value
+        )
+        amount: int | None = await PositiveIntTransformer().transform(
+            interaction, self.amount_input.value
+        )
 
         if interaction.response.is_done() or amount is None or interval is None:
             return
-        
+
         await interaction.response.defer()
-        self.messaging_info.message     = message
-        self.messaging_info.remaining   = amount
-        self.messaging_info.interval    = interval
-        await self.original_response.edit_original_response(embed=self.messaging_info.make_embed())
+        self.messaging_info.message = message
+        self.messaging_info.remaining = amount
+        self.messaging_info.interval = interval
+        await self.original_response.edit_original_response(
+            embed=self.messaging_info.make_embed()
+        )

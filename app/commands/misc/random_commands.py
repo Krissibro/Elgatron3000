@@ -29,50 +29,69 @@ class StimCommands(commands.GroupCog, group_name="stim"):
         description="this dude a dude",
     )
     async def this_dude(self, ctx: discord.Interaction):
-        await send_media(ctx, "https://tenor.com/view/this-dude-bro-bruh-welcome-to-gamestop-tiktok-gif-21824756")
+        await send_media(
+            ctx,
+            "https://tenor.com/view/this-dude-bro-bruh-welcome-to-gamestop-tiktok-gif-21824756",
+        )
 
     @app_commands.command(
         name="pet_elga3",
         description="pet elga3 a bit",
     )
     async def pet_elga3(self, ctx: discord.Interaction):
-        await send_media(ctx, "https://media.discordapp.net/attachments/875799818621046855/917046780854685716/5f4877b8-0843-4369-b0dc-0238c230723b.gif?ex=65e47cde&is=65d207de&hm=d79d73354d613b62fdea18fbd782279f980ff19e0d7ad5c4cf51d66094cb655d&")
+        await send_media(
+            ctx,
+            "https://media.discordapp.net/attachments/875799818621046855/917046780854685716/5f4877b8-0843-4369-b0dc-0238c230723b.gif?ex=65e47cde&is=65d207de&hm=d79d73354d613b62fdea18fbd782279f980ff19e0d7ad5c4cf51d66094cb655d&",
+        )
 
     @app_commands.command(
         name="thanos_snapped",
         description="you just got thanos snapped",
     )
     async def thanos_snapped(self, ctx: discord.Interaction):
-        await send_media(ctx, "https://tenor.com/view/disappointed-snapped-sad-gif-22165289")
+        await send_media(
+            ctx, "https://tenor.com/view/disappointed-snapped-sad-gif-22165289"
+        )
 
     @app_commands.command(
         name="weave",
         description="weave",
     )
     async def weave(self, ctx: discord.Interaction):
-        await send_media(ctx, "https://cdn.discordapp.com/attachments/839100318893211669/1211047164567093248/weave.mov?ex=65ecc690&is=65da5190&hm=6ba609dcb85e8ccda9ed75850c0686117f0fa6f824bd6073d035c55a487c6131&")
+        await send_media(
+            ctx,
+            "https://cdn.discordapp.com/attachments/839100318893211669/1211047164567093248/weave.mov?ex=65ecc690&is=65da5190&hm=6ba609dcb85e8ccda9ed75850c0686117f0fa6f824bd6073d035c55a487c6131&",
+        )
 
     @app_commands.command(
         name="trout",
         description="trout",
     )
     async def trout(self, ctx: discord.Interaction):
-        await send_media(ctx, "https://cdn.discordapp.com/attachments/839100318893211669/1211047338509082664/trout.mp4?ex=65ecc6b9&is=65da51b9&hm=53454f3fb04b5ac3c02974211f370897b90e3a1925f4d3e5c0ab5aee9dcd6077&")
+        await send_media(
+            ctx,
+            "https://cdn.discordapp.com/attachments/839100318893211669/1211047338509082664/trout.mp4?ex=65ecc6b9&is=65da51b9&hm=53454f3fb04b5ac3c02974211f370897b90e3a1925f4d3e5c0ab5aee9dcd6077&",
+        )
 
     @app_commands.command(
         name="sus",
         description="amogos sos amogos sossi sossi baki amogos sos amogos",
     )
     async def sussy_baki(self, ctx: discord.Interaction):
-        await send_media(ctx, "https://cdn.discordapp.com/attachments/839100318893211669/1245765875462836388/Sossi-baki.mp4?ex=6659f161&is=66589fe1&hm=5af0e663626613c8ef2ab2bb7c0876447eeeedc6194d7aa24f7c80c8dbb95d40&")
+        await send_media(
+            ctx,
+            "https://cdn.discordapp.com/attachments/839100318893211669/1245765875462836388/Sossi-baki.mp4?ex=6659f161&is=66589fe1&hm=5af0e663626613c8ef2ab2bb7c0876447eeeedc6194d7aa24f7c80c8dbb95d40&",
+        )
 
     @app_commands.command(
         name="crazy_jorgen_wordle_guess",
         description="We are onto you Jorgen",
     )
     async def crazy_jorgen_wordle_guess(self, ctx: discord.Interaction):
-        await send_media(ctx, "https://cdn.discordapp.com/attachments/839100318893211669/1463529624368578730/james_doakes_sus.mp4?ex=697229ad&is=6970d82d&hm=2ebdf49d9883e596017095b265acda6b4bc533d055bc20bab93873c9e70e4eb7&")
-
+        await send_media(
+            ctx,
+            "https://cdn.discordapp.com/attachments/839100318893211669/1463529624368578730/james_doakes_sus.mp4?ex=697229ad&is=6970d82d&hm=2ebdf49d9883e596017095b265acda6b4bc533d055bc20bab93873c9e70e4eb7&",
+        )
 
     @app_commands.command(
         name="minecraft",
@@ -86,84 +105,115 @@ class StimCommands(commands.GroupCog, group_name="stim"):
         ]
         await send_media(ctx, gifs)
 
-
     @app_commands.command(
         name="help",
         description="Gee you already know im obsessed with it *burp*, i cant get enough, back with another milk- ",
     )
     async def help(self, ctx: discord.Interaction):
-        await send_media(ctx, "https://cdn.discordapp.com/attachments/839100318893211669/1310589750490562640/HEEEELP.mp4?ex=6745c552&is=674473d2&hm=86c7673380acaf4bea501ca6cd938ba70da9ed7aa783882fa4445ef98c02ba85&")
+        await send_media(
+            ctx,
+            "https://cdn.discordapp.com/attachments/839100318893211669/1310589750490562640/HEEEELP.mp4?ex=6745c552&is=674473d2&hm=86c7673380acaf4bea501ca6cd938ba70da9ed7aa783882fa4445ef98c02ba85&",
+        )
 
     @app_commands.command(
         name="im_losing_it",
         description="DU DU DU, babababaaaaa babababa baba baba baaa baba ba baaa baaa baba ba ba babababa bababa baba",
     )
     async def im_losing_it(self, ctx: discord.Interaction):
-        await send_media(ctx, "https://cdn.discordapp.com/attachments/839100318893211669/1463529639015354451/im_losing_it.mp4?ex=697229b1&is=6970d831&hm=f196b15a2310458bfe65b3837b61092e600d6eef0d9fd2f39e4b09f372af9421&")
-
+        await send_media(
+            ctx,
+            "https://cdn.discordapp.com/attachments/839100318893211669/1463529639015354451/im_losing_it.mp4?ex=697229b1&is=6970d831&hm=f196b15a2310458bfe65b3837b61092e600d6eef0d9fd2f39e4b09f372af9421&",
+        )
 
     @app_commands.command(
         name="wassup_beijing",
         description="Christian winnie the pooh cosplay",
     )
     async def wassup_beijing(self, ctx: discord.Interaction):
-        await send_media(ctx, "https://cdn.discordapp.com/attachments/839100318893211669/1310925320014008340/wassup-beijing.mp4?ex=6746fdd8&is=6745ac58&hm=f3e680140b5238a1f6ec58b7c8ba95c7223e1fcc5246028dc7ba797be7d6f128&")
+        await send_media(
+            ctx,
+            "https://cdn.discordapp.com/attachments/839100318893211669/1310925320014008340/wassup-beijing.mp4?ex=6746fdd8&is=6745ac58&hm=f3e680140b5238a1f6ec58b7c8ba95c7223e1fcc5246028dc7ba797be7d6f128&",
+        )
 
     @app_commands.command(
         name="gn_girl",
         description="*Rambunctious falling sounds*",
     )
     async def gn_girl(self, ctx: discord.Interaction):
-        await send_media(ctx, "https://cdn.discordapp.com/attachments/839100318893211669/1310925339765248020/gn-girl.mp4?ex=6746fddc&is=6745ac5c&hm=b4168328e4f76d27e2649dc530bf33b69fcdc60c72a29f54d847bab35ac8b907&")
+        await send_media(
+            ctx,
+            "https://cdn.discordapp.com/attachments/839100318893211669/1310925339765248020/gn-girl.mp4?ex=6746fddc&is=6745ac5c&hm=b4168328e4f76d27e2649dc530bf33b69fcdc60c72a29f54d847bab35ac8b907&",
+        )
 
     @app_commands.command(
         name="dr_peppa",
         description="Epic dr pebba prank",
     )
     async def dr_peppa(self, ctx: discord.Interaction):
-        await send_media(ctx, "https://cdn.discordapp.com/attachments/839100318893211669/1351897109263290479/dr-peppa.mp4?ex=67dc0bcb&is=67daba4b&hm=3c104e683e6274cd6dccb001ba942fc71dc446c127e3c107fff159b5b456b418&")
+        await send_media(
+            ctx,
+            "https://cdn.discordapp.com/attachments/839100318893211669/1351897109263290479/dr-peppa.mp4?ex=67dc0bcb&is=67daba4b&hm=3c104e683e6274cd6dccb001ba942fc71dc446c127e3c107fff159b5b456b418&",
+        )
 
     @app_commands.command(
         name="sybau",
         description="man shut yo bitchass up",
     )
     async def sybau(self, ctx: discord.Interaction):
-        await send_media(ctx, "https://cdn.discordapp.com/attachments/839100318893211669/1463529609092927634/sybau.mp4?ex=697229a9&is=6970d829&hm=9eee151906d8101b13006fee369d379c5db1f71ff11521bc2b28cf1da852c1cb&")
+        await send_media(
+            ctx,
+            "https://cdn.discordapp.com/attachments/839100318893211669/1463529609092927634/sybau.mp4?ex=697229a9&is=6970d829&hm=9eee151906d8101b13006fee369d379c5db1f71ff11521bc2b28cf1da852c1cb&",
+        )
 
     @app_commands.command(
         name="game_pitch",
         description="ok hear me out",
     )
     async def game_pitch(self, ctx: discord.Interaction):
-        await send_media(ctx, "https://cdn.discordapp.com/attachments/839100318893211669/1463529572115939454/games_pitch.mp4?ex=697229a1&is=6970d821&hm=d80a2a59907c67d132756addcfb51e251ba49104412afc0dc25453ce0a98d37a&")
+        await send_media(
+            ctx,
+            "https://cdn.discordapp.com/attachments/839100318893211669/1463529572115939454/games_pitch.mp4?ex=697229a1&is=6970d821&hm=d80a2a59907c67d132756addcfb51e251ba49104412afc0dc25453ce0a98d37a&",
+        )
 
     @app_commands.command(
         name="crow_honk",
         description="boat noises",
     )
     async def crow_honk(self, ctx: discord.Interaction):
-        await send_media(ctx, "https://cdn.discordapp.com/attachments/163382741491122176/1500560584268058674/Crow_honk.mp4?ex=6a1dcb72&is=6a1c79f2&hm=834912f11d8b3869bacc78e12e260a48b3e181ee09ee6d977ffa5f2cfb48b58f&")
+        await send_media(
+            ctx,
+            "https://cdn.discordapp.com/attachments/163382741491122176/1500560584268058674/Crow_honk.mp4?ex=6a1dcb72&is=6a1c79f2&hm=834912f11d8b3869bacc78e12e260a48b3e181ee09ee6d977ffa5f2cfb48b58f&",
+        )
 
     @app_commands.command(
         name="feed_yourself",
         description="You should feed yourself NOW!",
     )
     async def feed_yourself(self, ctx: discord.Interaction):
-        await send_media(ctx, "https://cdn.discordapp.com/attachments/839100318893211669/1498318978634747954/unknown.png?ex=6a1d8cc9&is=6a1c3b49&hm=1e2ddcdb7746d8f6389f8003c27f8c2d214c9402c2c01ed8af6ef91154b51c22&")
+        await send_media(
+            ctx,
+            "https://cdn.discordapp.com/attachments/839100318893211669/1498318978634747954/unknown.png?ex=6a1d8cc9&is=6a1c3b49&hm=1e2ddcdb7746d8f6389f8003c27f8c2d214c9402c2c01ed8af6ef91154b51c22&",
+        )
 
     @app_commands.command(
         name="bergen",
         description="yep",
     )
     async def bergen(self, ctx: discord.Interaction):
-        await send_media(ctx, "https://cdn.discordapp.com/attachments/839100318893211669/1510761585440981054/bergen.mp4?ex=6a1dfdde&is=6a1cac5e&hm=417edf043d5da90f1a18d4704acc4ed9364ff7b8de4ebe2ce971702a6aa53bb7&")
+        await send_media(
+            ctx,
+            "https://cdn.discordapp.com/attachments/839100318893211669/1510761585440981054/bergen.mp4?ex=6a1dfdde&is=6a1cac5e&hm=417edf043d5da90f1a18d4704acc4ed9364ff7b8de4ebe2ce971702a6aa53bb7&",
+        )
 
     @app_commands.command(
         name="skeleton",
         description="RAAAHHHH *BANG* *BANG* *BANG*",
     )
     async def skeleton(self, ctx: discord.Interaction):
-        await send_media(ctx, "https://cdn.discordapp.com/attachments/839100318893211669/1510762628455071784/skeleton.mp4?ex=6a1dfed7&is=6a1cad57&hm=3f0cb0950f3bcde9bb7cd46cb3b79f6d003fb9db95108d9f525dd1f9ec4c3813&")
+        await send_media(
+            ctx,
+            "https://cdn.discordapp.com/attachments/839100318893211669/1510762628455071784/skeleton.mp4?ex=6a1dfed7&is=6a1cad57&hm=3f0cb0950f3bcde9bb7cd46cb3b79f6d003fb9db95108d9f525dd1f9ec4c3813&",
+        )
 
     @app_commands.command(
         name="dunk",
@@ -177,7 +227,9 @@ class StimCommands(commands.GroupCog, group_name="stim"):
         description=":pensive:",
     )
     async def fumble(self, ctx: discord.Interaction):
-        await send_media(ctx, "https://tenor.com/view/basketball-miss-failure-fail-gif-24912602")
+        await send_media(
+            ctx, "https://tenor.com/view/basketball-miss-failure-fail-gif-24912602"
+        )
 
     def pick_random_horse_gif(self):
         gifs = [
@@ -193,11 +245,11 @@ class StimCommands(commands.GroupCog, group_name="stim"):
             "https://media.discordapp.net/attachments/1217933367849386004/1377728078788296774/yeeeeeesssss.gif?ex=683a04c2&is=6838b342&hm=1875126d84f1c2ea82c9a499e486ed3ba7faed0a8e6ed088298cdb448c92e8c6&=&width=310&height=548",
             "https://cdn.discordapp.com/attachments/839100318893211669/1502603641616470116/20260508_181838.jpg?ex=6a1d5131&is=6a1bffb1&hm=0724c9e318d5e1bdaf40e5f08444cee78038af2988df4ece07b42a5b0f042cb9&",
             "https://tenor.com/view/horse-derp-tongue-lick-beffen-gif-16516227",
-            "https://tenor.com/view/horse-in-wind-horse-sad-horse-yeat-melancholy-gif-26693609"
+            "https://tenor.com/view/horse-in-wind-horse-sad-horse-yeat-melancholy-gif-26693609",
         ]
         return random.choice(gifs)
 
-    @commands.Cog.listener('on_message')
+    @commands.Cog.listener("on_message")
     async def on_message(self, message: discord.Message):
         if message.author.bot:
             return
@@ -218,7 +270,6 @@ class SteamAPICommands(commands.Cog):
     def __init__(self, bot: Elgatron):
         self.bot: Elgatron = bot
         self.steam_api_key = os.getenv("STEAM_WEB_API_KEY")
-
 
     def get_steam_game_hours_played(self, steam_user_id: int, steam_game_id: int):
         if not self.steam_api_key:
@@ -246,7 +297,6 @@ class SteamAPICommands(commands.Cog):
         minutes = games[0].get("playtime_forever", 0)
         return minutes / 60
 
-
     def is_playing_game(self, steam_user_id: int, game_id: int) -> bool:
         url = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/"
 
@@ -267,7 +317,6 @@ class SteamAPICommands(commands.Cog):
 
         return player.get("gameid") == str(game_id)
 
-
     @app_commands.command(
         name="tobias_nuke",
         description="Tobias acting up? Actually just kill him",
@@ -277,19 +326,32 @@ class SteamAPICommands(commands.Cog):
         TOBIAS_STEAM_ID = 76561198141333649
 
         try:
-            total_game_hours = self.get_steam_game_hours_played(TOBIAS_STEAM_ID, FFXIV_APP_ID)
+            total_game_hours = self.get_steam_game_hours_played(
+                TOBIAS_STEAM_ID, FFXIV_APP_ID
+            )
             is_playing_right_now = self.is_playing_game(TOBIAS_STEAM_ID, FFXIV_APP_ID)
 
             if total_game_hours is None:
-                await ctx.response.send_message( embed=discord.Embed( title="Couldn't find playtime", color=discord.Color.dark_red() ) )
+                await ctx.response.send_message(
+                    embed=discord.Embed(
+                        title="Couldn't find playtime", color=discord.Color.dark_red()
+                    )
+                )
             elif is_playing_right_now:
-                await ctx.response.send_message(embed=discord.Embed(
-                    title=":rotating_light: Tobias is currently playing Final Fantasy XIV Online :rotating_light:",
-                    description=f"He has a total of  **{total_game_hours:.0f}**  hours in the game",
-                    color=discord.Color.red()
-                ))
+                await ctx.response.send_message(
+                    embed=discord.Embed(
+                        title=":rotating_light: Tobias is currently playing Final Fantasy XIV Online :rotating_light:",
+                        description=f"He has a total of  **{total_game_hours:.0f}**  hours in the game",
+                        color=discord.Color.red(),
+                    )
+                )
             else:
-                await ctx.response.send_message( embed=discord.Embed( title=f"Tobias currently has  **{total_game_hours:.0f}**  hours played in Final Fantasy XIV Online", color=discord.Color.red() ) )
+                await ctx.response.send_message(
+                    embed=discord.Embed(
+                        title=f"Tobias currently has  **{total_game_hours:.0f}**  hours played in Final Fantasy XIV Online",
+                        color=discord.Color.red(),
+                    )
+                )
 
         except Exception as error:
             print(error)

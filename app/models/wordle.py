@@ -1,4 +1,4 @@
-from datetime import datetime, date, timedelta
+from datetime import date, datetime, timedelta
 from typing import Optional
 
 from tortoise import fields
@@ -6,18 +6,17 @@ from tortoise.models import Model
 
 
 class WordleGame(Model):
-    id:                 int                 = fields.IntField(primary_key=True)     # # ty:ignore[invalid-assignment]
+    id: int = fields.IntField(primary_key=True)  # ty:ignore[invalid-assignment]
 
-    game_date:          Optional[date]      = fields.DateField(null=True)           # # ty:ignore[invalid-assignment]
-    word:               str                 = fields.CharField(max_length=16)       # # ty:ignore[invalid-assignment]
+    game_date: date | None = fields.DateField(null=True)  # ty:ignore[invalid-assignment]
+    word: str = fields.CharField(max_length=16)  # ty:ignore[invalid-assignment]
 
-    guesses: fields.ReverseRelation['WordleGuess']
+    guesses: fields.ReverseRelation["WordleGuess"]
 
     async def get_previous_game(self) -> Optional["WordleGame"]:
         """Get the game before the given game."""
         previous_game = (
-            await self.__class__
-            .filter(id__lt=self.id)
+            await self.__class__.filter(id__lt=self.id)
             .prefetch_related("guesses")
             .last()
         )
@@ -26,8 +25,7 @@ class WordleGame(Model):
     async def get_next_game(self) -> Optional["WordleGame"]:
         """Get the game after the given game."""
         next_game = (
-            await self.__class__
-            .filter(id__gt=self.id)
+            await self.__class__.filter(id__gt=self.id)
             .prefetch_related("guesses")
             .first()
         )
@@ -37,7 +35,7 @@ class WordleGame(Model):
         """Check if the game is finished."""
         return any([guess.word == self.word for guess in self.guesses])
 
-    def time_taken(self) -> Optional[timedelta]:
+    def time_taken(self) -> timedelta | None:
         """measure time between first and latest guess, or None if not guesses is undefined or empty"""
         # make sure guesses are already prefetched
         if not self.guesses:
@@ -54,14 +52,15 @@ class WordleGame(Model):
 
 
 class WordleGuess(Model):
-    id:             int         = fields.IntField(primary_key=True) # # ty:ignore[invalid-assignment]
+    id: int = fields.IntField(primary_key=True)  # ty:ignore[invalid-assignment]
 
-    word:           str         = fields.CharField(max_length=16)   # # ty:ignore[invalid-assignment]
-    guesser_name:   str         = fields.CharField(max_length=64)   # # ty:ignore[invalid-assignment]
-    time:           datetime    = fields.DatetimeField(null=False)  # # ty:ignore[invalid-assignment]
-    guesser_id:           str         = fields.CharField(max_length=64)   # # ty:ignore[invalid-assignment]
-    game: WordleGame            = fields.ForeignKeyField(   # # ty:ignore[no-matching-overload]
-        model_name="models.WordleGame",
+    word: str = fields.CharField(max_length=16)  # ty:ignore[invalid-assignment]
+    guesser_name: str = fields.CharField(max_length=64)  # ty:ignore[invalid-assignment]
+    guesser_id: str = fields.CharField(max_length=64)  # ty:ignore[invalid-assignment]
+
+    time: datetime = fields.DatetimeField(null=False)  # ty:ignore[invalid-assignment]
+    game: WordleGame = fields.ForeignKeyField(  # ty:ignore[invalid-assignment]
+        "models.WordleGame",
         related_name="guesses",
         on_delete=fields.CASCADE,
     )
@@ -69,20 +68,24 @@ class WordleGuess(Model):
     def __str__(self) -> str:
         return f"{self.guesser_name} - {self.word}"
 
+
 class WordleStats(Model):
-    id:                 int             = fields.IntField(primary_key=True) # # ty:ignore[invalid-assignment]
-    server_id:          int             = fields.IntField(unique=True)      # ty:ignore[invalid-assignment]
+    id: int = fields.IntField(primary_key=True)  # ty:ignore[invalid-assignment]
+    server_id: int = fields.IntField(unique=True)  # ty:ignore[invalid-assignment]
 
-    total_games:        int             = fields.IntField(default=0)        # # ty:ignore[invalid-assignment]
-    total_wins:         int             = fields.IntField(default=0)        # # ty:ignore[invalid-assignment]
-    total_guesses:      int             = fields.IntField(default=0)        # # ty:ignore[invalid-assignment]
+    total_games: int = fields.IntField(default=0)  # ty:ignore[invalid-assignment]
+    total_wins: int = fields.IntField(default=0)  # ty:ignore[invalid-assignment]
+    total_guesses: int = fields.IntField(default=0)  # ty:ignore[invalid-assignment]
 
-    win_streak:         int             = fields.IntField(default=0)  # ty:ignore[invalid-assignment]
-    longest_win_streak: int             = fields.IntField(default=0)  # ty:ignore[invalid-assignment]
-    fastest_win:        timedelta       = fields.TimeDeltaField(default=timedelta(hours=23, minutes=59, seconds=59))  # ty:ignore[invalid-assignment]
+    win_streak: int = fields.IntField(default=0)  # ty:ignore[invalid-assignment]
+    longest_win_streak: int = fields.IntField(default=0)  # ty:ignore[invalid-assignment]
+    fastest_win: timedelta = fields.TimeDeltaField(  # ty:ignore[invalid-assignment]
+        default=timedelta(hours=23, minutes=59, seconds=59)
+    )
 
-    guess_distribution: dict            = fields.JSONField(default=dict)  # # ty:ignore[invalid-assignment]
-
+    guess_distribution: dict = fields.JSONField(  # ty:ignore[invalid-assignment]
+        default=dict
+    )
 
     def overall_win_percentage(self) -> float:
         if self.total_games == 0:

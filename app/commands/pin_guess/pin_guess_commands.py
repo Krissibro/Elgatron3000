@@ -1,14 +1,14 @@
-import discord
 import io
 
+import discord
 from discord import app_commands
 from discord.ext import commands
 
+from app.commands.pin_guess.pin_guess_db import PinDB
+from app.commands.pin_guess.pin_guess_view import PinView, TempPinView
 from app.core.elgatron import Elgatron
 from app.models.pin import Pin
 
-from app.commands.pin_guess.pin_guess_db import PinDB
-from app.commands.pin_guess.pin_guess_view import PinView, TempPinView
 
 class GuessThatPin(commands.GroupCog, group_name="pin"):
     def __init__(self, bot: Elgatron):
@@ -24,12 +24,16 @@ class GuessThatPin(commands.GroupCog, group_name="pin"):
         view: PinView = PinView(pin)
 
         if not pin.has_files:
-           await ctx.response.send_message(embed=view.make_first_embed(), view=view)
+            await ctx.response.send_message(embed=view.make_first_embed(), view=view)
         else:
             # if there are files show preview as soon as possible
-            await ctx.response.send_message(embed=view.make_first_embed(), view=TempPinView())
+            await ctx.response.send_message(
+                embed=view.make_first_embed(), view=TempPinView()
+            )
             # then edit with the full view
-            await ctx.edit_original_response(view=view, attachments=await self.get_message_attatchments(pin))
+            await ctx.edit_original_response(
+                view=view, attachments=await self.get_message_attatchments(pin)
+            )
 
     @app_commands.command(
         name="sync",
@@ -40,7 +44,9 @@ class GuessThatPin(commands.GroupCog, group_name="pin"):
         await self.pin_db.delete_all_server_pins(ctx.guild_id)
         pin_count = await self.pin_db.fetch_pins(ctx.guild)
 
-        embed = discord.Embed(title=f"{pin_count} pins were loaded!",)
+        embed = discord.Embed(
+            title=f"{pin_count} pins were loaded!",
+        )
         await ctx.response.send_message(embed=embed)
 
     @commands.Cog.listener()

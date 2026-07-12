@@ -1,10 +1,7 @@
 import asyncio
-
 from datetime import datetime, timedelta
-from typing import Dict
 
 import discord
-from typing import Optional
 from discord import app_commands
 from discord.ext import commands
 
@@ -26,20 +23,29 @@ class PollCommands(commands.GroupCog, group_name="poll"):
         title: str,
         option1: str,
         option2: str,
-        description: Optional[str] = None,
-        role_mention: Optional[discord.Role] = None,
-        option3: Optional[str] = None,
-        option4: Optional[str] = None,
-        option5: Optional[str] = None,
-        option6: Optional[str] = None,
-        option7: Optional[str] = None,
-        option8: Optional[str] = None,
-        option9: Optional[str] = None,
-        option10: Optional[str] = None,
+        description: str | None = None,
+        role_mention: discord.Role | None = None,
+        option3: str | None = None,
+        option4: str | None = None,
+        option5: str | None = None,
+        option6: str | None = None,
+        option7: str | None = None,
+        option8: str | None = None,
+        option9: str | None = None,
+        option10: str | None = None,
     ):
         # Make a list with valid options
         options = [
-            option1, option2, option3, option4, option5, option6, option7, option8, option9, option10,
+            option1,
+            option2,
+            option3,
+            option4,
+            option5,
+            option6,
+            option7,
+            option8,
+            option9,
+            option10,
         ]
         options = [
             option for option in options if option
@@ -59,8 +65,8 @@ class PollCommands(commands.GroupCog, group_name="poll"):
         ctx: discord.Interaction,
         title: str,
         options: app_commands.Range[int, 2, 10],
-        description: Optional[str] = None,
-        role_mention: Optional[discord.Role] = None,
+        description: str | None = None,
+        role_mention: discord.Role | None = None,
     ):
         emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
         option_dict = {}
@@ -68,7 +74,9 @@ class PollCommands(commands.GroupCog, group_name="poll"):
         for emoji in emojis[:options]:
             option_dict[emoji] = ""
 
-        await self.make_poll(ctx, option_dict, title, description, role_mention, write_options=False)
+        await self.make_poll(
+            ctx, option_dict, title, description, role_mention, write_options=False
+        )
 
     @app_commands.command(
         name="dates",
@@ -80,8 +88,8 @@ class PollCommands(commands.GroupCog, group_name="poll"):
         title: str,
         date: app_commands.Transform[datetime, DateTransformer],
         days: app_commands.Range[int, 2, 10],
-        description: Optional[str] = None,
-        role_mention: Optional[discord.Role] = None,
+        description: str | None = None,
+        role_mention: discord.Role | None = None,
     ):
         if ctx.response.is_done():
             return
@@ -97,10 +105,10 @@ class PollCommands(commands.GroupCog, group_name="poll"):
     @staticmethod
     async def make_poll(
         ctx: discord.Interaction,
-        options: Dict[str, str],
+        options: dict[str, str],
         title: str,
-        description: Optional[str] = None,
-        role_mention: Optional[discord.Role] = None,
+        description: str | None = None,
+        role_mention: discord.Role | None = None,
         write_options: bool = True,
     ) -> None:
         emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
@@ -116,10 +124,10 @@ class PollCommands(commands.GroupCog, group_name="poll"):
         for emoji in emojis[: len(options)]:
             await msg.add_reaction(emoji)
             await asyncio.sleep(0.05)
-        
+
         if isinstance(ctx.channel, discord.Thread):
             return
-        
+
         thread = await msg.create_thread(name=title[:100])
 
         if role_mention is not None:

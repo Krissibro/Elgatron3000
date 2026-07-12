@@ -1,22 +1,22 @@
+from typing import Literal
+
 import discord
 from discord import app_commands
 from discord.ext import commands
 
-from typing import Literal, Optional
-
 from app.core.elgaTree import ElgatronError
 from app.core.elgatron import Elgatron
+
 
 class CommandSync(commands.Cog):
     def __init__(self, bot: Elgatron):
         self.bot: Elgatron = bot
 
     @commands.is_owner()
-    @app_commands.command(
-        name="sync",
-        description="Syncs commands"
-    )
-    async def sync(self, ctx: discord.Interaction, spec: Optional[Literal["~", "*", "^"]] = None) -> None:
+    @app_commands.command(name="sync", description="Syncs commands")
+    async def sync(
+        self, ctx: discord.Interaction, spec: Literal["~", "*", "^"] | None = None
+    ) -> None:
         await ctx.response.defer()
 
         # Owner check, only the owner can proceed
@@ -25,7 +25,7 @@ class CommandSync(commands.Cog):
                 content="You do not have permission to use this command."
             )
             return
-        
+
         guild = ctx.guild
         if guild is None:
             raise ElgatronError("The discord server is undefined (HOW???)")

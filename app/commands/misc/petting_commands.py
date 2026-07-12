@@ -1,9 +1,10 @@
-import discord
-
 from io import BytesIO
-from PIL import Image, ImageSequence
+
+import anyio
+import discord
 from discord import app_commands
 from discord.ext import commands
+from PIL import Image, ImageSequence
 
 from app.core.elgatron import Elgatron
 
@@ -11,29 +12,40 @@ from app.core.elgatron import Elgatron
 class Petting(commands.Cog):
     def __init__(self, bot: Elgatron):
         self.bot: Elgatron = bot
+        self.template = Image.open("app/static/assets/petting/template.gif")
 
-    @app_commands.command(
-        name="petting",
-        description="give people pets!"
-    )
+    @app_commands.command(name="petting", description="give people pets!")
     async def petting(self, ctx: discord.Interaction, user: discord.User):
         file_name = f"{user.id}.gif"
         try:
-            await ctx.response.send_message(file=discord.File(f"static/assets/petting/{file_name}"))
+            await ctx.response.send_message(
+                file=discord.File(f"static/assets/petting/{file_name}")
+            )
         except FileNotFoundError:
             avatar_image: Image.Image = await get_profile_avatar(user)
-            file: BytesIO = await petting(avatar_image)
+            file: BytesIO = await self.make_petting_gif(avatar_image)
 
-            with open(f"static/assets/petting/{file_name}", "wb") as f:
-                f.write(file.getbuffer())
+            async with await anyio.open_file(f"app/static/assets/petting/{file_name}", "wb") as f:
+                await f.write(file.getbuffer())
 
             await ctx.response.send_message(file=discord.File(file, filename=file_name))
 
+    async def make_petting_gif(self, avatar_image: Image.Image) -> BytesIO:
+        frames_out = []
+        squash_and_stretch = [
+            (1.00, 1.00),  # frame 0
+            (0.97, 1.03),  # frame 1
+            (0.94, 1.06),  # frame 2
+            (0.91, 1.09),  # frame 3
+            (0.88, 1.12),  # frame 4
+            (0.88, 1.12),  # frame 5
+            (0.91, 1.09),  # frame 6
+            (0.94, 1.06),  # frame 7
+            (0.97, 1.03),  # frame 8
+            (1.00, 1.00),  # frame 9
+        ]
 
-async def get_profile_avatar(user: discord.User):
-    avatar = BytesIO()
-    await user.display_avatar.save(fp=avatar, seek_begin=True)
-    return Image.open(avatar).convert("RGBA")
+        # Load template hand GIF
 
 
 async def petting(avatar_image: Image.Image) -> BytesIO:
@@ -48,7 +60,7 @@ async def petting(avatar_image: Image.Image) -> BytesIO:
         (0.91, 1.09),  # frame 6
         (0.94, 1.06),  # frame 7
         (0.97, 1.03),  # frame 8
-        (1.00, 1.00)   # frame 9
+        (1.00, 1.00),  # frame 9
     ]
 
     # Load template hand GIF
@@ -61,14 +73,15 @@ async def petting(avatar_image: Image.Image) -> BytesIO:
         # Force avatar square (pet-pet standard)
         avatar_image = avatar_image.resize((base_size, base_size))
 
-        for i, hand_frame in enumerate(ImageSequence.Iterator(template)):
+        for i, hand_frame in enumerate(ImageSequence.Iterator(self.template)):
             # Loop scale values across frames
             scale = squash_and_stretch[i % len(squash_and_stretch)]
             sx, sy = scale
 
             # Resize avatar with squeeze/stretch
             resized_avatar = avatar_image.resize(
-                (int(base_size * sx), int(base_size * sy)))
+                (int(base_size * sx), int(base_size * sy))
+            )
 
             # Center the avatar on canvas
             vertical_offset = 10
@@ -85,20 +98,25 @@ async def petting(avatar_image: Image.Image) -> BytesIO:
 
             frames_out.append(frame)
 
-    # Export GIF
-    out = BytesIO()
-    frames_out[0].save(
-        out,
-        format="GIF",
-        save_all=True,
-        append_images=frames_out[1:],
-        duration=30,
-        loop=0,
-        disposal=2
-    )
-    out.seek(0)
-    return out
+        # Export GIF
+        out = BytesIO()
+        frames_out[0].save(
+            out,
+            format="GIF",
+            save_all=True,
+            append_images=frames_out[1:],
+            duration=30,
+            loop=0,
+            disposal=2,
+        )
+        out.seek(0)
+        return out
 
+
+async def get_profile_avatar(user: discord.User):
+    avatar = BytesIO()
+    await user.display_avatar.save(fp=avatar, seek_begin=True)
+    return Image.open(avatar).convert("RGBA")
 
 
 async def setup(bot: Elgatron):

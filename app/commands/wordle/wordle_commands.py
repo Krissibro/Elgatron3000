@@ -1,30 +1,39 @@
 import discord
+from apscheduler.triggers.cron import CronTrigger
 from discord import app_commands
 from discord.ext import commands
 
-from apscheduler.triggers.cron import CronTrigger
-
 from app.commands.wordle.wordle_db import WordleDB
-from app.commands.wordle.wordle_view import WordleView, WordleFinishedController
-
+from app.commands.wordle.wordle_view import WordleFinishedController, WordleView
 from app.core.elgatron import Elgatron
 from app.utilities.errors import ElgatronError
 from app.utilities.validators import validate_messageable
+
 
 @app_commands.guild_only()
 class WordleCommands(commands.GroupCog, group_name="wordle"):
     def __init__(self, bot: Elgatron):
         self.bot: Elgatron = bot
-        self.channel_id = bot.testing_channel_id if bot.testing else bot.wordle_channel_id
-        
+        self.channel_id = (
+            bot.testing_channel_id if bot.testing else bot.wordle_channel_id
+        )
+
         self.wordle_db = WordleDB(bot.wordle_path, bot.testing)
         self.wordle_view: WordleView = WordleView()
 
-        new_word_trigger = CronTrigger(hour=8, minute=0, second=0, timezone='Europe/Oslo')
-        bot.scheduler.add_job(self.scheduled_new_game, new_word_trigger, id="wordle_pick_new_word")
+        new_word_trigger = CronTrigger(
+            hour=8, minute=0, second=0, timezone="Europe/Oslo"
+        )
+        bot.scheduler.add_job(
+            self.scheduled_new_game, new_word_trigger, id="wordle_pick_new_word"
+        )
 
-        reminder_trigger = CronTrigger(hour=22, minute=0, second=0, timezone='Europe/Oslo')
-        bot.scheduler.add_job(self.send_wordle_reminder, reminder_trigger, id="wordle_reminder")
+        reminder_trigger = CronTrigger(
+            hour=22, minute=0, second=0, timezone="Europe/Oslo"
+        )
+        bot.scheduler.add_job(
+            self.send_wordle_reminder, reminder_trigger, id="wordle_reminder"
+        )
 
     @app_commands.command(
         name="guess",
@@ -33,14 +42,16 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
     async def guess_word(self, ctx: discord.Interaction, word: str) -> None:
         if ctx.guild is None:
             raise ElgatronError("This command can only be used in a server.")
-        
+
         await self.wordle_db.guess_word(word, ctx.user)
-        
+
         game = await self.wordle_db.get_current_game()
         embed = await self.wordle_view.make_wordle_embed(game)
 
         if game.is_finished():
-            await ctx.response.send_message(embed=embed, view=WordleFinishedController(game, self.wordle_view))            
+            await ctx.response.send_message(
+                embed=embed, view=WordleFinishedController(game, self.wordle_view)
+            )
             await self.wordle_db.handle_win(ctx.guild.id, game)
         else:
             await ctx.response.send_message(embed=embed)
@@ -54,7 +65,9 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         embed = await self.wordle_view.make_wordle_embed(game)
 
         if game.is_finished():
-            await ctx.response.send_message(embed=embed, view=WordleFinishedController(game, self.wordle_view))
+            await ctx.response.send_message(
+                embed=embed, view=WordleFinishedController(game, self.wordle_view)
+            )
         else:
             await ctx.response.send_message(embed=embed)
 
@@ -69,7 +82,7 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         stats = await self.wordle_db.get_wordle_stats(ctx.guild.id)
         embed = self.wordle_view.make_stats_embed(stats)
 
-        await ctx.response.send_message(embed=embed)    
+        await ctx.response.send_message(embed=embed)
 
     @app_commands.command(
         name="recalculate_stats",
@@ -83,7 +96,9 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
 
         await ctx.response.defer(thinking=True, ephemeral=True)
         await self.wordle_db.recalculate_stats(ctx.guild.id)
-        await ctx.edit_original_response(embed=discord.Embed(title="Wordle statistics recalculated!"))
+        await ctx.edit_original_response(
+            embed=discord.Embed(title="Wordle statistics recalculated!")
+        )
 
     @app_commands.command(
         name="reset",
@@ -102,11 +117,15 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
             game = await self.wordle_db.get_current_game()
             await game.delete()
             await self.wordle_db.recalculate_stats(ctx.guild.id)
-            
+
         game = await self.wordle_db.new_game()
 
-        self.bot.logger.info(f"Wordle reset by {ctx.user} ({ctx.user.id}). Word is: {game.word}")
-        await ctx.response.send_message(embed=discord.Embed(title="Wordle has been reset!"), ephemeral=True)
+        self.bot.logger.info(
+            f"Wordle reset by {ctx.user} ({ctx.user.id}). Word is: {game.word}"
+        )
+        await ctx.response.send_message(
+            embed=discord.Embed(title="Wordle has been reset!"), ephemeral=True
+        )
 
     async def scheduled_new_game(self) -> None:
         game = await self.wordle_db.get_current_game()
@@ -129,13 +148,12 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         game = await self.wordle_db.get_current_game()
         if not game.is_finished():
             channel = validate_messageable(self.bot.get_channel(self.channel_id))
-            embed = discord.Embed(title="Me when the and I and me when is and it",
-                                description="Uhhh:sob: :sob:")
+            embed = discord.Embed(
+                title="Me when the and I and me when is and it",
+                description="Uhhh:sob: :sob:",
+            )
             await channel.send(embed=embed)
 
 
 async def setup(bot: Elgatron):
     await bot.add_cog(WordleCommands(bot), guild=discord.Object(id=bot.guild_id))
-
-
-

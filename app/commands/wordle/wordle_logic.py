@@ -1,14 +1,14 @@
-from typing import List, Optional
 
-def wordle_logic(guess: str, daily_word: str) -> List[int]:
+
+def wordle_logic(guess: str, daily_word: str) -> list[int]:
     """
     Function to handle wordle logic
     :return: String of 0, 1, and 2 corresponding to red, yellow, and green.
     :
     """
     # Initialize the result with all red squares
-    guess_result: List[int] = [0] * len(guess)
-    yellow_checker: List[Optional[str]] = list(daily_word)
+    guess_result: list[int] = [0] * len(guess)
+    yellow_checker: list[str | None] = list(daily_word)
 
     # Check for correct letters (green)
     for i, letter in enumerate(guess):
@@ -25,13 +25,13 @@ def wordle_logic(guess: str, daily_word: str) -> List[int]:
     return guess_result
 
 
-NBSP = "\u00A0"   # non-breaking space
-THIN = "\u2009"   # thin space
-HAIR = "\u200A"   # hair space
+NBSP = "\u00a0"  # non-breaking space
+THIN = "\u2009"  # thin space
+HAIR = "\u200a"  # hair space
 
 LETTER_PAD = {
     "A": THIN,
-    "B": THIN+HAIR,
+    "B": THIN + HAIR,
     "C": THIN,
     "D": HAIR + HAIR,
     "E": NBSP + HAIR,
@@ -57,6 +57,7 @@ LETTER_PAD = {
     "Y": HAIR + HAIR + HAIR,
     "Z": NBSP + HAIR,
 }
+
 
 def pad_wordle_letters(word: str) -> str:
     out = []

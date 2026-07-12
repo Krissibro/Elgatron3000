@@ -1,14 +1,19 @@
-from typing import List
 
 import discord
 
 from app.commands.messaging.ActiveCommands import ActiveCommands
 
+
 class MessageSelectDropdown(discord.ui.Select):
     def __init__(self, active_commands: ActiveCommands):
         self.active_commands: ActiveCommands = active_commands
-        options: List[discord.SelectOption] = active_commands.make_dropdown_options()
-        super().__init__(placeholder="Which command would you like to edit?", min_values=1, max_values=1, options=options)
+        options: list[discord.SelectOption] = active_commands.make_dropdown_options()
+        super().__init__(
+            placeholder="Which command would you like to edit?",
+            min_values=1,
+            max_values=1,
+            options=options,
+        )
 
     async def callback(self, interaction: discord.Interaction) -> None:
         selected_command_id = int(self.values[0])
@@ -20,6 +25,7 @@ class MessageSelectDropdown(discord.ui.Select):
             embed = self.active_commands.make_overview_embed()
             view = ManageCommandsDropDown(self.active_commands)
         await interaction.response.edit_message(embed=embed, view=view)
+
 
 class ManageCommandsDropDown(discord.ui.View):
     def __init__(self, active_commands: ActiveCommands):
@@ -39,7 +45,9 @@ class ManageCommandsButtons(discord.ui.View):
             embed = self.active_commands[self.command_id].make_embed()
         else:
             view = None
-            embed = discord.Embed(title="No commands running", color=discord.Color.red())
+            embed = discord.Embed(
+                title="No commands running", color=discord.Color.red()
+            )
         await interaction.edit_original_response(embed=embed, view=view)
 
     async def return_to_dropdown(self, interaction: discord.Interaction) -> None:
@@ -48,17 +56,23 @@ class ManageCommandsButtons(discord.ui.View):
             embed = self.active_commands.make_overview_embed()
         else:
             view = None
-            embed = discord.Embed(title="No commands running", color=discord.Color.red())
+            embed = discord.Embed(
+                title="No commands running", color=discord.Color.red()
+            )
         await interaction.edit_original_response(view=view, embed=embed)
 
     @discord.ui.button(emoji="📄", style=discord.ButtonStyle.blurple)
-    async def return_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+    async def return_button(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ) -> None:
         await interaction.response.defer()
 
         await self.return_to_dropdown(interaction)
 
     @discord.ui.button(emoji="💀", style=discord.ButtonStyle.red)
-    async def kill_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+    async def kill_button(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ) -> None:
         await interaction.response.defer()
 
         if self.active_commands.check_if_command_exists(self.command_id):
@@ -66,9 +80,10 @@ class ManageCommandsButtons(discord.ui.View):
 
         await self.return_to_dropdown(interaction)
 
-
     @discord.ui.button(emoji="🪶", style=discord.ButtonStyle.green)
-    async def edit_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+    async def edit_button(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ) -> None:
 
         if self.active_commands.check_if_command_exists(self.command_id):
             modal = self.active_commands[self.command_id].get_edit_window(interaction)

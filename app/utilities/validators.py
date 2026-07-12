@@ -1,7 +1,8 @@
-from typing import Optional
+
 import discord
 
 from app.utilities.errors import ElgatronError
+
 
 def validate_natural_number(digit: str) -> int:
     integer: int = validate_digit(digit)
@@ -16,7 +17,9 @@ def validate_digit(digit: str) -> int:
     return int(digit)
 
 
-def validate_messageable(channel: Optional[discord.abc.GuildChannel | discord.abc.PrivateChannel | discord.Thread]) -> discord.abc.Messageable:
+def validate_messageable(
+    channel: discord.abc.GuildChannel | discord.abc.PrivateChannel | discord.Thread | None,
+) -> discord.abc.Messageable:
     if not isinstance(channel, discord.abc.Messageable):
         raise ElgatronError("The specified channel is not a text channel.")
     return channel

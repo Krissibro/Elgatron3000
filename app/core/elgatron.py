@@ -1,16 +1,15 @@
-from typing import Optional
+import json
+import logging
+from pathlib import Path
 
 import discord
-import logging
-import json
-
-from tortoise import Tortoise
-from pathlib import Path
-from discord.ext.commands import Bot
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from discord.ext.commands import Bot
+from tortoise import Tortoise
 
 from app.commands.messaging.ActiveCommands import ActiveCommands
 from app.core.elgaTree import ElgaTree
+
 
 class Elgatron(Bot):
     def __init__(self):
@@ -34,16 +33,15 @@ class Elgatron(Bot):
         self.wordle_path = Path("static/word_lists").resolve()
 
         super().__init__(
-                        intents=self.get_intents(),
-                        command_prefix="/",
-                        tree_cls=ElgaTree,
-                        help_command=None
-                        )
+            intents=self.get_intents(),
+            command_prefix="/",
+            tree_cls=ElgaTree,
+            help_command=None,
+        )
 
     async def setup_hook(self) -> None:
         await Tortoise.init(
-            db_url=f"sqlite:///{self.db_path}",
-            modules={"models": ["app.models"]}
+            db_url=f"sqlite:///{self.db_path}", modules={"models": ["app.models"]}
         )
         await Tortoise.generate_schemas()
 
@@ -62,7 +60,7 @@ class Elgatron(Bot):
         await Tortoise.close_connections()
         await super().close()
 
-    async def load_extension(self, name: str, *, package: Optional[str] = None) -> None:
+    async def load_extension(self, name: str, *, package: str | None = None) -> None:
         path = Path(name)
         for file_path in path.glob("**/*_commands.py"):
             file_parts = file_path.with_suffix("").parts

@@ -1,11 +1,13 @@
-import discord
-
 from abc import ABC, abstractmethod
+
+import discord
 
 
 class CommandInfo(ABC):
     @abstractmethod
-    def __init__(self, command_name: str,  channel: discord.TextChannel, active_commands):
+    def __init__(
+        self, command_name: str, channel: discord.TextChannel, active_commands
+    ):
         self.command_name = command_name
         self.channel = channel
         self.active_commands = active_commands

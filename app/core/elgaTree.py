@@ -1,6 +1,5 @@
-from discord import Interaction
-
 import discord
+from discord import Interaction
 from discord.app_commands import CommandTree
 from discord.app_commands.errors import AppCommandError, TransformerError
 
@@ -19,9 +18,11 @@ class ElgaTree(CommandTree):
         Centralized error handler for cog commands.
         Call this from any cog's cog_app_command_error method.
         """
-        original_error = getattr(error, 'original', error)
+        original_error = getattr(error, "original", error)
 
-        embed = discord.Embed(description=f"{original_error}", color=discord.Color.red())
+        embed = discord.Embed(
+            description=f"{original_error}", color=discord.Color.red()
+        )
 
         # Send an error message (handle if already responded)
         try:

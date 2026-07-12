@@ -1,5 +1,4 @@
-from typing import Callable
-
+from collections.abc import Callable
 from functools import wraps
 from inspect import iscoroutinefunction, signature
 
@@ -22,5 +21,5 @@ def transaction(func: Callable):
 
         async with in_transaction() as conn:
             return await func(*args, connection=conn, **kwargs)
-    return wrapper        
-    
+
+    return wrapper
