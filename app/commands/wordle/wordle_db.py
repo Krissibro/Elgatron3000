@@ -1,6 +1,7 @@
 import random
 from datetime import date, datetime, timedelta
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import discord
 import numpy as np
@@ -40,7 +41,7 @@ class WordleDB:
     ) -> WordleGame:
         random_word = random.choice(self.word_bank).upper()
         game = await WordleGame.create(
-            word=random_word, game_date=date.today(), using_db=connection
+            word=random_word, game_date=datetime.now(tz=ZoneInfo("Europe/Oslo")).date(), using_db=connection
         )
 
         await game.fetch_related("guesses", using_db=connection)
@@ -62,7 +63,7 @@ class WordleDB:
             guesser_id=user.id,
             guesser_name=user.display_name,
             word=guessed_word,
-            time=datetime.now(),
+            time=datetime.now(tz=ZoneInfo("Europe/Oslo")),
             game=game,
             using_db=connection,
         )
@@ -127,7 +128,7 @@ class WordleDB:
         self, connection: BaseDBAsyncClient | None = None
     ) -> WordleGame:
         game = (
-            await WordleGame.filter(game_date=date.today())
+            await WordleGame.filter(game_date=datetime.now(tz=ZoneInfo("Europe/Oslo")).date())
             .using_db(connection)
             .prefetch_related("guesses")
             .last()

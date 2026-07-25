@@ -1,5 +1,6 @@
 import re
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import discord
 from discord import app_commands
@@ -37,7 +38,7 @@ class DateTransformer(app_commands.Transformer):
             result = datetime.strptime(
                 value,
                 "%d.%m.%y",
-            )
+            ).replace(tzinfo=ZoneInfo("Europe/Oslo"))
             return result
         except ValueError:
             pass
@@ -46,8 +47,8 @@ class DateTransformer(app_commands.Transformer):
             result = datetime.strptime(
                 value,
                 "%d.%m",
-            )
-            result = result.replace(year=datetime.now().year)
+            ).replace(tzinfo=ZoneInfo("Europe/Oslo"))
+            result = result.replace(year=datetime.now(tz=ZoneInfo("Europe/Oslo")).year)
             return result
         except ValueError:
             pass

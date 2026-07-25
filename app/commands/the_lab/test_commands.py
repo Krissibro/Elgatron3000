@@ -1,5 +1,6 @@
 import csv
 
+import anyio
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -52,8 +53,9 @@ class TestCommands(commands.GroupCog, group_name="test"):
                 )
             except:  # TODO specify what kind of error can occur here?
                 continue
-        with open("app/static/messages.csv", "w", newline="", encoding="utf-8") as csvfile:
-            print("finished!")
+
+        async with await anyio.open_file("app/static/messages.csv", "w", newline="", encoding="utf-8") as csvfile:
+            self.bot.logger.info("finished!")
             writer = csv.writer(csvfile)
             writer.writerows(messages)
 

@@ -33,7 +33,7 @@ class WordleGame(Model):
 
     def is_finished(self) -> bool:
         """Check if the game is finished."""
-        return any([guess.word == self.word for guess in self.guesses])
+        return any(guess.word == self.word for guess in self.guesses)
 
     def time_taken(self) -> timedelta | None:
         """measure time between first and latest guess, or None if not guesses is undefined or empty"""

@@ -7,12 +7,12 @@ from discord.ext import commands
 from PIL import Image, ImageSequence
 
 from app.core.elgatron import Elgatron
+from app.utilities.errors import ElgatronError
 
 
 class Petting(commands.Cog):
     def __init__(self, bot: Elgatron):
         self.bot: Elgatron = bot
-        self.template = Image.open("app/static/assets/petting/template.gif")
 
     @app_commands.command(name="petting", description="give people pets!")
     async def petting(self, ctx: discord.Interaction, user: discord.User):
@@ -23,14 +23,18 @@ class Petting(commands.Cog):
             )
         except FileNotFoundError:
             avatar_image: Image.Image = await get_profile_avatar(user)
-            file: BytesIO = await self.make_petting_gif(avatar_image)
+
+            file: BytesIO | None = await self.make_petting_gif(avatar_image)
+
+            if file is None:
+                raise ElgatronError("Failed to create petting GIF")
 
             async with await anyio.open_file(f"app/static/assets/petting/{file_name}", "wb") as f:
                 await f.write(file.getbuffer())
 
             await ctx.response.send_message(file=discord.File(file, filename=file_name))
 
-    async def make_petting_gif(self, avatar_image: Image.Image) -> BytesIO:
+    async def make_petting_gif(self, avatar_image: Image.Image) -> BytesIO | None:
         frames_out = []
         squash_and_stretch = [
             (1.00, 1.00),  # frame 0
@@ -46,26 +50,8 @@ class Petting(commands.Cog):
         ]
 
         # Load template hand GIF
-
-
-async def petting(avatar_image: Image.Image) -> BytesIO:
-    frames_out = []
-    squash_and_stretch = [
-        (1.00, 1.00),  # frame 0
-        (0.97, 1.03),  # frame 1
-        (0.94, 1.06),  # frame 2
-        (0.91, 1.09),  # frame 3
-        (0.88, 1.12),  # frame 4
-        (0.88, 1.12),  # frame 5
-        (0.91, 1.09),  # frame 6
-        (0.94, 1.06),  # frame 7
-        (0.97, 1.03),  # frame 8
-        (1.00, 1.00),  # frame 9
-    ]
-
-    # Load template hand GIF
-    with open("app/static/assets/petting/template.gif", "rb") as f:
-        template = Image.open(f)
+        async with await anyio.open_file("app/static/assets/petting/template.gif", "rb") as f:
+            template = Image.open(await f.read())
 
         canvas_w, canvas_h = template.size
         base_size = int(canvas_w * 0.75)
@@ -73,7 +59,7 @@ async def petting(avatar_image: Image.Image) -> BytesIO:
         # Force avatar square (pet-pet standard)
         avatar_image = avatar_image.resize((base_size, base_size))
 
-        for i, hand_frame in enumerate(ImageSequence.Iterator(self.template)):
+        for i, hand_frame in enumerate(ImageSequence.Iterator(template)):
             # Loop scale values across frames
             scale = squash_and_stretch[i % len(squash_and_stretch)]
             sx, sy = scale

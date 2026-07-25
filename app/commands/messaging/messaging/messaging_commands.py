@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import discord
 from discord import app_commands
@@ -36,7 +37,7 @@ class MessagingCommands(commands.Cog):
             message,
             amount,
             ctx.channel,
-            datetime.now() + timedelta(seconds=1),
+            datetime.now(tz=ZoneInfo("Europe/Oslo")) + timedelta(seconds=1),
             interval,
             self.bot.scheduler,
             self.bot.active_commands,
@@ -66,7 +67,7 @@ class MessagingCommands(commands.Cog):
             message,
             amount,
             ctx.channel,
-            datetime.now() + timedelta(seconds=1),
+            datetime.now(tz=ZoneInfo("Europe/Oslo")) + timedelta(seconds=1),
             interval,
             self.bot.scheduler,
             self.bot.active_commands,
@@ -94,7 +95,7 @@ class MessagingCommands(commands.Cog):
             message,
             amount,
             ctx.channel,
-            datetime.now() + timedelta(seconds=1),
+            datetime.now(tz=ZoneInfo("Europe/Oslo")) + timedelta(seconds=1),
             interval,
             self.bot.scheduler,
             self.bot.active_commands,

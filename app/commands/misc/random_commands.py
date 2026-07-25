@@ -354,7 +354,8 @@ class SteamAPICommands(commands.Cog):
                 )
 
         except Exception as error:
-            print(error)
+            self.bot.logger.error(error)
+            raise
 
 
 async def setup(bot: Elgatron):

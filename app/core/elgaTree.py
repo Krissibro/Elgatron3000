@@ -13,7 +13,6 @@ class ElgaTree(CommandTree):
         error: AppCommandError,
         /,
     ) -> None:  # ty:ignore[invalid-method-override]
-        ...
         """
         Centralized error handler for cog commands.
         Call this from any cog's cog_app_command_error method.
