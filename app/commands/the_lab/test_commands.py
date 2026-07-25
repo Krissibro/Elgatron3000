@@ -52,9 +52,7 @@ class TestCommands(commands.GroupCog, group_name="test"):
                 )
             except:  # TODO specify what kind of error can occur here?
                 continue
-        with open(
-            "app/static/messages.csv", "w", newline="", encoding="utf-8"
-        ) as csvfile:
+        with open("app/static/messages.csv", "w", newline="", encoding="utf-8") as csvfile:
             print("finished!")
             writer = csv.writer(csvfile)
             writer.writerows(messages)

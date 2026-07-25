@@ -70,7 +70,7 @@ class Emulator(PyBoy):
 
 
 if __name__ == "__main__":
-    pyboy = Emulator("../static/game_roms/pokemon_red.gb")
+    pyboy = Emulator("app/static/game_roms/pokemon_red.gb")
 
     for i in range(10000):
         pyboy.tick()

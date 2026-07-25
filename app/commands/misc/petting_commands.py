@@ -19,7 +19,7 @@ class Petting(commands.Cog):
         file_name = f"{user.id}.gif"
         try:
             await ctx.response.send_message(
-                file=discord.File(f"static/assets/petting/{file_name}")
+                file=discord.File(f"app/static/assets/petting/{file_name}")
             )
         except FileNotFoundError:
             avatar_image: Image.Image = await get_profile_avatar(user)
@@ -64,7 +64,7 @@ async def petting(avatar_image: Image.Image) -> BytesIO:
     ]
 
     # Load template hand GIF
-    with open("static/assets/petting/template.gif", "rb") as f:
+    with open("app/static/assets/petting/template.gif", "rb") as f:
         template = Image.open(f)
 
         canvas_w, canvas_h = template.size

@@ -13,7 +13,7 @@ from app.core.elgaTree import ElgaTree
 
 class Elgatron(Bot):
     def __init__(self):
-        with open("static/config.json", "r") as f:
+        with open("app/static/config.json", "r") as f:
             contents = json.load(f)
 
         self.guild_id = contents["guild"]
@@ -29,8 +29,8 @@ class Elgatron(Bot):
 
         self.db_path = Path("app/database/db.sqlite3").resolve()
         self.command_paths = Path("app/commands")
-        self.emulator_path = Path("static/game_roms").resolve()
-        self.wordle_path = Path("static/word_lists").resolve()
+        self.emulator_path = Path("app/static/game_roms").resolve()
+        self.wordle_path = Path("app/static/word_lists").resolve()
 
         super().__init__(
             intents=self.get_intents(),
