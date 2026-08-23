@@ -114,21 +114,29 @@ class WordleDB:
     async def recalculate_stats(
         self, server_id: int, connection: BaseDBAsyncClient | None = None
     ) -> None:
-        # delete the row
         stats = await self.get_wordle_stats(server_id, connection=connection)
-        await stats.delete()
-
         games = (
             await WordleGame.filter(guild_id=server_id)
             .prefetch_related("guesses")
             .using_db(connection)
         )
+        current_game_id = max((game.id for game in games), default=None)
 
-        # replay history in order
+        stats.total_games = 0
+        stats.total_wins = 0
+        stats.total_guesses = 0
+        stats.win_streak = 0
+        stats.longest_win_streak = 0
+        stats.fastest_win = timedelta(hours=23, minutes=59, seconds=59)
+        stats.guess_distribution = {}
+        await stats.save(using_db=connection)
+
+        # Replay completed games in chronological order. The latest unfinished
+        # game is still active and should not count as a loss yet.
         for game in sorted(games, key=lambda g: g.game_date or date.min):
             if game.is_finished():
                 await self.handle_win(server_id, game, connection=connection)
-            else:
+            elif game.id != current_game_id:
                 await self.handle_loss(server_id, game, connection=connection)
 
     @transaction
