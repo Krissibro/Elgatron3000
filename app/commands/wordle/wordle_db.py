@@ -37,11 +37,14 @@ class WordleDB:
 
     @transaction
     async def new_game(
-        self, connection: BaseDBAsyncClient | None = None
+        self, guild_id: int, connection: BaseDBAsyncClient | None = None
     ) -> WordleGame:
         random_word = random.choice(self.word_bank).upper()
         game = await WordleGame.create(
-            word=random_word, game_date=datetime.now(tz=ZoneInfo("Europe/Oslo")).date(), using_db=connection
+            guild_id=guild_id,
+            word=random_word,
+            game_date=datetime.now(tz=ZoneInfo("Europe/Oslo")).date(),
+            using_db=connection,
         )
 
         await game.fetch_related("guesses", using_db=connection)
@@ -50,11 +53,12 @@ class WordleDB:
     @transaction
     async def guess_word(
         self,
+        server_id: int,
         guessed_word: str,
         user: discord.User | discord.Member,
         connection: BaseDBAsyncClient | None = None,
     ) -> None:
-        game = await self.get_current_game(connection=connection)
+        game = await self.get_current_game(guild_id=server_id, connection=connection)
 
         guessed_word = guessed_word.strip().upper()
         self.validate_wordle_guess(guessed_word, user, game)
@@ -114,7 +118,11 @@ class WordleDB:
         stats = await self.get_wordle_stats(server_id, connection=connection)
         await stats.delete()
 
-        games = await WordleGame.all().prefetch_related("guesses").using_db(connection)
+        games = (
+            await WordleGame.filter(guild_id=server_id)
+            .prefetch_related("guesses")
+            .using_db(connection)
+        )
 
         # replay history in order
         for game in sorted(games, key=lambda g: g.game_date or date.min):
@@ -125,17 +133,17 @@ class WordleDB:
 
     @transaction
     async def get_current_game(
-        self, connection: BaseDBAsyncClient | None = None
+        self, guild_id: int, connection: BaseDBAsyncClient | None = None
     ) -> WordleGame:
         game = (
-            await WordleGame.filter(game_date=datetime.now(tz=ZoneInfo("Europe/Oslo")).date())
+            await WordleGame.filter(guild_id=guild_id)
             .using_db(connection)
             .prefetch_related("guesses")
             .last()
         )
-
+        # if no game exists, create a new one
         if game is None:
-            game = await self.new_game(connection=connection)
+            game = await self.new_game(guild_id=guild_id, connection=connection)
         return game
 
     @transaction

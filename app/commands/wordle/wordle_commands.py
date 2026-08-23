@@ -14,7 +14,7 @@ from app.utilities.validators import validate_messageable
 class WordleCommands(commands.GroupCog, group_name="wordle"):
     def __init__(self, bot: Elgatron):
         self.bot: Elgatron = bot
-        self.channel_id = (
+        self.channel_id: int = (
             bot.testing_channel_id if bot.testing else bot.wordle_channel_id
         )
 
@@ -43,16 +43,16 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         if ctx.guild is None:
             raise ElgatronError("This command can only be used in a server.")
 
-        await self.wordle_db.guess_word(word, ctx.user)
+        await self.wordle_db.guess_word(ctx.guild.id, word, ctx.user)
 
-        game = await self.wordle_db.get_current_game()
+        game = await self.wordle_db.get_current_game(ctx.guild.id)
         embed = await self.wordle_view.make_wordle_embed(game)
 
         if game.is_finished():
+            await self.wordle_db.handle_win(ctx.guild.id, game)
             await ctx.response.send_message(
                 embed=embed, view=WordleFinishedController(game, self.wordle_view)
             )
-            await self.wordle_db.handle_win(ctx.guild.id, game)
         else:
             await ctx.response.send_message(embed=embed)
 
@@ -61,7 +61,10 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         description="See the current progress of the daily wordle!",
     )
     async def current_game(self, ctx: discord.Interaction) -> None:
-        game = await self.wordle_db.get_current_game()
+        if ctx.guild is None:
+            raise ElgatronError("This command can only be used in a server.")
+
+        game = await self.wordle_db.get_current_game(guild_id=ctx.guild.id)
         embed = await self.wordle_view.make_wordle_embed(game)
 
         if game.is_finished():
@@ -109,16 +112,15 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
             raise ElgatronError("You do not have permission to use this command!")
         if ctx.guild is None:
             raise ElgatronError("This command can only be used in a server.")
-        game = await self.wordle_db.get_current_game()
+        game = await self.wordle_db.get_current_game(guild_id=ctx.guild.id)
 
         if self.bot.testing:
             await self.wordle_db.handle_loss(ctx.guild.id, game)
         else:
-            game = await self.wordle_db.get_current_game()
             await game.delete()
             await self.wordle_db.recalculate_stats(ctx.guild.id)
 
-        game = await self.wordle_db.new_game()
+        game = await self.wordle_db.new_game(guild_id=ctx.guild.id)
 
         self.bot.logger.info(
             f"Wordle reset by {ctx.user} ({ctx.user.id}). Word is: {game.word}"
@@ -128,32 +130,30 @@ class WordleCommands(commands.GroupCog, group_name="wordle"):
         )
 
     async def scheduled_new_game(self) -> None:
-        game = await self.wordle_db.get_current_game()
-        channel = validate_messageable(self.bot.get_channel(self.channel_id))
+        for guild in self.bot.guilds:
+            game = await self.wordle_db.get_current_game(guild_id=guild.id)
+            channel = validate_messageable(self.bot.get_channel(self.channel_id))
 
-        if not game.is_finished():
-            server = self.bot.get_guild(self.bot.guild_id)
-            if server is None:
-                raise ElgatronError("Guild not found")
+            if not game.is_finished():
+                await self.wordle_db.handle_loss(guild.id, game)
+                embed = self.wordle_view.make_game_over_embed(game.word)
+                await channel.send(embed=embed)
 
-            await self.wordle_db.handle_loss(server.id, game)
-            embed = self.wordle_view.make_game_over_embed(game.word)
-            await channel.send(embed=embed)
-
-        await self.wordle_db.new_game()
-        await channel.send(embed=self.wordle_view.new_game_embed())
+            await self.wordle_db.new_game(guild_id=guild.id)
+            await channel.send(embed=self.wordle_view.new_game_embed())
 
     async def send_wordle_reminder(self) -> None:
         """Sends the reminder if the daily wordle hasn't been completed"""
-        game = await self.wordle_db.get_current_game()
-        if not game.is_finished():
-            channel = validate_messageable(self.bot.get_channel(self.channel_id))
-            embed = discord.Embed(
-                title="Me when the and I and me when is and it",
-                description="Uhhh:sob: :sob:",
-            )
-            await channel.send(embed=embed)
+        for guild in self.bot.guilds:
+            game = await self.wordle_db.get_current_game(guild_id=guild.id)
+            if not game.is_finished():
+                channel = validate_messageable(self.bot.get_channel(self.channel_id))
+                embed = discord.Embed(
+                    title="Me when the and I and me when is and it",
+                    description="Uhhh:sob: :sob:",
+                )
+                await channel.send(embed=embed)
 
 
-async def setup(bot: Elgatron):
+async def setup(bot: Elgatron) -> None:
     await bot.add_cog(WordleCommands(bot), guild=discord.Object(id=bot.guild_id))

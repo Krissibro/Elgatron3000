@@ -17,7 +17,7 @@ class WordleGame(Model):
     async def get_previous_game(self) -> Optional["WordleGame"]:
         """Get the game before the given game."""
         previous_game = (
-            await self.__class__.filter(id__lt=self.id)
+            await self.__class__.filter(id__lt=self.id, guild_id=self.guild_id)
             .prefetch_related("guesses")
             .last()
         )
@@ -26,7 +26,7 @@ class WordleGame(Model):
     async def get_next_game(self) -> Optional["WordleGame"]:
         """Get the game after the given game."""
         next_game = (
-            await self.__class__.filter(id__gt=self.id)
+            await self.__class__.filter(id__gt=self.id, guild_id=self.guild_id)
             .prefetch_related("guesses")
             .first()
         )
