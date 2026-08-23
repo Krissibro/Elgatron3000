@@ -1,11 +1,15 @@
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from functools import wraps
 from inspect import iscoroutinefunction, signature
+from typing import ParamSpec, TypeVar
 
 from tortoise.transactions import in_transaction
 
+P = ParamSpec("P")
+R = TypeVar("R")
 
-def transaction(func: Callable):
+
+def transaction(func: Callable[P, Awaitable[R]]) -> Callable[P, Awaitable[R]]:
     if not iscoroutinefunction(func):
         raise TypeError("transaction decorator only supports async functions")
 
@@ -15,7 +19,7 @@ def transaction(func: Callable):
         raise TypeError("wrapped function must accept a 'connection' parameter")
 
     @wraps(func)
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
         if "connection" in kwargs and kwargs["connection"] is not None:
             return await func(*args, **kwargs)
 

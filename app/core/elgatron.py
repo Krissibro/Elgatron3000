@@ -16,16 +16,16 @@ class Elgatron(Bot):
         with open("app/static/config.json", "r") as f:
             contents = json.load(f)
 
-        self.guild_id = contents["guild"]
-        self.testing = contents["testing"]
-        self.game_channel_id = contents["game_channel_id"]
-        self.wordle_channel_id = contents["wordle_channel_id"]
-        self.testing_channel_id = contents["testing_channel_id"]
+        self.guild_id: int = contents["guild"] # we should move away from these and save them in a db or something
+        self.testing: bool = contents["testing"]
+        self.game_channel_id: int = contents["game_channel_id"]
+        self.wordle_channel_id: int = contents["wordle_channel_id"]
+        self.testing_channel_id: int = contents["testing_channel_id"]
 
         self.scheduler: AsyncIOScheduler = AsyncIOScheduler(timezone="Europe/Oslo")
         self.active_commands: ActiveCommands = ActiveCommands()
 
-        self.logger = logging.getLogger("discord")
+        self.logger: logging.Logger = logging.getLogger("discord")
 
         self.db_path = Path("app/database/db.sqlite3").resolve()
         self.command_paths = Path("app/commands")

@@ -8,6 +8,7 @@ from tortoise.models import Model
 class WordleGame(Model):
     id: int = fields.IntField(primary_key=True)  # ty:ignore[invalid-assignment]
 
+    guild_id: int = fields.IntField()  # ty:ignore[invalid-assignment]
     game_date: date | None = fields.DateField(null=True)  # ty:ignore[invalid-assignment]
     word: str = fields.CharField(max_length=16)  # ty:ignore[invalid-assignment]
 
