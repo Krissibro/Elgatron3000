@@ -1,0 +1,28 @@
+services:
+  elgatron3000:
+    build: .
+    user: 1000:1000
+    dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      TOKEN: ${TOKEN}
+      UV_CACHE_DIR: /tmp/uv-cache
+
+    volumes:
+      # :ro == read only
+      - ./app/static/config.json:/app/app/static/config.json:ro,Z
+
+    # Automatically rebuild when changes are detected
+    # Use `docker compose watch` to use this feature
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /app
+          ignore:
+            - .venv/
+
+        - action: rebuild
+          path: ./pyproject.toml
+        - action: rebuild
+          path: ./uv.lock
