@@ -25,11 +25,13 @@ class ReactionCommands(commands.Cog):
         )
 
     async def add_reactions_to_message(self, ctx: discord.Interaction, message: discord.Message,):
+        await ctx.response.defer(ephemeral=True)
+
         for emoji in INTEREST_REACTIONS:
             await message.add_reaction(emoji)
             await asyncio.sleep(0.05)
 
-        await ctx.response.send_message("Done!", ephemeral=True, delete_after=3)
+        await ctx.followup.send("Done!", ephemeral=True, delete_after=3)
 
 async def setup(bot: Elgatron):
     await bot.add_cog(ReactionCommands(bot), guild=discord.Object(id=bot.guild_id))
