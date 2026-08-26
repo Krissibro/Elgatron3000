@@ -5,7 +5,7 @@ from discord import app_commands, Message
 from utilities.elgatron import Elgatron
 
 # REACTIONS = [":white_check_mark:", ":x:", ":person_shrugging:", ":pensive:"]
-REACTIONS = ["✅", "❌", "🤷", "😔"]
+REACTIONS = ["✅", "❌", "🤷", "🤔", "🫠", "😔"]
 
 class ReactionCommands(commands.Cog):
     def __init__(self, bot: Elgatron):
