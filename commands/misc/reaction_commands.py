@@ -1,11 +1,13 @@
+import asyncio
+
 import discord
 from discord.ext import commands
 from discord import app_commands, Message
 
 from utilities.elgatron import Elgatron
 
-# REACTIONS = [":white_check_mark:", ":x:", ":person_shrugging:", ":pensive:"]
-REACTIONS = ["✅", "❌", "🤷", "🤔", "🫠", "😔"]
+# :white_check_mark:, ":x:", :pleading:, :person_shrugging:, :melting:, :date:
+INTEREST_REACTIONS = ["✅", "❌", "🥺", "🤷", "🫠", "📅"]
 
 class ReactionCommands(commands.Cog):
     def __init__(self, bot: Elgatron):
@@ -23,8 +25,10 @@ class ReactionCommands(commands.Cog):
         )
 
     async def add_reactions_to_message(self, ctx: discord.Interaction, message: discord.Message,):
-        for emoji in REACTIONS:
+        for emoji in INTEREST_REACTIONS:
             await message.add_reaction(emoji)
+            await asyncio.sleep(0.05)
+
         await ctx.response.send_message("Done!", ephemeral=True, delete_after=3)
 
 async def setup(bot: Elgatron):
