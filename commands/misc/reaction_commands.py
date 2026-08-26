@@ -31,7 +31,7 @@ class ReactionCommands(commands.Cog):
             await message.add_reaction(emoji)
             await asyncio.sleep(0.05)
 
-        await ctx.followup.send("Done!", ephemeral=True, delete_after=3)
+        await ctx.followup.send("Done!", ephemeral=True)
 
 async def setup(bot: Elgatron):
     await bot.add_cog(ReactionCommands(bot), guild=discord.Object(id=bot.guild_id))
