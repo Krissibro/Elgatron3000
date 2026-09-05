@@ -163,7 +163,7 @@ class StimCommands(commands.GroupCog, group_name="stim"):
         description="RAAAHHHH *BANG* *BANG* *BANG*",
     )
     async def skeleton(self, ctx: discord.Interaction):
-        await send_media(ctx, "https://cdn.discordapp.com/attachments/839100318893211669/1510762628455071784/skeleton.mp4?ex=6a1dfed7&is=6a1cad57&hm=3f0cb0950f3bcde9bb7cd46cb3b79f6d003fb9db95108d9f525dd1f9ec4c3813&")
+        await send_media(ctx, "https://cdn.discordapp.com/attachments/1433888759685840976/1545846564000633013/skeleton_banging_shield_-_robparx_1080p_h264.mp4?ex=6a9da14d&is=6a9c4fcd&hm=930d6b482483e433bc96289fd8662bb1e25d3799510b4e4d2adf4e8ddc05a4ad&")
 
     @app_commands.command(
         name="dunk",
