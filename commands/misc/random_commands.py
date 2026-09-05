@@ -178,6 +178,13 @@ class StimCommands(commands.GroupCog, group_name="stim"):
         await send_media(ctx, "https://klipy.com/gifs/skating-basketball")
 
     @app_commands.command(
+        name="dracula_flow",
+        description="peak",
+    )
+    async def dracula_flow(self, ctx: discord.Interaction):
+        await send_media(ctx, "https://cdn.discordapp.com/attachments/881573234485624902/1545883566150254682/v8engine.mp4?ex=6a9dc3c3&is=6a9c7243&hm=48f52de8fa0faf65abe068164ef765cbd1816357bd7489a848f34845421ec408&")
+
+    @app_commands.command(
         name="fumble",
         description=":pensive:",
     )
@@ -236,6 +243,10 @@ class StimCommands(commands.GroupCog, group_name="stim"):
             "https://media.discordapp.net/attachments/569581973161639946/1545840836594638939/Boysgolftripgonewild-PGAMemes720ph264-ezgif.com-optimize1.gif?ex=6a9d9bf7&is=6a9c4a77&hm=b7fa523361a06e8a76e5685d2c9965916f2460365d0a66619bf2c6113826eaf8&animated=true"
         ]
         await send_media(ctx, gifs)
+
+
+
+
 
 
 class SteamAPICommands(commands.Cog):
