@@ -193,7 +193,8 @@ class StimCommands(commands.GroupCog, group_name="stim"):
             "https://media.discordapp.net/attachments/1217933367849386004/1377728078788296774/yeeeeeesssss.gif?ex=683a04c2&is=6838b342&hm=1875126d84f1c2ea82c9a499e486ed3ba7faed0a8e6ed088298cdb448c92e8c6&=&width=310&height=548",
             "https://cdn.discordapp.com/attachments/839100318893211669/1502603641616470116/20260508_181838.jpg?ex=6a1d5131&is=6a1bffb1&hm=0724c9e318d5e1bdaf40e5f08444cee78038af2988df4ece07b42a5b0f042cb9&",
             "https://tenor.com/view/horse-derp-tongue-lick-beffen-gif-16516227",
-            "https://tenor.com/view/horse-in-wind-horse-sad-horse-yeat-melancholy-gif-26693609"
+            "https://tenor.com/view/horse-in-wind-horse-sad-horse-yeat-melancholy-gif-26693609",
+            "https://images-ext-1.discordapp.net/external/3Qh5wtuKKxyRXWmNW-kkm16XyWQnn9Vrjd6cI6Nfbko/https/static.klipy.com/ii/35ccce3d852f7995dd2da910f2abd795/fe/12/REyOi2t8.mp4"
         ]
         return random.choice(gifs)
 
