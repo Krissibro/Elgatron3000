@@ -163,7 +163,12 @@ class StimCommands(commands.GroupCog, group_name="stim"):
         description="RAAAHHHH *BANG* *BANG* *BANG*",
     )
     async def skeleton(self, ctx: discord.Interaction):
-        await send_media(ctx, "https://cdn.discordapp.com/attachments/1433888759685840976/1545846564000633013/skeleton_banging_shield_-_robparx_1080p_h264.mp4?ex=6a9da14d&is=6a9c4fcd&hm=930d6b482483e433bc96289fd8662bb1e25d3799510b4e4d2adf4e8ddc05a4ad&")
+        gifs = [
+            "https://cdn.discordapp.com/attachments/839100318893211669/1545849591088422913/skeleton-falling.gif?ex=6a9da41f&is=6a9c529f&hm=bd18f840dd370030c815b854260dfd68fcfc22f66f78f6cc41fa57ede33eebb9&",
+            "https://cdn.discordapp.com/attachments/839100318893211669/1545849628975431800/skeleton-running-eyes.gif?ex=6a9da428&is=6a9c52a8&hm=6e92bf89b658dd9d9aaeed1605695f5d9c8e06c973164cc37f200049285c17db&",
+            "https://cdn.discordapp.com/attachments/839100318893211669/1545849663578439840/skeleton-shield.mp4?ex=6a9da430&is=6a9c52b0&hm=028c5d1128793d6c753ff5cb857b595e0c59367eaf7868f3d1dcf21f04f07333&",
+        ]
+        await send_media(ctx, gifs)
 
     @app_commands.command(
         name="dunk",
