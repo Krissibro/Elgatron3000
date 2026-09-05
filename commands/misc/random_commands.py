@@ -308,7 +308,7 @@ class SteamAPICommands(commands.Cog):
                     color=discord.Color.red()
                 ))
             else:
-                await ctx.response.send_message( embed=discord.Embed( title=f"Tobias currently has  **{total_game_hours:.0f}**  hours played in Final Fantasy XIV Online", color=discord.Color.red() ) )
+                await ctx.response.send_message( embed=discord.Embed( title=f"Tobias currently has  **{total_game_hours:.0f}**  hours recorded in Final Fantasy XIV Online", color=discord.Color.red() ) )
 
         except Exception as error:
             print(error)
