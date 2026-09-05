@@ -214,6 +214,24 @@ class StimCommands(commands.GroupCog, group_name="stim"):
         await send_media(ctx, self.pick_random_horse_gif())
 
 
+    @app_commands.command(
+        name="golf",
+        description="Me when im golfing it fr"
+    )
+    async def golf(self, ctx: discord.Interaction):
+        gifs = [
+            "https://cdn.discordapp.com/attachments/569581973161639946/1545837554899624049/Boysgolftripgonewild-PGAMemes720ph264-ezgif.com-optimize.gif?ex=6a9d98e9&is=6a9c4769&hm=2cd6d48c9e810e54995af21034c5388d5319120f2c1646be683dac502b095df1&animated=true",
+            "https://media.discordapp.net/attachments/569581973161639946/1545838284838670386/Boysgolftripgonewild-PGAMemes720ph264-ezgif.com-video-to-gif-converter.gif?ex=6a9d9997&is=6a9c4817&hm=12b99fa34aa59cccd6662423d036dd62511417454a3cd4a07e63c7322845a1ed&animated=true",
+            "https://media.discordapp.net/attachments/569581973161639946/1545838570713911337/Boysgolftripgonewild-PGAMemes720ph264-ezgif.com-video-to-gif-converter1.gif?ex=6a9d99db&is=6a9c485b&hm=d12f2a3669d7e57a4f71aee8ec7f88a0d7cad4e93fc43c186983677abefc5697&animated=true",
+            "https://media.discordapp.net/attachments/569581973161639946/1545839083551461487/Boysgolftripgonewild-PGAMemes720ph264-ezgif.com-video-to-gif-converter2.gif?ex=6a9d9a55&is=6a9c48d5&hm=66ba24d25e61adece83672fecdef1f096ad8eee6ee28348e2b5509c2e704bbd8&animated=true",
+            "https://media.discordapp.net/attachments/569581973161639946/1545839445557780591/Boysgolftripgonewild-PGAMemes720ph264-ezgif.com-video-to-gif-converter3.gif?ex=6a9d9aac&is=6a9c492c&hm=6a7f9426899da78caa0ae15b89e91d052f4f8398b5c1f7363a8010182c60c503&animated=true",
+            "https://media.discordapp.net/attachments/569581973161639946/1545839880263696495/Boysgolftripgonewild-PGAMemes720ph264-ezgif.com-video-to-gif-converter4.gif?ex=6a9d9b13&is=6a9c4993&hm=62d5e1cc2f8789086aafe35c81b3e411f4f51e4375ff546623a4ab5807df3d66&animated=true",
+            "https://media.discordapp.net/attachments/569581973161639946/1545840246548074616/Boysgolftripgonewild-PGAMemes720ph264-ezgif.com-video-to-gif-converter5.gif?ex=6a9d9b6b&is=6a9c49eb&hm=8b9486c4df25ee1e34375f66319d6fcacdbebbaa0cd454f644d6403e89e82ebe&animated=true",
+            "https://media.discordapp.net/attachments/569581973161639946/1545840836594638939/Boysgolftripgonewild-PGAMemes720ph264-ezgif.com-optimize1.gif?ex=6a9d9bf7&is=6a9c4a77&hm=b7fa523361a06e8a76e5685d2c9965916f2460365d0a66619bf2c6113826eaf8&animated=true"
+        ]
+        await send_media(ctx, gifs)
+
+
 class SteamAPICommands(commands.Cog):
     def __init__(self, bot: Elgatron):
         self.bot: Elgatron = bot
